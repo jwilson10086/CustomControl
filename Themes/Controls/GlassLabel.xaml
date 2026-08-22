@@ -1,0 +1,38 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:CustomControl.Controls">
+
+    <!--
+        ================================================================
+        文件说明：Themes\Controls\GlassLabel.xaml
+        GlassLabel 标签样式（半透明玻璃胶囊背景）。
+        旋转功能由控件的 Angle 属性在代码中实现（RenderTransform）。
+
+        依赖：GlassBrushes.xaml（画刷资源）。
+        ================================================================
+    -->
+
+    <Style TargetType="controls:GlassLabel">
+        <Setter Property="Foreground" Value="{DynamicResource GlassTextBrush}" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Padding" Value="14,6" />
+        <Setter Property="Background" Value="{DynamicResource GlassControlBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource GlassEdgeHighlightBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="controls:GlassLabel">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="13"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>

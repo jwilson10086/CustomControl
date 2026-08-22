@@ -1,0 +1,87 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--
+        ================================================================
+        文件说明：Themes\GlassTheme.xaml
+        毛玻璃控件主题入口：按依赖顺序合并全部样式文件。
+
+        合并顺序原则（被依赖者在前）：
+        1. Base\GlassBrushes.xaml —— 全部画刷与通用转换器（所有文件依赖）
+        2. GlassWindow.xaml —— 窗体样式（含标题栏按钮样式）
+        3. 基础输入控件：Button → ToggleButton → TextBox → PasswordBox
+        4. 选择控件：CheckBox → RadioButton → ToggleSwitch → ComboBox(+Item)
+        5. 数值/展示控件：Slider → ProgressBar → TextBlock → Label
+        6. 容器控件：GroupBox → Separator → Expander → ToolTip
+        7. 菜单/导航：ContextMenu(含 MenuItem) → ListBox(+Item) → TabControl(+Item)
+        8. 滚动/表格：ScrollBar → DataGrid(含列头/行/单元格)
+        9. 卡片容器：Card → Panel
+        10. 弹窗体系：Dialog(含弹窗按钮样式) → InputDialog → KeyboardPopup
+
+        跨文件资源引用说明：
+        - 同文件内的 BasedOn / StaticResource 保持不变；
+        - GlassInputDialog 与 GlassKeyboardPopup 模板中的
+          GlassDialogButtonStyle / GlassDialogConfirmStyle 使用 DynamicResource，
+          不依赖合并顺序；
+        - GlassPasswordBox.xaml 内部本地定义 BoolToVisibilityConverter
+          （Binding.Converter 不支持 DynamicResource）。
+        ================================================================
+    -->
+    <ResourceDictionary.MergedDictionaries>
+        <!-- 1. 画刷基础 -->
+        <ResourceDictionary Source="Base\GlassBrushes.xaml" />
+        <!-- 2. 窗体 -->
+        <ResourceDictionary Source="GlassWindow.xaml" />
+        <!-- 3. 基础输入控件 -->
+        <ResourceDictionary Source="Controls\GlassButton.xaml" />
+        <ResourceDictionary Source="Controls\GlassToggleButton.xaml" />
+        <ResourceDictionary Source="Controls\GlassTextBox.xaml" />
+        <ResourceDictionary Source="Controls\GlassPasswordBox.xaml" />
+        <!-- 4. 选择控件 -->
+        <ResourceDictionary Source="Controls\GlassCheckBox.xaml" />
+        <ResourceDictionary Source="Controls\GlassRadioButton.xaml" />
+        <ResourceDictionary Source="Controls\GlassToggleSwitch.xaml" />
+        <ResourceDictionary Source="Controls\GlassComboBoxItem.xaml" />
+        <ResourceDictionary Source="Controls\GlassComboBox.xaml" />
+        <!-- 5. 数值/展示控件 -->
+        <ResourceDictionary Source="Controls\GlassSlider.xaml" />
+        <ResourceDictionary Source="Controls\GlassProgressBar.xaml" />
+        <ResourceDictionary Source="Controls\GlassTextBlock.xaml" />
+        <ResourceDictionary Source="Controls\GlassLabel.xaml" />
+        <!-- 6. 容器控件 -->
+        <ResourceDictionary Source="Controls\GlassGroupBox.xaml" />
+        <ResourceDictionary Source="Controls\GlassSeparator.xaml" />
+        <ResourceDictionary Source="Controls\GlassExpander.xaml" />
+        <ResourceDictionary Source="Controls\GlassToolTip.xaml" />
+        <!-- 7. 菜单/导航 -->
+        <ResourceDictionary Source="Controls\MenuItem.xaml" />
+        <ResourceDictionary Source="Controls\GlassContextMenu.xaml" />
+        <ResourceDictionary Source="Controls\GlassListBoxItem.xaml" />
+        <ResourceDictionary Source="Controls\GlassListBox.xaml" />
+        <ResourceDictionary Source="Controls\GlassTabItem.xaml" />
+        <ResourceDictionary Source="Controls\GlassTabControl.xaml" />
+        <!-- 8. 滚动/表格 -->
+        <ResourceDictionary Source="Controls\ScrollBar.xaml" />
+        <ResourceDictionary Source="Controls\GlassDataGrid.xaml" />
+        <!-- 9. 卡片容器 -->
+        <ResourceDictionary Source="Controls\GlassCard.xaml" />
+        <ResourceDictionary Source="Controls\GlassPanel.xaml" />
+        <!-- 10. 弹窗体系 -->
+        <ResourceDictionary Source="Controls\GlassDialog.xaml" />
+        <ResourceDictionary Source="Controls\GlassInputDialog.xaml" />
+        <ResourceDictionary Source="Controls\GlassKeyboardPopup.xaml" />
+        <!-- 11. 扩展控件：Badge(纯代码无样式) → Tag → NumericBox → Avatar -->
+        <ResourceDictionary Source="Controls\GlassTag.xaml" />
+        <ResourceDictionary Source="Controls\GlassNumericBox.xaml" />
+        <ResourceDictionary Source="Controls\GlassAvatar.xaml" />
+        <!-- 12. 工业元件：Valve → Pump → Tank → Pipe → Cylinder → FlowMeter → Thermo -->
+        <ResourceDictionary Source="Controls\GlassValve.xaml" />
+        <ResourceDictionary Source="Controls\GlassPump.xaml" />
+        <ResourceDictionary Source="Controls\GlassTank.xaml" />
+        <ResourceDictionary Source="Controls\GlassPipe.xaml" />
+        <ResourceDictionary Source="Controls\GlassCylinder.xaml" />
+        <ResourceDictionary Source="Controls\GlassFlowMeter.xaml" />
+        <ResourceDictionary Source="Controls\GlassThermoController.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+</ResourceDictionary>

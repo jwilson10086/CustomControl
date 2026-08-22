@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WPF 毛玻璃控件库 — 学习实操路线图</title>
+<style>
+:root{--bg:#0a0a1a;--card:rgba(255,255,255,0.04);--card-hover:rgba(255,255,255,0.08);--border:rgba(255,255,255,0.1);--accent:#4FB6FF;--accent2:#7B61FF;--green:#4ADE80;--orange:#FB923C;--red:#F87171;--pink:#E879F9;--text:#E0E0E0;--text-dim:#888;--code-bg:rgba(0,0,0,0.4)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;overflow-x:hidden}
+.hero{position:relative;padding:80px 40px 60px;text-align:center;background:linear-gradient(135deg,rgba(79,182,255,0.15),rgba(123,97,255,0.15));border-bottom:1px solid var(--border);overflow:hidden}
+.hero::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at 30% 50%,rgba(79,182,255,0.08) 0%,transparent 50%),radial-gradient(circle at 70% 50%,rgba(123,97,255,0.08) 0%,transparent 50%);animation:drift 20s ease-in-out infinite alternate}
+@keyframes drift{0%{transform:translate(0,0) rotate(0deg)}100%{transform:translate(-5%,3%) rotate(3deg)}}
+.hero h1{position:relative;font-size:2.8em;font-weight:800;background:linear-gradient(135deg,#fff,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:12px}
+.hero p{position:relative;font-size:1.15em;color:var(--text-dim);max-width:700px;margin:0 auto}
+.progress-bar{position:sticky;top:0;z-index:100;background:rgba(10,10,26,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:12px 40px;display:flex;align-items:center;gap:16px}
+.progress-bar .label{font-size:0.85em;color:var(--text-dim);white-space:nowrap}
+.progress-track{flex:1;height:6px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width .5s ease}
+.progress-bar .pct{font-size:0.85em;color:var(--accent);font-weight:600;min-width:40px}
+.container{max-width:960px;margin:0 auto;padding:40px 24px 120px}
+.phase{margin-top:60px;margin-bottom:24px;display:flex;align-items:center;gap:16px}
+.phase-num{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.3em;font-weight:800;color:#fff;flex-shrink:0}
+.phase-num.p1{background:linear-gradient(135deg,#4FB6FF,#2196F3)}.phase-num.p2{background:linear-gradient(135deg,#7B61FF,#5B3FD9)}.phase-num.p3{background:linear-gradient(135deg,#4ADE80,#16A34A)}.phase-num.p4{background:linear-gradient(135deg,#FB923C,#EA580C)}.phase-num.p5{background:linear-gradient(135deg,#F87171,#DC2626)}.phase-num.p6{background:linear-gradient(135deg,#E879F9,#A855F7)}
+.phase-title{font-size:1.5em;font-weight:700}.phase-desc{color:var(--text-dim);font-size:0.9em;margin-top:2px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;margin-bottom:16px;overflow:hidden;transition:background .3s,border-color .3s}
+.card:hover{background:var(--card-hover);border-color:rgba(79,182,255,0.3)}
+.card-header{padding:20px 24px;cursor:pointer;display:flex;align-items:center;gap:14px;user-select:none}
+.card-header .icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1em;flex-shrink:0}
+.card-header .icon.blue{background:rgba(79,182,255,0.15)}.card-header .icon.purple{background:rgba(123,97,255,0.15)}.card-header .icon.green{background:rgba(74,222,128,0.15)}.card-header .icon.orange{background:rgba(251,146,60,0.15)}.card-header .icon.red{background:rgba(248,113,113,0.15)}.card-header .icon.pink{background:rgba(232,121,249,0.15)}
+.card-header .info{flex:1}.card-header .title{font-weight:600;font-size:1.05em}.card-header .sub{font-size:0.82em;color:var(--text-dim);margin-top:2px}
+.card-header .arrow{font-size:0.8em;color:var(--text-dim);transition:transform .3s}
+.card.open .card-header .arrow{transform:rotate(180deg)}
+.card-body{max-height:0;overflow:hidden;transition:max-height .4s ease}.card.open .card-body{max-height:8000px}
+.card-content{padding:0 24px 24px;border-top:1px solid var(--border)}
+.card-content h4{font-size:1em;font-weight:700;margin:20px 0 8px}
+.card-content h4.c-blue{color:var(--accent)}.card-content h4.c-green{color:var(--green)}.card-content h4.c-orange{color:var(--orange)}.card-content h4.c-red{color:var(--red)}.card-content h4.c-pink{color:var(--pink)}
+.card-content p,.card-content li{font-size:0.92em;line-height:1.8}
+.card-content ul{padding-left:20px;margin:6px 0}.card-content li{margin-bottom:4px}.card-content li::marker{color:var(--accent)}
+.hl{padding:12px 16px;border-radius:0 8px 8px 0;margin:12px 0;font-size:0.9em;line-height:1.7}
+.hl.info{background:rgba(79,182,255,0.1);border-left:3px solid var(--accent)}
+.hl.warn{background:rgba(251,146,60,0.1);border-left:3px solid var(--orange)}
+.hl.good{background:rgba(74,222,128,0.1);border-left:3px solid var(--green)}
+.hl.danger{background:rgba(248,113,113,0.1);border-left:3px solid var(--red)}
+pre{background:var(--code-bg);border:1px solid var(--border);border-radius:8px;padding:14px 18px;overflow-x:auto;font-size:0.85em;line-height:1.6;margin:10px 0;font-family:'Cascadia Code','Fira Code',Consolas,monospace}
+code{font-family:'Cascadia Code','Fira Code',Consolas,monospace;font-size:0.9em}
+.card-content code:not(pre code){background:rgba(79,182,255,0.1);padding:1px 6px;border-radius:4px;color:var(--accent)}
+.tag{display:inline-block;padding:2px 10px;border-radius:20px;font-size:0.75em;font-weight:600;margin-right:6px}
+.tag.what{background:rgba(232,121,249,0.15);color:var(--pink)}
+.tag.why{background:rgba(79,182,255,0.15);color:var(--accent)}
+.tag.benefit{background:rgba(74,222,128,0.15);color:var(--green)}
+.tag.effect{background:rgba(251,146,60,0.15);color:var(--orange)}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:0.88em}
+th,td{padding:10px 14px;border:1px solid var(--border);text-align:left}
+th{background:rgba(79,182,255,0.08);font-weight:600;color:var(--accent)}
+td{background:rgba(255,255,255,0.02)}
+.footer{text-align:center;padding:40px;color:var(--text-dim);font-size:0.85em;border-top:1px solid var(--border)}
+</style>
+</head>
+<body>
+
+<div class="hero">
+<h1>WPF 毛玻璃控件库</h1>
+<p>从零到一的完整学习实操路线图 —— 覆盖 XAML 基础、依赖属性、控件模板、附加属性、鱼眼效果、输入键盘、弹窗系统等全部核心概念</p>
+</div>
+
+<div class="progress-bar">
+<span class="label">学习进度</span>
+<div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+<span class="pct" id="progressPct">0%</span>
+</div>
+
+<div class="container">
+
+<!-- ==================== 阶段一 ==================== -->
+<div class="phase"><div class="phase-num p1">1</div><div><div class="phase-title">WPF 基础概念</div><div class="phase-desc">理解 WPF 的核心架构——所有高级功能的地基</div></div></div>
+
+<div class="card" data-id="1.1">
+<div class="card-header">
+<div class="icon blue">📄</div>
+<div class="info"><div class="title">1.1 XAML 与代码分离</div><div class="sub">理解为什么 WPF 用 XML 写界面而不是 C#</div></div>
+<div class="arrow">▼</div>
+</div>
+<div class="card-body"><div class="card-content">
+<h4 class="c-blue"><span class="tag what">做什么</span>学习 XAML 基本语法</h4>
+<p>XAML (Extensible Application Markup Language) 是 WPF 的声明式 UI 语言。你在 <code>.xaml</code> 文件中描述界面结构，在 <code>.xaml.cs</code> / <code>.xaml.vb</code> 中编写交互逻辑。</p>
+<ul>
+<li>学习元素声明：<code>&lt;StackPanel&gt;</code>、<code>&lt;Grid&gt;</code>、<code>&lt;Button&gt;</code> 等</li>
+<li>属性赋值：简单属性（<code>Width="100"</code>）vs 标记扩展（<code>Binding</code>、<code>StaticResource</code>）</li>
+<li>命名空间：<code>xmlns</code>、<code>xmlns:x</code>、自定义控件库引用</li>
+<li>代码后台：<code>x:Name</code> 在 C# 中生成字段，<code>x:Class</code> 指定 partial class</li>
+</ul>
+
+<h4 class="c-green"><span class="tag why">为什么这么做</span></h4>
+<div class="hl info">WPF 的设计哲学是 <strong>关注点分离（Separation of Concerns）</strong>。UI 设计师负责 XAML，程序员负责 C# 逻辑。两者可以并行开发，互不干扰。Windows Forms 时代所有 UI 都写在 C# 代码里，界面一旦变化就要改代码、重新编译，效率极低。</div>
+
+<h4 class="c-orange"><span class="tag benefit">好处</span></h4>
+<ul>
+<li><strong>热重载</strong>：修改 XAML 后无需重新编译，即时预览效果</li>
+<li><strong>可读性</strong>：XAML 的树形结构天然对应 UI 层级，一目了然</li>
+<li><strong>设计工具支持</strong>：Visual Studio 设计器、Blend for Visual Studio 都基于 XAML</li>
+<li><strong>数据绑定</strong>：XAML 的 <code>Binding</code> 表达式让 UI 自动跟随数据变化</li>
+</ul>
+
+<h4 class="c-red"><span class="tag effect">效果</span></h4>
+<p>在本项目中，<code>GlassTextBox.xaml</code> 定义了控件的视觉结构（Template + Style），<code>GlassTextBox.cs</code> 只处理逻辑（密码可见切换等）。这种分离让样式修改完全不需要动 C# 代码。</p>
+</div></div>
+</div>
+
+<div class="card" data-id="1.2">
+<div class="card-header">
+<div class="icon blue">⚙️</div>
+<div class="info"><div class="title">1.2 依赖属性 (DependencyProperty)</div><div class="sub">WPF 属性系统的核心——比普通 C# 属性强大得多</div></div>
+<div class="arrow">▼</div>
+</div>
+<div class="card-body"><div class="card-content">
+<h4 class="c-blue"><span class="tag what">做什么</span>理解依赖属性的注册与使用</h4>
+<pre>// 1. 注册依赖属性
+public static readonly DependencyProperty InputPlaceholderProperty =
+    DependencyProperty.Register(
+        "InputPlaceholder",           // 属性名
+        typeof(string),               // 属性类型
+        typeof(GlassTextBox),         // 所有者类型
+        new PropertyMetadata(string.Empty));  // 默认值
+
+// 2. CLR 包装器（让 C# 代码也能用）
+public string InputPlaceholder
+{
+    get => (string)GetValue(InputPlaceholderProperty);
+    set => SetValue(InputPlaceholderProperty, value);
+}</pre>
+
+<h4 class="c-green"><span class="tag why">为什么这么做</span></h4>
+<div class="hl info">普通 C# 属性没有这些能力：
+<ul>
+<li><strong>数据绑定</strong>：只有依赖属性才能作为 <code>Binding</code> 的源和目标</li>
+<li><strong>动画</strong>：只有依赖属性才能被 <code>StoryBoard</code> / <code>Animation</code> 驱动</li>
+<li><strong>样式 Setter</strong>：<code>&lt;Style&gt;</code> 只能设置依赖属性</li>
+<li><strong>继承</strong>：可以通过 <code>Inherits</code> 让子控件自动继承父控件的属性值</li>
+<li><strong>默认值</strong>：由 WPF 框架管理，节省内存——只有值改变时才占用存储</li>
+</ul>
+</div>
+
+<h4 class="c-orange"><span class="tag benefit">好处</span></h4>
+<ul>
+<li><strong>内存优化</strong>：默认值不存储在实例中，只在改变时分配内存</li>
+<li><strong>变更通知</strong>：<code>PropertyMetadata</code> 中的回调函数自动通知 UI 更新</li>
+<li><strong>优先级系统</strong>：Local Value > Style Trigger > Style Setter > Default —— 框架自动解析</li>
+<li><strong>跨平台绑定</strong>：同一个依赖属性可以同时被动画、样式、绑定驱动</li>
+</ul>
+
+<h4 class="c-red"><span class="tag effect">效果</span></h4>
+<p>本项目中每个控件都有 5-15 个依赖属性。例如 <code>GlassTextBox</code> 的 <code>InputPlaceholder</code>、<code>InputLength</code>、<code>InputMin</code>、<code>InputMax</code>、<code>InputTitle</code> 等。这些属性都是依赖属性，所以能在 XAML 中用 <code>{Binding}</code> 绑定、用 <code>&lt;Style&gt;</code> 设置默认值、用动画驱动视觉变化。</p>
+
+<h4 class="c-blue">实操练习</h4>
+<ol>
+<li>在 Visual Studio 中创建一个 WPF 用户控件</li>
+<li>注册一个 <code>MyTextProperty</code> 依赖属性（string 类型）</li>
+<li>在 XAML 中用 <code>Binding</code> 绑定它</li>
+<li>在 <code>Style</code> 中用 <code>Setter</code> 设置默认值</li>
+<li>用 <code>PropertyMetadata PropertyChangedCallback</code> 打印变更日志</li>
+</ol>
+</div></div>
+</div>
+
+<div class="card" data-id="1.3">
+<div class="card-header">
+<div class="icon blue">📡</div>
+<div class="info"><div class="title">1.3 路由事件 (RoutedEvent)</div><div class="sub">WPF 事件系统的三大策略——事件如何在视觉树中传播</div></div>
+<div class="arrow">▼</div>
+</div>
+<div class="card-body"><div class="card-content">
+<h4 class="c-blue"><span class="tag what">做什么</span>理解三种路由策略</h4>
+<table>
+<tr><th>策略</th><th>方向</th><th>说明</th><th>典型例子</th></tr>
+<tr><td><strong>Tunnel (隧道)</strong></td><td>根 → 目标</td><td>从视觉树根部向下穿透到目标元素</td><td><code>PreviewKeyDown</code></td></tr>
+<tr><td><strong>Bubble (冒泡)</strong></td><td>目标 → 根</td><td>从目标元素向上传播到根</td><td><code>KeyDown</code>、<code>Click</code></td></tr>
+<tr><td><strong>Direct (直接)</strong></td><td>只在目标</td><td>类似普通 .NET 事件，只在声明元素上触发</td><td><code>MouseEnter</code></td></tr>
+</table>
+<pre>// 拦截键盘事件——冒泡到最外层容器
+private void GlassKeyboard_KeyDown(object sender, KeyEventArgs e)
+{
+    if (e.Key == Key.Enter || e.Key == Key.Return)
+    {
+        e.Handled = true;  // 标记已处理，阻止继续冒泡
+        HandleConfirm();
+    }
+}</pre>
+
+<h4 class="c-green"><span class="tag why">为什么这么做</span></h4>
+<div class="hl info">WPF 用路由事件解决了一个关键问题：<strong>事件委托的性能</strong>。在 WinForms 中，如果 100 个按钮各自注册 Click 事件，就是 100 个委托。而 WPF 的路由事件只注册一次处理函数，通过视觉树路由分发。更重要的是，你可以在外层容器上"拦截"子元素的事件——这就是为什么 <code>GlassKeyboard</code> 只在最外层注册 <code>KeyDown</code>，就能捕获所有子按钮的回车键。</div>
+
+<h4 class="c-orange"><span class="tag benefit">好处</span></h4>
+<ul>
+<li><strong>事件聚合</strong>：一个处理函数管理所有子元素的同类事件</li>
+<li><strong>Preview 机制</strong>：Tunnel 策略让你在事件到达目标之前就拦截处理</li>
+<li><strong>性能</strong>：减少事件订阅数量，降低内存占用</li>
+<li><strong>灵活性</strong>：<code>e.Handled = true</code> 可以阻止事件继续传播</li>
+</ul>
+
+<h4 class="c-red"><span class="tag effect">效果</span></h4>
+<p>本项目的 <code>GlassKeyboard</code> 在 <code>OnApplyTemplate</code> 中给 <code>PopupOverlay</code> 注册 <code>KeyDown</code> 事件。由于冒泡机制，所有子按钮的回车键都会被统一捕获处理——无需给每个按钮单独注册。</p>
+</div></div>
+</div>
+
+<div class="card" data-id="1.4">
+<div class="card-header">
+<div class="icon blue">🎨</div>
+<div class="info"><div class="title">1.4 控件模板 (ControlTemplate)</div><div class="sub">控件的"外衣"——同一个逻辑可以有完全不同的视觉表现</div></div>
+<div class="arrow">▼</div>
+</div>
+<div class="card-body"><div class="card-content">
+<h4 class="c-blue"><span class="tag what">做什么</span>掌握 ControlTemplate 的结构与生命周期</h4>
+<pre>&lt;ControlTemplate x:Key="GlassButtonTemplate" TargetType="Button"&gt;
+    &lt;Border x:Name="border" CornerRadius="14"
+            Background="{TemplateBinding Background}"
+            BorderBrush="{TemplateBinding BorderBrush}"&gt;
+        &lt;ContentPresenter HorizontalAlignment="Center"
+                          VerticalAlignment="Center"/&gt;
+    &lt;/Border&gt;
+&lt;/ControlTemplate&gt;</pre>
+
+<p>控件模板的关键概念：</p>
+<ul>
+<li><strong>视觉树 (Visual Tree)</strong>：模板内的所有元素构成控件的视觉表现</li>
+<li><strong>逻辑树 (Logical Tree)</strong>：模板外的控件层级——<code>Button</code> → <code>StackPanel</code> → <code>Window</code></li>
+<li><strong><code>TemplateBinding</code></strong>：将模板内元素的属性绑定到宿主控件的属性</li>
+<li><strong><code>ContentPresenter</code></strong>：占位符，显示控件的 <code>Content</code></li>
+<li><strong><code>TemplatePart</code> (PART_ 命名)</strong>：约定命名，<code>OnApplyTemplate</code> 中通过 <code>GetTemplateChild("PART_xxx")</code> 获取</li>
+</ul>
+
+<h4 class="c-green"><span class="tag why">为什么这么做</span></h4>
+<div class="hl info">控件模板是 WPF 实现 <strong>外观与行为分离</strong> 的核心机制。一个 <code>Button</code> 逻辑上永远是"可点击的"，但你可以用 ControlTemplate 把它变成圆形、方形、毛玻璃、金属拉丝——任何你能画出来的东西。这意味着：
+<ul>
+<li>同一套逻辑代码，不同的视觉风格</li>
+<li>设计师可以只改 XAML 模板，不需要动 C# 代码</li>
+<li>可以通过 <code>Style</code> 批量替换所有按钮的外观</li>
+</ul>
+</div>
+
+<h4 class="c-orange"><span class="tag benefit">好处</span></h4>
+<ul>
+<li><strong>解耦</strong>：控件逻辑和视觉完全分离</li>
+<li><strong>复用</strong>：一个 Template 可以应用给无数个控件实例</li>
+<li><strong>主题</strong>：切换主题 = 替换所有 ControlTemplate</li>
+<li><strong>自定义</strong>：完全重写控件外观，但保留原生行为</li>
+</ul>
+
+<h4 class="c-red"><span class="tag effect">效果</span></h4>
+<p>本项目的 <code>GlassTextBox.xaml</code> 中定义了完整的控件模板：多层 Border（外框 + 内框 + 渐变），水印 TextBlock（用 Style+DataTrigger 控制显示），以及 <code>ContentPresenter</code> 占位符。这让你看到的毛玻璃输入框本质上还是一个标准 <code>TextBox</code>，只是"穿了件新衣服"。</p>
+
+<div class="hl warn"><strong>OnApplyTemplate 生命周期</strong>：这个方法在控件模板被应用时调用。在这里通过 <code>GetTemplateChild("PART_xxx")</code> 获取模板内的子元素引用，并注册事件处理。对于复合控件（如本项目的 <code>GlassKeyboard</code>），<code>OnApplyTemplate</code> 还负责创建动态子元素（BuildNumericKeys 等）。</div>
+</div></div>
+</div>
+
+<!-- ==================== 阶段二 ==================== -->
+<div class="phase"><div class="phase-num p2">2</div><div><div class="phase-title">样式与触发器</div><div class="phase-desc">用声明式语法控制控件的外观状态——本项目毛玻璃效果的核心</div></div></div>
+
+<div class="card" data-id="2.1">
+<div class="card-header">
+<div class="icon purple">🎭</div>
+<div class="info"><div class="title">2.1 Style 与 Setter</div><div class="sub">批量设置控件属性——隐式样式 vs 显式样式</div></div>
+<div class="arrow">▼</div>
+</div>
+<div class="card-body"><div class="card-content">
+<h4 class="c-blue"><span class="tag what">做什么</span>掌握两种样式类型</h4>
+<pre>&lt;!-- 显式样式：需要手动引用 --&gt;
+&lt;Style x:Key="MyButtonStyle" TargetType="Button"&gt;
+    &lt;Setter Property="Background" Value="#4FB6FF"/&gt;
+    &lt;Setter Property="Foreground" Value="White"/&gt;
+&lt;/Style&gt;
+
+&lt;!-- 隐式样式：自动应用于所有同类型控件 --&gt;
+&lt;Style TargetType="TextBox"&gt;
+    &lt;Setter Property="FontFamily" Value="Segoe UI"/&gt;
+&lt;/Style&gt;
+
+&lt;!-- 样式继承 --&gt;
+&lt;Style x:Key="SpecialButton" BasedOn="{StaticResource MyButtonStyle}"&gt;
+    &lt;Setter Property="FontSize" Value="18"/&gt;
+&lt;/Style&gt;</pre>
+
+<h4 class="c-green"><span class="tag why">为什么这么做</span></h4>
+<div class="hl info">如果没有 Style，你需要给每个控件逐一设置属性——10 个按钮就要写 10 遍相同的属性。Style 本质上就是属性值的"模板"，一处定义，多处复用。<code>BasedOn</code> 继承机制让你可以创建层级化的样式系统：基础样式 → 变体样式 → 特殊样式。</div>
+
+<h4 class="c-orange"><span class="tag benefit">好处</span></h4>
+<ul>
+<li><strong>DRY 原则</strong>：属性值只定义一次</li>
+<li><strong>主题切换</strong>：更换 Style 即可批量改变所有控件外观</li>
+<li><strong>继承</strong>：<code>BasedOn</code> 让样式可以层层叠加</li>
+</ul>
+
+<h4 class="c-red"><span class="tag effect">效果</span></h4>
+<p>本项目的 <code>GlassTextBox.xaml</code> 中的 Style 定义了默认背景色、边框色、字体等。所有使用该样式的文本框自动获得一致的毛玻璃外观。</p>
+</div></div>
+</div>
+
+<div class="card" data-id="2.2">
+<div class="card-header">
+<div class="icon purple">⚡</div>
+<div class="info"><div class="title">2.2 Trigger 与 DataTrigger</div><div class="sub">属性变化自动驱动视觉变化——无需写一行 C# 代码</div></div>
+<div class="arrow">▼</div>
+</div>
+<div class="card-body"><div class="card-content">
+<h4 class="c-blue"><span class="tag what">做什么</span>理解三种触发器及优先级</h4>
+<pre>&lt;!-- PropertyTrigger：属性值变化时触发 --&gt;
+&lt;Style.Triggers&gt;
+    &lt;Trigger Property="IsMouseOver" Value="True"&gt;
+        &lt;Setter Property="Opacity" Value="0.8"/&gt;
+    &lt;/Trigger&gt;
+&lt;/Style.Triggers&gt;
+
+&lt;!-- DataTrigger：绑定表达式结果变化时触发 --&gt;
+&lt;DataTrigger Binding="{Binding Text.Length}" Value="0"&gt;
+    &lt;Setter Property="Visibility" Value="Visible"/&gt; &lt;!-- 显示水印 --&gt;
+&lt;/DataTrigger&gt;
+&lt;DataTrigger Binding="{Binding Text.Length}" Value="1"&gt;
+    &lt;Setter Property="Visibility" Value="Collapsed"/&gt; &lt;!-- 隐藏水印 --&gt;
+&lt;/DataTrigger&gt;
+
+&lt;!-- 多条件触发器 --&gt;
+&lt;MultiTrigger&gt;
+    &lt;MultiTrigger.Conditions&gt;
+        &lt;Condition Property="IsMouseOver" Value="True"/&gt;
+        &lt;Condition Property="IsPressed" Value="True"/&gt;
+    &lt;/MultiTrigger.Conditions&gt;
+    &lt;Setter Property="Opacity" Value="0.5"/&gt;
+&lt;/MultiTrigger&gt;</pre>
+
+<h4 class="c-green"><span class="tag why">为什么这么做</span></h4>
+<div class="hl info">WPF 属性优先级系统（从高到低）：
+<ol>
+<li><strong>Local Value</strong>（代码中直接设置）</li>
+<li><strong>Template Trigger</strong>（ControlTemplate 中的 Trigger）</li>
+<li><strong>Style Trigger</strong>（Style 中的 Trigger）</li>
+<li><strong>Style Setter</strong>（Style 中的 Setter）</li>
+<li><strong>Inherited Value</strong>（继承自父控件）</li>
+<li><strong>Default Value</strong>（依赖属性注册时的默认值）</li>
+</ol>
+理解这个优先级至关重要！它决定了当多个来源设置同一个属性时，哪个值最终生效。</div>
+
+<h4 class="c-orange"><span class="tag benefit">好处</span></h4>
+<ul>
+<li><strong>零代码</strong>：纯 XAML 实现所有视觉状态变化</li>
+<li><strong>性能</strong>：WPF 框架内部优化，比手动监听属性变更更高效</li>
+<li><strong>声明式</strong>：设计工具可以预览和编辑触发器效果</li>
+</ul>
+
+<h4 class="c-red"><span class="tag effect">效果</span></h4>
+<p>本项目的核心交互模式就是 DataTrigger。例如 <code>GlassTextBox</code> 的水印：当 <code>Text.Length == 0</code> 时显示，否则隐藏。<code>GlassKeyboard</code> 的按键高亮：当 <code>IsChecked == True</code> 时背景变深。所有这些都是纯 XAML 实现。</p>
+</div></div>
+</div>
+
+<div class="card" data-id="2.3">
+<div class="card-header">
+<div class="icon purple">🔗</div>
+<div class="info"><div class="title">2.3 TemplateBinding vs Binding</div><div class="sub">模板内绑定的两种方式——性能 vs 功能的权衡</div></div>
+<div class="arrow">▼</div>
+</div>
+<div class="card-body"><div class="card-content">
+<h4 class="c-blue"><span class="tag what">做什么</span>区分两种模板绑定</h4>
+<pre>&lt;!-- TemplateBinding：单向、性能高 --&gt;
+&lt;Border Background="{TemplateBinding Background}"/&gt;
+
+&lt;!-- Binding：双向、功能全 --&gt;
+&lt;Border Background="{Binding RelativeSource={RelativeSource TemplatedParent},
+                     Path=Background}"/&gt;</pre>
+
+<table>
+<tr><th>特性</th><th>TemplateBinding</th><th>Binding (RelativeSource)</th></tr>
+<tr><td>方向</td><td>仅单向 (控件→模板)</td><td>双向均可</td></tr>
+<tr><td>性能</td><td>更高（编译时优化）</td><td>略低（运行时解析）</td></tr>
+<tr><td>Converter</td><td>不支持</td><td>支持</td></tr>
+<tr><td>模式</td><td>OneWay 固定</td><td>可设置 Mode</td></tr>
+</table>
+
+<h4 class="c-green"><span class="tag why">为什么这么做</span></h4>
+<div class="hl info">大部分模板内绑定都是单向的（从控件属性到视觉元素），用 <code>TemplateBinding</code> 性能最优。但当你需要 Converter、双向绑定、或更复杂的绑定表达式时，必须用 <code>Binding RelativeSource={RelativeSource TemplatedParent}</code>。本项目中大量使用 TemplateBinding，因为模板元素只需要读取控件属性值。</div>
+
+<h4 class="c-orange"><span class="tag benefit">好处</span></h4>
+<ul>
+<li><strong>TemplateBinding</strong>：编译时检查，性能最佳，代码最简洁</li>
+<li><strong>Binding TemplatedParent</strong>：功能完整，支持 Converter 和双向绑定</li>
+</ul>
+
+<h4 class="c-red"><span class="tag effect">效果</span></h4>
+<p>本项目的毛玻璃边框色、背景透明度等都通过 <code>TemplateBinding</code> 绑定到控件属性，保证了模板渲染的高性能。</p>
+</div></div>
+</div>
+
+<div class="card" data-id="2.4">
+<div class="card-header">
+<div class="icon purple">📎</div>
+<div class="info"><div class="title">2.4 附加属性 (AttachedProperty)</div><div class="sub">让任何控件获得额外能力——本项目的 ShowKeyboard 和 Placeholder 都用到了</div></div>
+<div class="arrow">▼</div>
+</div>
+<div class="card-body"><div class="card-content">
+<h4 class="c-blue"><span class="tag what">做什么</span>掌握 RegisterAttached 的注册与使用</h4>
+<pre>// 注册附加属性
+public static readonly DependencyProperty ShowKeyboardProperty =
+    DependencyProperty.RegisterAttached(
+        "ShowKeyboard",         // 属性名
+        typeof(bool),           // 类型
+        typeof(GlassKeyboard),  // 宿主类型
+        new PropertyMetadata(false, OnShowKeyboardChanged));
+
+// Getter/Setter（必须是 static）
+public static bool GetShowKeyboard(DependencyObject obj) =>
+    (bool)obj.GetValue(ShowKeyboardProperty);
+public static void SetShowKeyboard(DependencyObject obj, bool value) =>
+    obj.SetValue(ShowKeyboardProperty, value);
+
+// 变更回调——附加属性的核心价值
+private static void OnShowKeyboardChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+{
+    if (d is TextBox textBox && e.NewValue is true)
+    {
+        textBox.Loaded += OnTextBoxLoaded;  // 绑定事件
+    }
+}</pre>
+
+<h4 class="c-green"><span class="tag why">为什么这么做</span></h4>
+<div class="hl info">附加属性的本质是：<strong>在不修改目标类的情况下，给任意控件注入新行为</strong>。TextBox 本身不知道键盘的存在，但通过附加属性 <code>GlassKeyboard.ShowKeyboard="True"</code>，你可以在 TextBox 加载时自动创建弹出键盘——而不需要继承 TextBox 创建一个新类。这就是"组合优于继承"的 WPF 实现。</div>
+
+<h4 class="c-orange"><span class="tag benefit">好处</span></h4>
+<ul>
+<li><strong>零侵入</strong>：不需要修改 TextBox 源码或创建子类</li>
+<li><strong>复用</strong>：同一个附加属性可以附加到任何控件上</li>
+<li><strong>XAML 友好</strong>：在 XAML 中用语法 <code>local:ShowKeyboard="True"</code> 使用</li>
+<li><strong>自动发现</strong>：通过 <code>FindChildByName</code> 在视觉树中自动查找关联控件</li>
+</ul>
+
+<h4 class="c-red"><span class="tag effect">效果</span></h4>
+<p>本项目的使用方式极其简洁：在任何 TextBox 上加一行 <code>local:GlassKeyboard.ShowKeyboard="True"</code>，就自动获得数字键盘支持。附加属性的变更回调在 TextBox 加载时触发，自动在视觉树中找到关联的 <code>GlassKeyboardPopup</code> 并注入键盘。</p>
+
+<div class="hl warn"><strong>Register vs RegisterAttached</strong>：普通的 <code>Register</code> 用于控件自己的属性，只能在该控件上使用。<code>RegisterAttached</code> 注册的属性可以附加到任何 <code>DependencyObject</code> 上——这就是两者的根本区别。</div>
+</div></div>
+</div>
+
+<!-- ==================== 阶段三 ==================== -->
+<div class="phase"><div class="phase-num p3">3</div><div><div class="phase-title">本项目基础控件</div><div class="phase-desc">逐个拆解项目的输入类控件——从模板到触发器的完整实战</div></div></div>
+
+<div class="card" data-id="3.1">
+<div class="card-header">
+<div class="icon green">📝</div>
+<div class="info"><div class="title">3.1 GlassTextBox 毛玻璃文本框</div><div class="sub">本项目最核心的控件——理解多层 Border + 水印实现</div></div>
+<div class="arrow">▼</div>
+</div>
+<div class="card-body"><div class="card-content">
+<h4 class="c-blue"><span class="tag what">做什么</span>分析 GlassTextBox 的模板结构</h4>
+<p>模板层次从外到内：</p>
+<ol>
+<li><strong>外框 Border</strong>：圆角 14px，渐变背景 <code>#E0202020 → #1AFFFFFF</code>，白色半透明边框 <code>#33FFFFFF</code></li>
+<li><strong>内框 Border</strong>：圆角 11px，更暗的渐变 <code>#E0101010 → #0AFFFFFF</code></li>
+<li><strong>水印 TextBlock</strong>：通过 <code>Style</code>+<code>DataTrigger</code> 绑定 <code>Text.Length</code></li>
+<li><strong>ContentPresenter</strong>：实际的 TextBox 内容区域</li>
+</ol>
+
+<pre>&lt;!-- 水印实现核心 --&gt;
+&lt;Style x:Key="PlaceholderStyle" TargetType="TextBlock"&gt;
+    &lt;Setter Property="Visibility" Value="Collapsed"/&gt;
+    &lt;Style.Triggers&gt;
+        &lt;DataTrigger Binding="{Binding Text.Length,
+            RelativeSource={RelativeSource AncestorType=TextBox}}" Value="0"&gt;
+            &lt;Setter Property="Visibility" Value="Visible"/&gt;
+        &lt;/DataTrigger&gt;
+    &lt;/Style.Triggers&gt;
+&lt;/Style&gt;</pre>
+
+<h4 class="c-green"><span class="tag why">为什么这么做</span></h4>
+<div class="hl info">
+<ul>
+<li><strong>多层 Border</strong>：单层 Border 无法实现内外框不同的透明度效果。两层 Border 叠加产生深度感——外层稍亮，内层更暗，模拟毛玻璃的光折射效果</li>
+<li><strong>DataTrigger 绑定 Text.Length</strong>：TextBox 的 Text 是依赖属性，但其 Length 不是。通过 DataTrigger 监听 Length 变化，实现了水印的自动显示/隐藏</li>
+<li><strong>Style Setter</strong>：水印的 Visibility 默认设为 Collapsed（隐藏），只有 Text 为空时才显示——这是典型的"默认隐藏，条件显示"模式</li>
+</ul>
+</div>
+
+<h4 class="c-orange"><span class="tag benefit">好处</span></h4>
+<ul>
+<li>视觉层次丰富，毛玻璃效果逼真</li>
+<li>水印实现零 C# 代码，纯 XAML 声明式</li>
+<li>通过依赖属性暴露 InputPlaceholder，用户完全可配置</li>
+</ul>
+
+<h4 class="c-red"><span class="tag effect">效果</span></h4>
+<p>运行时看到的是一个双层圆角毛玻璃输入框，输入文字后水印自动消失，焦点时边框高亮——所有视觉变化都通过 Style + DataTrigger 驱动，不需要一行 C# 代码。</p>
+</div></div>
+</div>
+
+<div class="card" data-id="3.2">
+<div class="card-header">
+<div class="icon green">🔒</div>
+<div class="info"><div class="title">3.2 GlassPasswordBox 密码框</div><div class="sub">为什么用附加属性而不是继承 PasswordBox</div></div>
+<div class="arrow">▼</div>
+</div>
+<div class="card-body"><div class="card-content">
+<h4 class="c-blue"><span class="tag what">做什么</span>理解 PasswordBox 的特殊性</h4>
+<p><code>PasswordBox</code> 是 <code>sealed</code> 类——不能被继承。同时它的 <code>Password</code> 属性<strong>不是依赖属性</strong>，无法被绑定。这是 WPF 的安全设计（防止密码被绑定到日志、MVVM 框架等）。</p>
+
+<p>本项目的解决方案：</p>
+<ul>
+<li>通过附加属性 <code>GlassKeyboard.ShowKeyboard</code> 赋予密码框键盘支持</li>
+<li>通过附加属性 <code>GlassKeyboard.InputTitle/GlassKeyboard.ShowPasswordVisible</code> 配置键盘选项</li>
+<li>密码可见切换通过 <code>PasswordBoxTemplate</code> 中的 DataTrigger 实现</li>
+</ul>
+
+<h4 class="c-green"><span class="tag why">为什么这么做</span></h4>
+<div class="hl info">由于 <code>PasswordBox.Sealed</code>，你无法继承它创建 <code>GlassPasswordBox : PasswordBox</code>。所以项目采用了组合模式：在 <code>GlassKeyboardPopup</code> 内部创建 <code>PasswordBox</code>，通过附加属性在运行时注入键盘行为。这比继承更灵活——附加属性可以附加到任意控件。</div>
+
+<h4 class="c-orange"><span class="tag benefit">好处</span></h4>
+<ul>
+<li>绕过 <code>sealed</code> 限制，无需使用继承</li>
+<li>密码框获得与文本框一致的键盘体验</li>
+<li>密码可见/隐藏切换完全通过模板样式实现</li>
+</ul>
+
+<h4 class="c-red"><span class="tag effect">效果</span></h4>
+<p>用户看到的密码框与文本框外观一致（毛玻璃边框、水印提示），但内部使用的是原生 <code>PasswordBox</code> 保证安全性。</p>
+</div></div>
+</div>
+
+<div class="card" data-id="3.3">
+<div class="card-header">
+<div class="icon green">🔘</div>
+<div class="info"><div class="title">3.3 GlassButton / GlassToggleButton</div><div class="sub">按钮类控件的模板与触发器实战</div></div>
+<div class="arrow">▼</div>
+</div>
+<div class="card-body"><div class="card-content">
+<h4 class="c-blue"><span class="tag what">做什么</span>理解按钮模板的交互状态</h4>
+<p>按钮有四个状态，每个状态对应不同的视觉表现：</p>
+<table>
+<tr><th>状态</th><th>触发条件</th><th>视觉效果</th></tr>
+<tr><td>Normal</td><td>默认</td><td>半透明背景，渐变边框</td></tr>
+<tr><td>Hover</td><td><code>IsMouseOver=True</code></td><td>Opacity 降低，鼠标悬停反馈</td></tr>
+<tr><td>Pressed</td><td><code>IsPressed=True</code></td><td>Opacity 更低，点击反馈</td></tr>
+<tr><td>Checked</td><td><code>IsChecked=True</code>（ToggleButton）</td><td>背景色加深</td></tr>
+</table>
+<pre>&lt;ControlTemplate TargetType="Button"&gt;
+    &lt;Border x:Name="border" CornerRadius="14"
+            Opacity="1"
+            Background="{TemplateBinding Background}"&gt;
+        &lt;Border.Triggers&gt;
+            &lt;EventTrigger RoutedEvent="MouseEnter"&gt;
+                &lt;BeginStoryboard&gt;
+                    &lt;Storyboard&gt;
+                        &lt;DoubleAnimation Storyboard.TargetName="border"
+                            Storyboard.TargetProperty="Opacity"
+                            To="0.8" Duration="0:0:0.2"/&gt;
+                    &lt;/Storyboard&gt;
+                &lt;/BeginStoryboard&gt;
+            &lt;/EventTrigger&gt;
+        &lt;/Border.Triggers&gt;
+        &lt;ContentPresenter/&gt;
+    &lt;/Border&gt;
+&lt;/ControlTemplate&gt;</pre>
+
+<h4 class="c-green"><span class="tag why">为什么这么做</span></h4>
+<div class="hl info">按钮模板中的状态变化是用户交互反馈的关键。没有视觉反馈的按钮会让用户感到"卡顿"或"无响应"。通过 ControlTemplate 中的 Trigger 和 EventTrigger + Storyboard，你可以实现平滑的过渡动画，让用户明确知道"我点击到了"。</div>
+
+<h4 class="c-orange"><span class="tag benefit">好处</span></h4>
+<ul>
+<li>按钮视觉完全自定义，不受系统样式限制</li>
+<li>交互反馈通过动画实现，用户体验流畅</li>
+<li>ToggleButton 的选中状态自动切换，无需额外代码</li>
+</ul>
+
+<h4 class="c-red"><span class="tag effect">效果</span></h4>
+<p>按钮按下时平滑变暗，松开时恢复——这是通过 Storyboard 动画驱动的依赖属性变化。整个过程零 C# 代码。</p>
+</div></div>
+</div>
+
+<div class="card" data-id="3.4">
+<div class="card-header">
+<div class="icon green">🃏</div>
+<div class="info"><div class="title">3.4 GlassCard 毛玻璃卡片</div><div class="sub">分层架构——高光层 + 内容层的叠加设计</div></div>
+<div class="arrow">▼</div>
+</div>
+<div class="card-body"><div class="card-content">
+<h4 class="c-blue"><span class="tag what">做什么</span>理解 GlassCard 的双层架构</h4>
+<p>GlassCard 的模板由三层组成：</p>
+<ol>
+<li><strong>外框 Border</strong>：圆角 18px，渐变背景，白色边框 —— 整体容器</li>
+<li><strong>高光 Border</strong>（IsElevated=True 时）：从上到下 30% 高度的半透明渐变 —— 模拟光照效果</li>
+<li><strong>ContentPresenter</strong>：实际内容</li>
+</ol>
+
+<h4 class="c-green"><span class="tag why">为什么这么做</span></h4>
+<div class="hl info">毛玻璃效果的关键在于"光"的模拟。高光层使用从 <code>#44FFFFFF</code>（顶部）到 <code>#00FFFFFF</code>（底部）的线性渐变，模拟自然光从上方照射的效果。配合 <code>ClipToBounds="True"</code> 和 <code>Opacity="0.5"</code>，高光被限制在卡片范围内，产生真实的玻璃质感。当 <code>IsElevated=True</code> 时还会附加 <code>DropShadowEffect</code>，进一步增强层次感。</div>
+
+<h4 class="c-orange"><span class="tag benefit">好处</span></h4>
+<ul>
+<li><strong>IsElevated 属性</strong>：控制高光和阴影，用户可选择"平面"或"浮起"效果</li>
+<li><strong>内容灵活</strong>：ContentPresenter 可以放任何内容</li>
+<li><strong>性能</strong>：纯 XAML 实现，不依赖图片资源</li>
+</ul>
+
+<h4 class="c-red"><span class="tag effect">效果</span></h4>
+<p>打开 <code>MainWindow.xaml</code> 可以看到，所有键盘和弹窗都包裹在 <code>GlassCard</code> 中——卡片效果统一，有层次感，有阴影深度。</p>
+</div></div>
+</div>
+
+<!-- ==================== 阶段四 ==================== -->
+<div class="phase"><div class="phase-num p4">4</div><div><div class="phase-title">键盘控件开发</div><div class="phase-desc">本项目最复杂的部分——从附加属性到动态创建 UI 的完整流程</div></div></div>
+
+<div class="card" data-id="4.1">
+<div class="card-header">
+<div class="icon orange">🔌</div>
+<div class="info"><div class="title">4.1 GlassKeyboard 附加属性系统</div><div class="sub">触发入口——TextBox.Loaded → 附加属性回调 → 注入键盘</div></div>
+<div class="arrow">▼</div>
+</div>
+<div class="card-body"><div class="card-content">
+<h4 class="c-blue"><span class="tag what">做什么</span>理解从附加属性到键盘注入的完整链路</h4>
+<ol>
+<li>用户在 XAML 中写 <code>local:GlassKeyboard.ShowKeyboard="True"</code></li>
+<li>附加属性 <code>OnShowKeyboardChanged</code> 回调触发</li>
+<li>回调中给 TextBox 注册 <code>Loaded</code> 事件</li>
+<li>TextBox 加载时，<code>OnTextBoxLoaded</code> 通过 <code>FindChildByName</code> 在视觉树中查找 <code>GlassKeyboardPopup</code></li>
+<li>找到后调用 <code>kbpopup.BindToTextBox(textBox)</code></li>
+</ol>
+
+<pre>// FindChildByName — 视觉树遍历查找
+private static T FindChildByName&lt;T&gt;(DependencyObject parent, string name)
+    where T : FrameworkElement
+{
+    int count = VisualTreeHelper.GetChildrenCount(parent);
+    for (int i = 0; i &lt; count; i++)
+    {
+        var child = VisualTreeHelper.GetChild(parent, i);
+        if (child is T element &amp;&amp; element.Name == name)
+            return element;
+        var result = FindChildByName&lt;T&gt;(child, name);  // 递归
+        if (result != null) return result;
+    }
+    return null;
+}</pre>
+
+<h4 class="c-green"><span class="tag why">为什么这么做</span></h4>
+<div class="hl info">这个设计的核心是<strong>解耦</strong>。TextBox 不需要知道键盘的存在，键盘也不需要知道谁触发了它。附加属性充当"桥梁"——它监听 TextBox 的生命周期（Loaded），然后在视觉树中自动搜索匹配的键盘控件。这意味着你可以在同一个 XAML 中放置多个 TextBox 和多个 GlassKeyboardPopup，它们通过名称自动配对。</div>
+
+<h4 class="c-orange"><span class="tag benefit">好处</span></h4>
+<ul>
+<li>TextBox 和键盘完全解耦</li>
+<li>通过名称自动配对，无需手动编码关联</li>
+<li>一个键盘可以服务多个 TextBox</li>
+</ul>
+
+<h4 class="c-red"><span class="tag effect">效果</span></h4>
+<p>用户只需在 TextBox 上加一行附加属性，键盘功能就自动可用。开发者不需要写任何事件处理代码。</p>
+</div></div>
+</div>
+
+<div class="card" data-id="4.2">
+<div class="card-header">
+<div class="icon orange">📍</div>
+<div class="info"><div class="title">4.2 GlassKeyboardPopup 弹出键盘控件</div><div class="sub">键盘的容器——管理弹出位置、输入框关联、状态切换</div></div>
+<div class="arrow">▼</div>
+</div>
+<div class="card-body"><div class="card-content">
+<h4 class="c-blue"><span class="tag what">做什么</span>理解 GlassKeyboardPopup 的职责</h4>
+<ul>
+<li><strong>弹出管理</strong>：通过 <code>Popup.IsOpen</code> 控制键盘的显示/隐藏</li>
+<li><strong>输入框绑定</strong>：<code>BindToTextBox</code> 方法建立与目标 TextBox 的连接</li>
+<li><strong>输入处理</strong>：<code>HandleInput</code>、<code>HandleBackspace</code>、<code>HandleConfirm</code></li>
+<li><strong>模式切换</strong>：BuildNumericKeys / BuildAlphaKeys 动态创建不同键盘</li>
+<li><strong>ESC 关闭</strong>：监听 KeyDown 事件，按 ESC 关闭弹窗</li>
+</ul>
+
+<h4 class="c-green"><span class="tag why">为什么这么做</span></h4>
+<div class="hl info">GlassKeyboardPopup 采用 ContentControl 模式——它本身不包含具体的键盘布局，而是通过 <code>Content</code> 属性动态设置不同的键盘面板。这种设计让数字键盘和字母键盘可以共享同一个弹出容器、同一个输入处理逻辑、同一个事件系统。切换键盘只需要替换 Content，不需要创建新的弹窗实例。</div>
+
+<h4 class="c-orange"><span class="tag benefit">好处</span></h4>
+<ul>
+<li>弹出逻辑、输入逻辑、键盘创建逻辑三者分离</li>
+<li>切换键盘模式时无需重新创建 Popup</li>
+<li>ESC 键统一处理，代码集中管理</li>
+</ul>
+
+<h4 class="c-red"><span class="tag effect">效果</span></h4>
+<p>数字键盘和字母键盘共享同一个弹出容器，切换时无缝过渡。</p>
+</div></div>
+</div>
+
+<div class="card" data-id="4.3">
+<div class="card-header">
+<div class="icon orange">🔢</div>
+<div class="info"><div class="title">4.3 数字键盘 BuildNumericKeys</div><div class="sub">Grid 布局 + 自定义 Slider —— 程序化创建 UI 的实战</div></div>
+<div class="arrow">▼</div>
+</div>
+<div class="card-body"><div class="card-content">
+<h4 class="c-blue"><span class="tag what">做什么</span>理解数字键盘的程序化创建</h4>
+<p>数字键盘用纯 C# 代码创建 UI（不是 XAML），因为布局需要根据参数动态调整：</p>
+<ul>
+<li><strong>5 列 Grid</strong>：根据 <code>ButtonCount / 5.0</code> 向上取整计算行数</li>
+<li><strong>数字按钮</strong>：1-9、0、小数点、退格、确认、清除</li>
+<li><strong>自定义 Slider</strong>：<code>SliderTrace</code> 用 <code>FrameworkElementFactory</code> 构建自定义 ControlTemplate</li>
+</ul>
+<pre>// 自定义 Slider 的 ControlTemplate（程序化构建）
+var trackFactory = new FrameworkElementFactory(typeof(Track));
+var thumbFactory = new FrameworkElementFactory(typeof(Thumb));
+thumbFactory.SetProperty(StyleProperty, thumbStyle);
+trackFactory.AppendChild(thumbFactory);
+
+var sliderTemplate = new FrameworkElementFactory(typeof(Border));
+sliderTemplate.AppendChild(trackFactory);
+var template = new ControlTemplate(typeof(Slider)) { VisualTree = sliderTemplate };</pre>
+
+<h4 class="c-green"><span class="tag why">为什么这么做</span></h4>
+<div class="hl info"><code>FrameworkElementFactory</code> 是程序化创建 ControlTemplate 的方式。XAML 在编译时确定结构，而 <code>FrameworkElementFactory</code> 在运行时动态构建。数字键盘的布局需要根据参数（ButtonCount、是否显示小数点等）动态调整，所以必须用程序化方式创建。虽然代码量大，但提供了最大的灵活性。</div>
+
+<h4 class="c-orange"><span class="tag benefit">好处</span></h4>
+<ul>
+<li>布局完全参数化：按钮数量、类型、排列都可配置</li>
+<li>自定义 Slider 样式与项目整体风格一致</li>
+<li><code>_syncingSlider</code> 标志防止循环更新（Slider↔TextBox 互相触发）</li>
+</ul>
+
+<h4 class="c-red"><span class="tag effect">效果</span></h4>
+<p>滑块拖动时实时更新输入框数值，输入框手动输入时也更新滑块位置——但通过 <code>_syncingSlider</code> 防止了无限循环。</p>
+</div></div>
+</div>
+
+<div class="card" data-id="4.4">
+<div class="card-header">
+<div class="icon orange">🔤</div>
+<div class="info"><div class="title">4.4 字母键盘 BuildAlphaKeys</div><div class="sub">Shift/Caps 切换、符号模式——最复杂的键盘布局</div></div>
+<div class="arrow">▼</div>
+</div>
+<div class="card-body"><div class="card-content">
+<h4 class="c-blue"><span class="tag what">做什么</span>理解字母键盘的多模式切换</h4>
+<p>字母键盘有三种模式：</p>
+<ol>
+<li><strong>小写模式</strong>：a-z 默认显示</li>
+<li><strong>大写模式</strong>：Shift 或 Caps Lock 激活时显示 A-Z</li>
+<li><strong>符号模式</strong>：切换到数字符号面板</li>
+</ol>
+<p>布局使用 <code>StackPanel</code> 按行分组，每行 10 个按钮。切换大小写时遍历所有字母按钮更新文本。</p>
+
+<h4 class="c-green"><span class="tag why">为什么这么做</span></h4>
+<div class="hl info">字母键盘需要处理大小写切换和符号模式切换。通过维护 <code>_isShift</code> 和 <code>_isCapsLock</code> 两个布尔状态，加上 <code>_symbolMode</code> 标志，实现了三种显示模式。切换时调用 <code>UpdateKeyLabels</code> 遍历所有按钮更新文本——这种"状态+更新"模式是 UI 状态管理的经典范式。</div>
+
+<h4 class="c-orange"><span class="tag benefit">好处</span></h4>
+<ul>
+<li>三种模式无缝切换，用户体验流畅</li>
+<li>符号模式使用数字键盘布局，代码复用</li>
+<li>Caps Lock 状态在关闭键盘后保持（通过静态字段）</li>
+</ul>
+
+<h4 class="c-red"><span class="tag effect">效果</span></h4>
+<p>用户点击 Shift 键盘切换大小写，点击 Sym 切换到符号面板，点击 Back 回到字母面板——所有切换都是即时的。</p>
+</div></div>
+</div>
+
+<div class="card" data-id="4.5">
+<div class="card-header">
+<div class="icon orange">✅</div>
+<div class="info"><div class="title">4.5 输入验证与确认</div><div class="sub">前导零处理、小数点验证、范围检查——数据完整性保障</div></div>
+<div class="arrow">▼</div>
+</div>
+<div class="card-body"><div class="card-content">
+<h4 class="c-blue"><span class="tag what">做什么</span>理解输入验证的完整逻辑</h4>
+<pre>private void HandleConfirm()
+{
+    // 1. 前导零处理
+    var trimmedText = StripLeadingZeros(currentInput);
+
+    // 2. 小数点处理——确保不以小数点结尾
+    if (trimmedText.EndsWith("."))
+        trimmedText = trimmedText.TrimEnd('.');
+
+    // 3. 范围验证
+    if (IsNumeric &amp;&amp; double.TryParse(trimmedText, NumberStyles.Any,
+        CultureInfo.InvariantCulture, out double val))
+    {
+        if (val &lt; InputMin) val = InputMin;
+        if (val &gt; InputMax) val = InputMax;
+        trimmedText = val.ToString(CultureInfo.InvariantCulture);
+    }
+
+    // 4. 更新到目标 TextBox
+    targetTextBox.Text = trimmedText;
+}</pre>
+
+<h4 class="c-green"><span class="tag why">为什么这么做</span></h4>
+<div class="hl info">用户在键盘上随意输入可能产生非法值（前导零 "007"、空小数点 "3."、超出范围的值）。在确认时统一验证和清洗，既保证了数据完整性，又不会在每次按键时打断用户输入。这是一种"宽容输入，严格确认"的设计模式。</div>
+
+<h4 class="c-orange"><span class="tag benefit">好处</span></h4>
+<ul>
+<li>用户体验友好：输入过程中不打断</li>
+<li>数据完整性：确认时自动修正和验证</li>
+<li>范围保护：超出 min/max 自动钳制</li>
+</ul>
+
+<h4 class="c-red"><span class="tag effect">效果</span></h4>
+<p>用户输入 "007" 确认后变成 "7"，输入 "3." 确认后变成 "3"，输入 "-5" 但 min=0 时自动变成 "0"。</p>
+</div></div>
+</div>
+
+<!-- ==================== 阶段五 ==================== -->
+<div class="phase"><div class="phase-num p5">5</div><div><div class="phase-title">弹窗控件开发</div><div class="phase-desc">对话框系统——从附加属性到无边框窗口的完整实现</div></div></div>
+
+<div class="card" data-id="5.1">
+<div class="card-header">
+<div class="icon red">🏷️</div>
+<div class="info"><div class="title">5.1 DialogProperties 附加属性</div><div class="sub">为什么用字符串而不是集合——XAML 配置性优先</div></div>
+<div class="arrow">▼</div>
+</div>
+<div class="card-body"><div class="card-content">
+<h4 class="c-blue"><span class="tag what">做什么</span>理解 DialogProperties 的设计选择</h4>
+<p>DialogProperties 使用 <code>string</code> 类型存储选项列表（逗号分隔），而不是 <code>ObservableCollection</code> 或数组：</p>
+<pre>local:DialogProperties.DialogTitle="选择颜色"
+local:DialogProperties.DialogItems="红色,蓝色,绿色,黄色"
+local:DialogProperties.DialogSubtitle="请选择一个颜色"
+local:DialogProperties.DialogWidth="400"
+local:DialogProperties.DialogHeight="300"</pre>
+
+<h4 class="c-green"><span class="tag why">为什么这么做</span></h4>
+<div class="hl info">如果用 <code>ObservableCollection&lt;string&gt;</code>，XAML 写法会变得冗长：
+<pre>&lt;local:DialogProperties.DialogItems&gt;
+    &lt;sys:String&gt;红色&lt;/sys:String&gt;
+    &lt;sys:String&gt;蓝色&lt;/sys:String&gt;
+    &lt;sys:String&gt;绿色&lt;/sys:String&gt;
+&lt;/local:DialogProperties.DialogItems&gt;</pre>
+而用逗号分隔的字符串只需一行，代码简洁性对于配置型属性至关重要。运行时再 <code>Split(',')</code> 解析即可。</div>
+
+<h4 class="c-orange"><span class="tag benefit">好处</span></h4>
+<ul>
+<li>XAML 使用极其简洁</li>
+<li>不需要额外的 xmlns 声明</li>
+<li>适合选项数量不多的场景（如颜色选择、确认对话框）</li>
+</ul>
+
+<h4 class="c-red"><span class="tag effect">效果</span></h4>
+<p>调用者只需一行附加属性即可配置完整的弹窗内容。</p>
+</div></div>
+</div>
+
+<div class="card" data-id="5.2">
+<div class="card-header">
+<div class="icon red">📋</div>
+<div class="info"><div class="title">5.2 GlassDialog 列表选择</div><div class="sub">ListBox + 自定义模板 —— 弹出式选项选择</div></div>
+<div class="arrow">▼</div>
+</div>
+<div class="card-body"><div class="card-content">
+<h4 class="c-blue"><span class="tag what">做什么</span>理解 GlassDialog 的实现方式</h4>
+<p>GlassDialog 内部包含：</p>
+<ul>
+<li><strong>标题区域</strong>：DialogTitle + DialogSubtitle</li>
+<li><strong>ListBox</strong>：显示 DialogItems 的选项列表，自定义 ItemTemplate</li>
+<li><strong>确定/取消按钮</strong>：底部操作区</li>
+<li><strong>PopupOverlay</strong>：无边框窗口实现弹出效果</li>
+</ul>
+
+<h4 class="c-green"><span class="tag why">为什么这么做</span></h4>
+<div class="hl info">选择用 ListBox 而不是自定义列表，是因为 ListBox 已经提供了完整的列表交互：选中状态管理、键盘导航、滚动支持。通过自定义 <code>ItemTemplate</code> 可以完全控制每个选项的视觉表现，同时保留 ListBox 的全部交互能力。</div>
+
+<h4 class="c-orange"><span class="tag benefit">好处</span></h4>
+<ul>
+<li>利用 ListBox 原生的选中管理和键盘支持</li>
+<li>自定义 ItemTemplate 实现毛玻璃视觉效果</li>
+<li>选中结果通过 DialogSelectedValue 属性返回</li>
+</ul>
+
+<h4 class="c-red"><span class="tag effect">效果</span></h4>
+<p>弹出一个毛玻璃卡片，显示选项列表，用户点击选择后自动关闭并返回选中值。</p>
+</div></div>
+</div>
+
+<div class="card" data-id="5.3">
+<div class="card-header">
+<div class="icon red">⌨️</div>
+<div class="info"><div class="title">5.3 GlassInputDialog 文本输入</div><div class="sub">弹出式文本输入——InputText vs InputValue 的区别</div></div>
+<div class="arrow">▼</div>
+</div>
+<div class="card-body"><div class="card-content">
+<h4 class="c-blue"><span class="tag what">做什么</span>理解输入弹窗的属性设计</h4>
+<ul>
+<li><strong>InputText</strong>：弹窗的默认显示文本（初始值）</li>
+<li><strong>InputValue</strong>：用户确认后的最终值（输出）</li>
+<li><strong>InputPlaceholder</strong>：输入框的水印提示</li>
+</ul>
+
+<h4 class="c-green"><span class="tag why">为什么这么做</span></h4>
+<div class="hl info">将输入值和输出值分开是重要的设计决策。InputText 是"输入参数"——调用者设置的初始值；InputValue 是"输出结果"——用户确认后的值。这种分离让调用者可以：(1) 设置默认值 (2) 弹窗关闭后读取 InputValue 获取用户选择。类似于 <code>MessageBox.ShowDialog()</code> 的返回值模式。</div>
+
+<h4 class="c-orange"><span class="tag benefit">好处</span></h4>
+<ul>
+<li>输入输出分离，逻辑清晰</li>
+<li>支持默认值预填充</li>
+<li>支持水印提示</li>
+</ul>
+
+<h4 class="c-red"><span class="tag effect">效果</span></h4>
+<p>弹出一个毛玻璃卡片，内含文本输入框，用户输入后点击确定，值保存在 InputValue 属性中。</p>
+</div></div>
+</div>
+
+<div class="card" data-id="5.4">
+<div class="card-header">
+<div class="icon red">🪟</div>
+<div class="info"><div class="title">5.4 PopupOverlay 无边框窗口</div><div class="sub">无边框 + 半透明 + ESC 关闭——弹窗的底层实现</div></div>
+<div class="arrow">▼</div>
+</div>
+<div class="card-body"><div class="card-content">
+<h4 class="c-blue"><span class="tag what">做什么</span>理解无边框弹窗的技术方案</h4>
+<pre>var overlay = new Window()
+{
+    WindowStyle = WindowStyle.None,      // 无标题栏/边框
+    AllowsTransparency = true,           // 允许透明
+    Background = new SolidColorBrush(Color.FromArgb(128, 0, 0, 0)),  // 半透明黑色
+    Content = dialogContent,             // 弹窗内容
+    Owner = Window.GetWindow(ownerElement),  // 父窗口
+    WindowStartupLocation = WindowStartupLocation.CenterOwner,  // 居中
+    ShowInTaskbar = false                // 不在任务栏显示
+};
+overlay.KeyDown += (s, e) => {
+    if (e.Key == Key.Escape) overlay.Close();  // ESC 关闭
+};</pre>
+
+<h4 class="c-green"><span class="tag why">为什么这么做</span></h4>
+<div class="hl info">WPF 的 <code>Window</code> 类默认有标题栏和系统边框，无法实现毛玻璃效果。通过 <code>WindowStyle.None</code> + <code>AllowsTransparency=True</code>，你获得了一个完全透明的画布，可以在上面放置任何内容。<code>Owner</code> 属性让弹窗跟随父窗口最小化/关闭，<code>CenterOwner</code> 让弹窗居中显示在父窗口中央。</div>
+
+<h4 class="c-orange"><span class="tag benefit">好处</span></h4>
+<ul>
+<li>完全自定义外观，不受系统样式限制</li>
+<li>半透明背景提供视觉层次感</li>
+<li>ESC 关闭符合用户习惯</li>
+<li>Owner 模式保证弹窗不会跑到父窗口后面</li>
+</ul>
+
+<h4 class="c-red"><span class="tag effect">效果</span></h4>
+<p>点击按钮后，屏幕中央弹出半透明黑色遮罩 + 毛玻璃卡片。点击卡片外的遮罩区域或按 ESC 键关闭弹窗。</p>
+</div></div>
+</div>
+
+<!-- ==================== 阶段六 ==================== -->
+<div class="phase"><div class="phase-num p6">6</div><div><div class="phase-title">高级效果与优化</div><div class="phase-desc">鱼眼效果、水印机制、毛玻璃视觉系统——让控件库真正出彩</div></div></div>
+
+<div class="card" data-id="6.1">
+<div class="card-header">
+<div class="icon pink">🐟</div>
+<div class="info"><div class="title">6.1 FishEye 鱼眼效果</div><div class="sub">距离检测 + 缩放动画——鼠标靠近时按钮放大的交互效果</div></div>
+<div class="arrow">▼</div>
+</div>
+<div class="card-body"><div class="card-content">
+<h4 class="c-blue"><span class="tag what">做什么</span>理解鱼眼效果的算法</h4>
+<p>FishEye 效果的核心流程：</p>
+<ol>
+<li><strong>距离检测</strong>：鼠标移动时，计算鼠标位置与每个按钮中心点的距离</li>
+<li><strong>缩放计算</strong>：距离越近缩放越大，最大 <code>ScaleFactor</code>（默认 1.35），超出范围的为 1.0</li>
+<li><strong>动画驱动</strong>：使用 <code>CubicEase</code> 缓动函数实现平滑缩放</li>
+<li><strong>Transform 分组</strong>：<code>ScaleTransform</code>（缩放）+ <code>TranslateTransform</code>（位移补偿）</li>
+</ol>
+<pre>// 核心算法
+double dist = Math.Sqrt(Math.Pow(mousePos.X - center.X, 2) +
+                        Math.Pow(mousePos.Y - center.Y, 2));
+double scale = 1.0;
+if (dist &lt; Range)
+{
+    // 线性映射：距离越近缩放越大
+    double t = 1.0 - (dist / Range);
+    scale = 1.0 + (ScaleFactor - 1.0) * t;
+}
+
+// 动画驱动
+var animation = new DoubleAnimation(scale,
+    TimeSpan.FromSeconds(0.15)) { EasingFunction = new CubicEase() };
+scaleTransform.BeginAnimation(ScaleTransform.ScaleXProperty, animation);
+scaleTransform.BeginAnimation(ScaleTransform.ScaleYProperty, animation);</pre>
+
+<h4 class="c-green"><span class="tag why">为什么这么做</span></h4>
+<div class="hl info">鱼眼效果的核心价值是<strong>视觉引导</strong>。在密集的按钮排列中，用户可能难以找到目标。当鼠标靠近时按钮放大，提供了即时的视觉反馈，帮助用户确认"我正在指向正确的按钮"。这在工具栏、导航菜单等场景中非常有效。</div>
+
+<h4 class="c-orange"><span class="tag benefit">好处</span></h4>
+<ul>
+<li><strong>视觉引导</strong>：鼠标靠近时按钮放大，帮助用户确认目标</li>
+<li><strong>交互趣味性</strong>：比静态按钮更有趣，提升用户体验</li>
+<li><strong>性能</strong>：基于 Transform 的动画性能极高，不影响布局</li>
+<li><strong>自定义</strong>：ScaleFactor 和 Range 都可配置</li>
+</ul>
+
+<h4 class="c-red"><span class="tag effect">效果</span></h4>
+<p>在数字键盘上移动鼠标，靠近的按钮平滑放大，远离后恢复——所有动画使用 CubicEase 缓动，过渡自然流畅。</p>
+
+<h4 class="c-blue">Transform 分组的必要性</h4>
+<div class="hl warn">如果不使用 <code>TranslateTransform</code>，缩放时按钮会向左上角偏移（因为默认缩放原点是左上角 0,0）。通过 <code>TranslateTransform</code> 补偿偏移量，让按钮在原位缩放。这就是为什么需要 <code>TransformGroup</code> 而不是单独的 <code>ScaleTransform</code>。</div>
+</div></div>
+</div>
+
+<div class="card" data-id="6.2">
+<div class="card-header">
+<div class="icon pink">💧</div>
+<div class="info"><div class="title">6.2 水印 Placeholder 实现</div><div class="sub">Style Setter vs Local Value 的优先级博弈</div></div>
+<div class="arrow">▼</div>
+</div>
+<div class="card-body"><div class="card-content">
+<h4 class="c-blue"><span class="tag what">做什么</span>理解水印的完整实现机制</h4>
+<p>水印通过两层机制实现：</p>
+<ol>
+<li><strong>Style + DataTrigger</strong>：TextBlock 的 Visibility 由 Text.Length 决定</li>
+<li><strong>附加属性 InputPlaceholder</strong>：传递水印文本内容</li>
+</ol>
+
+<h4 class="c-green"><span class="tag why">为什么这么做</span></h4>
+<div class="hl info">这里有一个精妙的设计决策：水印 TextBlock 的 Visibility 放在 <code>Style.Setter</code> 中而不是作为 Local Value。原因是 WPF 属性优先级：<strong>Local Value > Style Setter</strong>。如果 Visibility 是 Local Value，DataTrigger 的 Setter 就无法覆盖它。通过将默认值放在 Style Setter 中，DataTrigger 的 Setter 可以在条件满足时成功修改 Visibility。</div>
+
+<h4 class="c-orange"><span class="tag benefit">好处</span></h4>
+<ul>
+<li>水印显示/隐藏完全自动化</li>
+<li>优先级正确——DataTrigger 能够控制 Visibility</li>
+<li>零 C# 代码，纯 XAML 声明式</li>
+</ul>
+
+<h4 class="c-red"><span class="tag effect">效果</span></h4>
+<p>输入框为空时显示灰色水印文字，输入任意字符后水印立即隐藏——这个过程完全由 DataTrigger 自动驱动。</p>
+</div></div>
+</div>
+
+<div class="card" data-id="6.3">
+<div class="card-header">
+<div class="icon pink">✨</div>
+<div class="info"><div class="title">6.3 毛玻璃视觉效果系统</div><div class="sub">颜色值、透明度、圆角、阴影——本项目的设计语言</div></div>
+<div class="arrow">▼</div>
+</div>
+<div class="card-body"><div class="card-content">
+<h4 class="c-blue"><span class="tag what">做什么</span>解析本项目的视觉设计系统</h4>
+<table>
+<tr><th>元素</th><th>值</th><th>效果</th></tr>
+<tr><td>外框背景</td><td><code>#E0202020 → #1AFFFFFF</code></td><td>深色半透明渐变</td></tr>
+<tr><td>内框背景</td><td><code>#E0101010 → #0AFFFFFF</code></td><td>更深的内层</td></tr>
+<tr><td>边框</td><td><code>#33FFFFFF</code></td><td>白色半透明边框</td></tr>
+<tr><td>高光层</td><td><code>#44FFFFFF → #00FFFFFF</code></td><td>30% 高度的顶部光照</td></tr>
+<tr><td>圆角</td><td>18px（卡片）/ 14px（输入框）/ 11px（内框）</td><td>柔和的圆角</td></tr>
+<tr><td>阴影</td><td><code>BlurRadius=20, ShadowDepth=4</code></td><td>轻微的浮起效果</td></tr>
+<tr><td>字体色</td><td><code>#FFFFFFCC</code></td><td>白色 80% 透明度</td></tr>
+<tr><td>禁用色</td><td><code>#4DFFFFFF</code></td><td>白色 30% 透明度</td></tr>
+</table>
+
+<h4 class="c-green"><span class="tag why">为什么这么做</span></h4>
+<div class="hl info">毛玻璃效果的核心原理是<strong>多层半透明叠加</strong>。真实玻璃有两个特性：(1) 半透明——能隐约看到背后的东西 (2) 反光——表面有高光。本项目通过两层 Border 模拟厚度，通过高光 Border 模拟反光，通过 DropShadow 模拟深度。所有颜色都使用带透明度的值，确保整体的通透感。</div>
+
+<h4 class="c-orange"><span class="tag benefit">好处</span></h4>
+<ul>
+<li>视觉效果统一——所有控件共享同一套颜色和圆角</li>
+<li>纯代码实现——不依赖任何图片资源</li>
+<li>可定制——修改颜色值即可调整整体风格</li>
+</ul>
+
+<h4 class="c-red"><span class="tag effect">效果</span></h4>
+<p>所有控件呈现一致的深色毛玻璃外观：半透明背景、白色边框、顶部高光、柔和阴影。</p>
+</div></div>
+</div>
+
+<div class="card" data-id="6.4">
+<div class="card-header">
+<div class="icon pink">⚡</div>
+<div class="info"><div class="title">6.4 性能与优化</div><div class="sub">FrameworkElementFactory vs XAML、密封集合问题——实战中的坑与解</div></div>
+<div class="arrow">▼</div>
+</div>
+<div class="card-body"><div class="card-content">
+<h4 class="c-blue"><span class="tag what">做什么</span>理解程序化创建 UI 的性能考量</h4>
+
+<h4 class="c-pink">FrameworkElementFactory vs XAML</h4>
+<table>
+<tr><th>方式</th><th>优势</th><th>劣势</th></tr>
+<tr><td>XAML</td><td>可读性高、设计器支持、编译时检查</td><td>编译时确定，无法动态调整</td></tr>
+<tr><td>FrameworkElementFactory</td><td>运行时动态创建、参数化布局</td><td>代码冗长、无设计器支持</td></tr>
+</table>
+
+<h4 class="c-pink">密封集合 (Sealed Collection) 问题</h4>
+<div class="hl danger"><strong>常见错误</strong>：<code>ItemsSource</code> 绑定到一个集合后，该集合会被 WPF 内部密封。之后尝试调用 <code>Add()</code>、<code>Clear()</code> 等方法会抛出 <code>InvalidOperationException</code>。
+<br><br>
+<strong>解决方案</strong>：在修改集合前检查 <code>IsSealed</code>，或者创建新集合赋值给 <code>ItemsSource</code>。</div>
+
+<h4 class="c-green"><span class="tag why">为什么这么做</span></h4>
+<div class="hl info">本项目的键盘控件（GlassKeyboard、GlassKeyboardPopup）使用 <code>FrameworkElementFactory</code> 动态创建按钮。这是因为键盘布局需要根据参数（按钮数量、类型、排列方式）在运行时调整。虽然 XAML 更优雅，但无法满足这种动态需求。</div>
+
+<h4 class="c-orange"><span class="tag benefit">好处</span></h4>
+<ul>
+<li>动态布局完全参数化</li>
+<li>一个代码路径支持多种键盘类型</li>
+<li>避免了密封集合异常</li>
+</ul>
+
+<h4 class="c-red"><span class="tag effect">效果</span></h4>
+<p>数字键盘和字母键盘共享同一套创建逻辑，通过参数控制差异——代码复用率高，维护成本低。</p>
+
+<h4 class="c-pink">性能优化技巧</h4>
+<ul>
+<li><strong>虚拟化</strong>：ListBox/TreeView 默认启用虚拟化，只渲染可见项</li>
+<li><strong>冻结</strong>：Freeze() 冻结 Brush 等资源，减少内存开销</li>
+<li><strong>缓存</strong>：重复使用的 ControlTemplate 应该定义在 Resources 中复用</li>
+<li><strong>延迟加载</strong>：复杂控件可以延迟到需要时再创建</li>
+</ul>
+</div></div>
+</div>
+
+<!-- ==================== 总结 ==================== -->
+<div class="phase"><div class="phase-num p1">✦</div><div><div class="phase-title">学习建议与总结</div><div class="phase-desc">如何高效地掌握这些知识</div></div></div>
+
+<div class="card open" data-id="summary">
+<div class="card-header">
+<div class="icon blue">🗺️</div>
+<div class="info"><div class="title">学习路径总结</div><div class="sub">从基础到进阶的推荐学习顺序</div></div>
+<div class="arrow">▼</div>
+</div>
+<div class="card-body"><div class="card-content">
+<h4 class="c-blue">推荐学习顺序</h4>
+<ol>
+<li><strong>先学 XAML 基础</strong>（阶段一）—— 这是一切的基础</li>
+<li><strong>再学依赖属性</strong>—— WPF 属性系统的核心，后面每个控件都用到</li>
+<li><strong>然后学 ControlTemplate</strong>—— 理解"控件 = 逻辑 + 模板"的设计哲学</li>
+<li><strong>接着学 Style + Trigger</strong>—— 本项目视觉效果的实现手段</li>
+<li><strong>最后学附加属性</strong>—— 本项目的"粘合剂"，连接独立控件</li>
+</ol>
+
+<h4 class="c-green">实操建议</h4>
+<ul>
+<li><strong>边学边改</strong>：每个概念学完后，修改本项目的对应代码观察效果</li>
+<li><strong>从简单开始</strong>：先改 GlassButton 的颜色，再改 GlassTextBox 的模板，最后挑战 GlassKeyboard</li>
+<li><strong>善用调试</strong>：在 Visual Studio 中用"Live Visual Tree"查看运行时的控件层级</li>
+<li><strong>记录笔记</strong>：把遇到的坑和解决方案记下来——比如密封集合问题、TemplateBinding 方向问题</li>
+</ul>
+
+<h4 class="c-orange">常见陷阱</h4>
+<ul>
+<li><strong>TemplateBinding 是单向的</strong>：模板内修改属性不会反映到控件上</li>
+<li><strong>Local Value 优先级最高</strong>：Style Setter 无法覆盖 Local Value</li>
+<li><strong>FrameworkElementFactory 已过时</strong>：推荐用 <code>FrameworkElementFactory</code> 的替代方案 <code>XamlReader</code></li>
+<li><strong>ItemsSource 绑定后集合被密封</strong>：不能直接修改，需要创建新集合</li>
+</ul>
+
+<div class="hl good"><strong>最终目标</strong>：能够独立创建一个新的毛玻璃风格控件——从 ControlTemplate 设计、依赖属性注册、样式和触发器配置，到附加属性注入行为。本项目的 14+ 个控件就是最好的练习素材。</div>
+</div></div>
+</div>
+
+</div><!-- container -->
+
+<div class="footer">
+    WPF 毛玻璃控件库 — 学习实操路线图 | 涵盖 6 个阶段、22 个知识模块<br>
+    点击每个卡片展开查看详细内容，学习进度自动保存
+</div>
+
+<script>
+// 展开/折叠卡片
+document.querySelectorAll('.card-header').forEach(function(header) {
+    header.addEventListener('click', function() {
+        var card = this.parentElement;
+        card.classList.toggle('open');
+        saveProgress();
+    });
+});
+
+// 进度追踪
+function saveProgress() {
+    var all = document.querySelectorAll('.card[data-id]');
+    var opened = document.querySelectorAll('.card.open[data-id]');
+    var ids = [];
+    opened.forEach(function(c) { ids.push(c.getAttribute('data-id')); });
+    localStorage.setItem('wpf-roadmap-progress', JSON.stringify(ids));
+    localStorage.setItem('wpf-roadmap-pct', Math.round(ids.length / all.length * 100));
+    updateBar();
+}
+
+function loadProgress() {
+    try {
+        var ids = JSON.parse(localStorage.getItem('wpf-roadmap-progress') || '[]');
+        ids.forEach(function(id) {
+            var card = document.querySelector('.card[data-id="' + id + '"]');
+            if (card) card.classList.add('open');
+        });
+    } catch(e) {}
+    updateBar();
+}
+
+function updateBar() {
+    var all = document.querySelectorAll('.card[data-id]').length;
+    var opened = document.querySelectorAll('.card.open[data-id]').length;
+    var pct = Math.round(opened / all * 100);
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressPct').textContent = pct + '%';
+}
+
+loadProgress();
+</script>
+</body>
+</html>

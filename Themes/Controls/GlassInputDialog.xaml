@@ -1,0 +1,152 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:CustomControl.Controls">
+
+    <!--
+        ================================================================
+        文件说明：Themes\Controls\GlassInputDialog.xaml
+        GlassInputDialog 输入对话框样式。
+
+        依赖：GlassBrushes.xaml（画刷资源）、GlassDialog.xaml（弹窗按钮样式）。
+        注意：模板中对 GlassDialogButtonStyle / GlassDialogConfirmStyle
+        使用 DynamicResource 引用（跨文件资源，避免合并顺序导致的
+        StaticResource 解析失败）。
+        ================================================================
+    -->
+
+    <!--
+        ===================== 输入对话框 =====================
+        GlassInputDialog：用于文本输入的对话框，比 GlassDialog 多一个输入框。
+        布局结构（从上到下）：
+        1. 标题（Title）
+        2. 提示信息（Message）
+        3. 文本输入框
+        4. 底部按钮（取消 + 确认）
+
+        与 GlassDialog 的区别：
+        - 多了 Message 属性用于显示输入提示
+        - 用 TextBox 替代 ListBox，用于用户输入文本
+        - 支持 CaretBrush（光标颜色）和 MaxLength（最大输入长度）
+    -->
+    <Style TargetType="controls:GlassInputDialog">
+        <Setter Property="Background" Value="#E81A1A2E" />
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="MinWidth" Value="340" />
+        <Setter Property="MaxWidth" Value="480" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="controls:GlassInputDialog">
+                    <Border Background="{TemplateBinding Background}"
+                            CornerRadius="16"
+                            Padding="24"
+                            BorderBrush="#30FFFFFF"
+                            BorderThickness="1">
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="24" ShadowDepth="4" Opacity="0.5" Color="#000" />
+                        </Border.Effect>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <!-- Row 0：标题，18号粗体 -->
+                            <TextBlock Grid.Row="0"
+                                       Text="{TemplateBinding Title}"
+                                       FontSize="18"
+                                       FontWeight="Bold"
+                                       Margin="0,0,0,8" />
+
+                            <!--
+                                Row 1：提示信息
+                                13号字体，半透明白色（#B8FFFFFF），不抢标题的视觉焦点
+                                TextWrapping="Wrap" 允许长文本自动换行
+                            -->
+                            <TextBlock Grid.Row="1"
+                                       Text="{TemplateBinding Message}"
+                                       FontSize="13"
+                                       Foreground="#B8FFFFFF"
+                                       TextWrapping="Wrap"
+                                       Margin="0,0,0,16" />
+
+                            <!--
+                                Row 2：输入框区域
+                                外层 Border 提供半透明背景和圆角
+                            -->
+                            <Border Grid.Row="2"
+                                    Background="#15FFFFFF"
+                                    CornerRadius="10"
+                                    Padding="2"
+                                    Margin="0,0,0,20">
+                                <Grid>
+                                    <!--
+                                        PART_InputBox：文本输入框
+                                        CaretBrush="#4FB6FF" 蓝色光标，与主题色调一致
+                                        MaxLength="200" 限制最大输入200字符
+                                        Background="Transparent" 去掉默认白色背景，使用外层 Border 的背景
+                                    -->
+                                    <TextBox x:Name="PART_InputBox"
+                                             Background="Transparent"
+                                             BorderThickness="0"
+                                             Foreground="White"
+                                             FontSize="15"
+                                             Padding="12,10"
+                                             CaretBrush="#4FB6FF"
+                                             MaxLength="200" />
+                                    <!--
+                                        水印提示：绑定 InputPlaceholder 属性，
+                                        输入为空且未获得焦点时显示。
+                                    -->
+                                    <TextBlock x:Name="PART_Watermark"
+                                               Margin="14,10,12,10"
+                                               Text="{TemplateBinding InputPlaceholder}"
+                                               Foreground="#78FFFFFF"
+                                               FontSize="15"
+                                               VerticalAlignment="Center"
+                                               IsHitTestVisible="False"
+                                               TextTrimming="CharacterEllipsis">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                <Style.Triggers>
+                                                    <MultiDataTrigger>
+                                                        <MultiDataTrigger.Conditions>
+                                                            <Condition Binding="{Binding Text.Length, ElementName=PART_InputBox}" Value="0" />
+                                                            <Condition Binding="{Binding IsKeyboardFocused, ElementName=PART_InputBox}" Value="False" />
+                                                        </MultiDataTrigger.Conditions>
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                    </MultiDataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </Grid>
+                            </Border>
+
+                            <!-- Row 3：底部按钮，与 GlassDialog 相同的三列布局 -->
+                            <Grid Grid.Row="3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Button x:Name="PART_CancelButton"
+                                        Grid.Column="1"
+                                        Content="{TemplateBinding CancelText}"
+                                        Style="{DynamicResource GlassDialogButtonStyle}"
+                                        Margin="0,0,12,0" />
+                                <Button x:Name="PART_ConfirmButton"
+                                        Grid.Column="2"
+                                        Content="{TemplateBinding ConfirmText}"
+                                        Style="{DynamicResource GlassDialogConfirmStyle}" />
+                            </Grid>
+                        </Grid>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>

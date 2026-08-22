@@ -1,0 +1,39 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:CustomControl.Controls">
+
+    <!--
+        ================================================================
+        文件说明：Themes\Controls\GlassListBox.xaml
+        GlassListBox 列表容器样式。
+
+        依赖：GlassBrushes.xaml（画刷资源）、GlassListBoxItem.xaml（列表项样式）。
+        ================================================================
+    -->
+
+    <Style TargetType="controls:GlassListBox">
+        <Setter Property="Background" Value="{DynamicResource GlassBackdropBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource GlassEdgeHighlightBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Foreground" Value="{DynamicResource GlassTextBrush}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="controls:GlassListBox">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="10"
+                            SnapsToDevicePixels="True">
+                        <ScrollViewer Focusable="False"
+                                      Padding="3"
+                                      HorizontalScrollBarVisibility="Disabled"
+                                      VerticalScrollBarVisibility="Auto">
+                            <ItemsPresenter />
+                        </ScrollViewer>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>

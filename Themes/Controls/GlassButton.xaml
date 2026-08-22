@@ -1,0 +1,228 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:CustomControl.Controls">
+
+    <!--
+        ================================================================
+        文件说明：Themes\Controls\GlassButton.xaml
+        GlassButton 按钮样式（含两种变体）：
+        - 隐式默认样式：基础毛玻璃按钮
+        - GlassPrimaryButtonStyle：蓝紫渐变主操作按钮
+        - GlassGhostButtonStyle：透明幽灵按钮
+
+        依赖：GlassBrushes.xaml（画刷资源）。
+        注意：两个变体通过 BasedOn 引用同文件内的隐式样式，
+        因此必须与本文件一起合并，不能单独使用。
+        ================================================================
+    -->
+
+    <!--
+        ===================== GlassButton 基础按钮样式 =====================
+        GlassButton：毛玻璃主题的基础按钮。
+        特点：
+        - 三态效果：默认（微渐变）→ 悬停（变亮 + 高光渐现）→ 按下（蓝色调 + 缩放）
+        - 顶部高光层（与 GlassCard 类似）悬停时通过动画渐显
+        - 禁用时降低透明度
+        - RecognizesAccessKey="True" 支持快捷键（如 _OK 中的 O 会加下划线）
+
+        动画说明：
+        - EnterActions：鼠标进入时，高光层 Opacity 从0→1，持续180ms
+        - ExitActions：鼠标离开时，高光层 Opacity 从1→0，持续200ms
+        进入比离开快（180ms vs 200ms），营造"响应迅速但退出从容"的感觉。
+    -->
+    <Style TargetType="controls:GlassButton">
+        <Setter Property="Background" Value="{DynamicResource GlassControlBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource GlassBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Foreground" Value="{DynamicResource GlassTextBrush}" />
+        <Setter Property="Padding" Value="18,9" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="controls:GlassButton">
+                    <Border x:Name="Root"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="9"
+                            SnapsToDevicePixels="True">
+                        <Grid ClipToBounds="True">
+                            <!-- 高光层：初始 Opacity=0 不可见，悬停时动画渐显 -->
+                            <Border x:Name="Highlight"
+                                    CornerRadius="9"
+                                    Background="{DynamicResource GlassTopHighlightBrush}"
+                                    Opacity="0"
+                                    IsHitTestVisible="False" />
+                            <ContentPresenter Margin="{TemplateBinding Padding}"
+                                              HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              RecognizesAccessKey="True" />
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <!--
+                            悬停触发器：
+                            1. 切换背景和边框为悬停状态画刷
+                            2. EnterActions：开始高光渐显动画（Opacity 0→1，180ms）
+                            3. ExitActions：开始高光渐隐动画（Opacity 1→0，200ms）
+                            BeginStoryboard 默认行为是 Stop 展开行为，
+                            即新动画会停止旧动画并从当前值开始过渡。
+                        -->
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Root" Property="Background" Value="{DynamicResource GlassControlHoverBrush}" />
+                            <Setter TargetName="Root" Property="BorderBrush" Value="{DynamicResource GlassBorderHoverBrush}" />
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="Highlight"
+                                                         Storyboard.TargetProperty="Opacity"
+                                                         To="1" Duration="0:0:0.18" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="Highlight"
+                                                         Storyboard.TargetProperty="Opacity"
+                                                         To="0" Duration="0:0:0.2" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
+                        </Trigger>
+                        <!--
+                            按下触发器：
+                            - 切换为蓝色调按下背景
+                            - RenderTransform 缩放到97%，产生物理按压感
+                            - RenderTransformOrigin 确保从中心缩放
+                        -->
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Root" Property="Background" Value="{DynamicResource GlassControlPressedBrush}" />
+                            <Setter TargetName="Root" Property="RenderTransform" Value="0.97,0,0,0.97,0,0" />
+                            <Setter TargetName="Root" Property="RenderTransformOrigin" Value="0.5,0.5" />
+                        </Trigger>
+                        <!-- 禁用状态：降低透明度到45% -->
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Root" Property="Opacity" Value="0.45" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--
+        ===================== 主要操作按钮样式 =====================
+        GlassPrimaryButtonStyle：强调型按钮，用于页面中的主要操作（如提交、确认）。
+        继承自上方隐式 GlassButton 样式（BasedOn 同文件引用），
+        完全替换模板以实现：
+        - 蓝紫渐变背景（GlassAccentBrush）
+        - 蓝色投影效果，悬浮感更强
+        - 悬停时阴影增大 + 透明度微调
+        - 按下时降低透明度
+        - 禁用时进一步降低透明度
+
+        与普通按钮的区别：
+        普通按钮靠背景色变化交互，主按钮靠投影变化交互，更符合"主要操作"的视觉权重。
+    -->
+    <Style x:Key="GlassPrimaryButtonStyle" TargetType="controls:GlassButton"
+           BasedOn="{StaticResource {x:Type controls:GlassButton}}">
+        <Setter Property="Background" Value="{DynamicResource GlassAccentBrush}" />
+        <Setter Property="BorderBrush" Value="#55FFFFFF" />
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="controls:GlassButton">
+                    <Border x:Name="Root"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="9">
+                        <!-- 蓝色投影：Color="#4A6FE8" 与主题蓝色调一致 -->
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="14" ShadowDepth="3" Direction="270" Opacity="0.45" Color="#4A6FE8" />
+                        </Border.Effect>
+                        <ContentPresenter Margin="{TemplateBinding Padding}"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <!--
+                            悬停：增大投影范围和深度
+                            BlurRadius 14→20，ShadowDepth 3→5，Opacity 0.45→0.65
+                            卡片视觉上进一步"浮起"，但同时降低背景透明度到92%，
+                            防止整体过亮。
+                        -->
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Root" Property="Opacity" Value="0.92" />
+                            <Setter TargetName="Root" Property="Effect">
+                                <Setter.Value>
+                                    <DropShadowEffect BlurRadius="20" ShadowDepth="5" Direction="270" Opacity="0.65" Color="#4A6FE8" />
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <!-- 按下：降低整体透明度到78%，模拟按压效果 -->
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Root" Property="Opacity" Value="0.78" />
+                        </Trigger>
+                        <!-- 禁用：降低到40%透明度 -->
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Root" Property="Opacity" Value="0.4" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--
+        ===================== 幽灵按钮样式 =====================
+        GlassGhostButtonStyle：幽灵按钮（Ghost Button），也叫透明按钮。
+        默认状态完全透明（Background="Transparent"），仅显示文字。
+        悬停时显示微弱的白色背景，按下时背景稍深。
+        适用于不希望抢占视觉焦点的次要操作（如"了解更多"）。
+
+        幽灵按钮是现代 UI 设计中非常流行的模式，
+        在深色背景上尤其优雅，因为它几乎不引入额外的视觉元素。
+    -->
+    <Style x:Key="GlassGhostButtonStyle" TargetType="controls:GlassButton"
+           BasedOn="{StaticResource {x:Type controls:GlassButton}}">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="#40FFFFFF" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="controls:GlassButton">
+                    <Border x:Name="Root"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="9">
+                        <ContentPresenter Margin="{TemplateBinding Padding}"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <!-- 悬停：显示微弱白色背景，边框变亮 -->
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Root" Property="Background" Value="#1CFFFFFF" />
+                            <Setter TargetName="Root" Property="BorderBrush" Value="#73FFFFFF" />
+                        </Trigger>
+                        <!-- 按下：背景稍深 -->
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Root" Property="Background" Value="#2EFFFFFF" />
+                        </Trigger>
+                        <!-- 禁用：降低透明度 -->
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Root" Property="Opacity" Value="0.4" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>

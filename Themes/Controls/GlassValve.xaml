@@ -1,0 +1,76 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:CustomControl.Controls">
+
+    <!--
+        ================================================================
+        文件说明：Themes\Controls\GlassValve.xaml
+        GlassValve 工业阀门样式（P&ID 蝶阀符号）。
+
+        依赖：GlassBrushes.xaml（画刷资源）。
+        结构：Viewbox(等比缩放) → 40x40 画布
+              → [执行器方块 + 阀杆 + 蝶形阀板(PART_Disc)]
+
+        【配色规则】
+        - 打开：PART_Disc 填充强调色（介质可通过）
+        - 关闭：暗色填充 + 边框
+        - 故障：整体红色（优先级最高，用 Trigger 排在最后）
+        ================================================================
+    -->
+
+    <Style TargetType="controls:GlassValve">
+        <Setter Property="Width" Value="40" />
+        <Setter Property="Height" Value="40" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="controls:GlassValve">
+                    <Viewbox Stretch="Uniform">
+                        <Canvas Width="40" Height="40">
+                            <!-- 端口短管：端面齐平控件边缘，管路端点伸入 3px 形成实体搭接 -->
+                            <Rectangle Canvas.Left="0" Canvas.Top="16"
+                                       Width="5" Height="8"
+                                       Fill="#33FFFFFF" />
+                            <Rectangle Canvas.Left="35" Canvas.Top="16"
+                                       Width="5" Height="8"
+                                       Fill="#33FFFFFF" />
+
+                            <!-- 执行器（Actuator）：顶部圆角方块 -->
+                            <Border Canvas.Left="12" Canvas.Top="0"
+                                    Width="16" Height="6"
+                                    CornerRadius="2"
+                                    Background="#3DFFFFFF"
+                                    BorderBrush="#59FFFFFF"
+                                    BorderThickness="1" />
+                            <!-- 阀杆 -->
+                            <Rectangle Canvas.Left="19" Canvas.Top="5"
+                                       Width="2" Height="10"
+                                       Fill="#8CFFFFFF" />
+
+                            <!-- 蝶形阀板：两个对角三角 -->
+                            <Path x:Name="PART_Disc"
+                                  Data="M4,14 L20,21 L4,28 Z M36,14 L20,21 L36,28 Z"
+                                  Fill="#26FFFFFF"
+                                  Stroke="{DynamicResource GlassEdgeHighlightBrush}"
+                                  StrokeThickness="1.4"
+                                  StrokeLineJoin="Round" />
+                        </Canvas>
+                    </Viewbox>
+                    <ControlTemplate.Triggers>
+                        <!-- 打开：通道填充强调色 -->
+                        <Trigger Property="IsOpen" Value="True">
+                            <Setter TargetName="PART_Disc" Property="Fill" Value="{DynamicResource GlassAccentBrush}" />
+                        </Trigger>
+                        <!-- 故障：红色警示（放在最后，覆盖上面的状态色） -->
+                        <Trigger Property="IsFault" Value="True">
+                            <Setter TargetName="PART_Disc" Property="Fill" Value="#E85555" />
+                            <Setter TargetName="PART_Disc" Property="Stroke" Value="#FF8080" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>
