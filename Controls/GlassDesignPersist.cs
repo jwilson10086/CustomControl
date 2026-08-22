@@ -29,6 +29,19 @@ namespace CustomControl.Controls;
 /// </summary>
 internal static class GlassDesignPersist
 {
+    /// <summary>
+    /// 可视化编辑能力总开关：仅 DEBUG 编译且附加调试器时可用；
+    /// 直接运行 exe（发布版 / 无调试器）时恒为 false，编辑手柄与交互全部禁用。
+    /// </summary>
+    public static bool IsEditingSupported
+    {
+#if DEBUG
+        get => Debugger.IsAttached;
+#else
+        get => false;
+#endif
+    }
+
     /// <summary>某控件成功写回后触发（参数：控件、本次写入的属性集），供调用方同步定位指纹。</summary>
     public static event Action<FrameworkElement, IReadOnlyList<KeyValuePair<string, string>>>? WrittenBack;
 

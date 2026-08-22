@@ -29,7 +29,9 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="controls:GlassPump">
-                    <Viewbox Stretch="Uniform"
+                    <!-- Stretch=Fill：Width/Height 直接控制内容长宽（组态编辑时拖宽拖高即时生效）；
+                         Uniform 会等比限制，编辑器中"拉宽"看起来无效 -->
+                    <Viewbox Stretch="Fill"
                              HorizontalAlignment="Center"
                              VerticalAlignment="Center">
                         <Canvas Width="48" Height="48">

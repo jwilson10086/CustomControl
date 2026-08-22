@@ -274,6 +274,19 @@ public class GlassPipe : Control
     private static void OnIsEditingChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         var pipe = (GlassPipe)d;
+
+        // 非调试环境（直接运行 exe）不进入编辑模式：
+        // 强制回退 IsEditing，样式触发器（光标/命中）也随之关闭
+        if (!GlassDesignPersist.IsEditingSupported)
+        {
+            if (e.NewValue is true)
+            {
+                pipe.IsEditing = false;
+            }
+
+            return;
+        }
+
         if (e.NewValue is false)
         {
             pipe._dragIndex = -1;

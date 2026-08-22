@@ -198,11 +198,15 @@
                                         </Grid>
                                     </Border>
 
-                                    <!-- 页面/内容宿主 -->
-                                    <ContentPresenter Grid.Row="1"
-                                                      
-                                                      Content="{TemplateBinding Content}"
-                                                      ContentTemplate="{TemplateBinding ContentTemplate}" />
+                                    <!-- 页面/内容宿主
+                                         必须包 AdornerDecorator：AdornerLayer 由它提供，
+                                         否则 GetAdornerLayer 返回 null，编辑器选框/手柄、
+                                         GlassBadge 等装饰层全部失效 -->
+                                    <AdornerDecorator Grid.Row="1">
+                                        <ContentPresenter
+                                            Content="{TemplateBinding Content}"
+                                            ContentTemplate="{TemplateBinding ContentTemplate}" />
+                                    </AdornerDecorator>
                                 </Grid>
 
                                 <!-- 底部玻璃着色渐变 -->

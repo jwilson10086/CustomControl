@@ -78,10 +78,10 @@
                         Height="200"
                         HorizontalAlignment="Center">
                     <controls:GlassPump x:Name="Valve1"
-                                        Width="200"
-                                        Height="200"
+                                        Width="203"
+                                        Height="215"
                                         controls:GlassEditor.Editing="True"
-                                        IsRunning="True" Canvas.Left="126" Canvas.Top="158" />
+                                        IsRunning="True" Canvas.Left="67" Canvas.Top="12" />
                     <controls:GlassPipe x:Name="Pipe1"
                                         Width="486"
                                         IsEditing="True"
@@ -89,7 +89,7 @@
                                         IsFlowing="True"
                                         Canvas.Left="214"
                                         Canvas.Top="24"
-                                        Points="231,25.4 231,153.4 83,68.4"
+                                        Points="231,25.4 231,153.4 173,124.4"
                                         HorizontalAlignment="Left"
                                         VerticalAlignment="Top"
                                         Height="368" />

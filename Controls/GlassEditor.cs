@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -11,13 +10,16 @@ using System.Windows.Shapes;
 namespace CustomControl.Controls;
 
 /// <summary>
-/// 附加属性：给任意控件开启可视化编辑——
+/// 附加属性：给任意控件开启可视化编辑（父容器必须是 Canvas）——
 /// - 拖动控件本体：调整位置（Canvas.Left / Canvas.Top，取整对齐）；
-/// - 拖右侧中点手柄：改宽度；下侧中点：改高度；右下角：宽高一起缩放。
+/// - 拖右侧中点手柄：直接改宽度；下侧中点：直接改高度；
+/// - 拖右下角手柄：按控件"当前长宽比"等比缩放（每次按下时锁定比例，
+///   例如先拉宽成 1:4 后再拖斜角，就保持 1:4 缩放，不会跳回初始比例）。
+/// 三个手柄直接画在父 Canvas 上（覆盖层），与控件同层移动，天然跟随。
 /// DEBUG 编译且附加调试器时，操作结束约 0.5 秒自动把
 /// Canvas.Left / Canvas.Top / Width / Height 写回项目源 *.xaml。
 ///
-/// 用法（父容器必须是 Canvas）：
+/// 用法：
 /// <controls:GlassPump controls:GlassEditor.Editing="True" ... />
 /// </summary>
 public static class GlassEditor
@@ -43,6 +45,12 @@ public static class GlassEditor
             return;
         }
 
+        // 非调试环境（直接运行 exe）不进入编辑模式：无手柄、无拖拽拦截
+        if (!GlassDesignPersist.IsEditingSupported)
+        {
+            return;
+        }
+
         // 先清理旧状态，保证反复开关不叠加处理器
         if (el.GetValue(StateProperty) is EditorState old)
         {
@@ -59,21 +67,35 @@ public static class GlassEditor
     }
 }
 
-/// <summary>单个被编辑控件的全部编辑行为：本体拖动 + 三手柄缩放 + 回写。</summary>
+/// <summary>
+/// 单个被编辑控件的编辑行为：本体拖动 + 三个 Canvas 覆盖层手柄缩放 + XAML 回写。
+/// </summary>
 internal sealed class EditorState
 {
+    private enum HandleRole
+    {
+        East,
+        South,
+        Corner,
+    }
+
     private const double HandleSize = 10;
     private const double MinSize = 12;
 
     private readonly FrameworkElement _el;
     private readonly Dictionary<string, string> _seeds = new();
+    private readonly Dictionary<HandleRole, Rectangle> _handles = new();
 
     private bool _attached;
     private bool _moving;
     private Point _dragOrigin;
     private double _origLeft;
     private double _origTop;
-    private GlassEditorAdorner? _adorner;
+
+    private HandleRole? _resizing;
+    private double _resizeOriginWidth;
+    private double _resizeOriginHeight;
+    private Point _resizeOriginPoint;
 
     internal EditorState(FrameworkElement el)
     {
@@ -97,6 +119,9 @@ internal sealed class EditorState
         _el.PreviewMouseLeftButtonUp += OnMoveEnd;
         _el.LostMouseCapture += (_, _) => _moving = false;
 
+        // 布局变化（拖动/缩放/外部改尺寸）后重算手柄位置
+        _el.LayoutUpdated += OnLayoutUpdated;
+
         GlassDesignPersist.WrittenBack += OnWrittenBack;
     }
 
@@ -113,44 +138,178 @@ internal sealed class EditorState
         _el.PreviewMouseLeftButtonDown -= OnMoveBegin;
         _el.PreviewMouseMove -= OnMoveDelta;
         _el.PreviewMouseLeftButtonUp -= OnMoveEnd;
+        _el.LayoutUpdated -= OnLayoutUpdated;
 
         GlassDesignPersist.WrittenBack -= OnWrittenBack;
 
-        RemoveAdorner();
+        RemoveHandles();
     }
 
-    private void OnLoaded(object sender, RoutedEventArgs e) => AddAdorner();
+    private void OnLoaded(object sender, RoutedEventArgs e) => EnsureHandles();
 
-    private void OnUnloaded(object? sender, RoutedEventArgs e) => RemoveAdorner();
+    private void OnUnloaded(object? sender, RoutedEventArgs e) => RemoveHandles();
 
-    private void AddAdorner()
+    private void OnLayoutUpdated(object? sender, EventArgs e) => UpdateHandles();
+
+    private Canvas? GetCanvas() => VisualTreeHelper.GetParent(_el) as Canvas;
+
+    #region 手柄（覆盖层：画在父 Canvas 上，与控件同层，天然跟随）
+
+    private void EnsureHandles()
     {
-        if (_adorner is not null || DesignerProperties.GetIsInDesignMode(_el))
+        if (_handles.Count > 0)
         {
             return;
         }
 
-        var layer = AdornerLayer.GetAdornerLayer(_el);
-        if (layer is null)
+        var canvas = GetCanvas();
+        if (canvas is null || DesignerProperties.GetIsInDesignMode(_el))
         {
             return;
         }
 
-        _adorner = new GlassEditorAdorner(_el, this);
-        layer.Add(_adorner);
+        CreateHandle(HandleRole.East, Cursors.SizeWE, "拖动调宽度");
+        CreateHandle(HandleRole.South, Cursors.SizeNS, "拖动调高度");
+        CreateHandle(HandleRole.Corner, Cursors.SizeNWSE, "拖动按当前比例等比缩放");
+
+        UpdateHandles();
     }
 
-    private void RemoveAdorner()
+    private void RemoveHandles()
     {
-        if (_adorner is null)
+        if (GetCanvas() is { } canvas)
+        {
+            foreach (var h in _handles.Values)
+            {
+                canvas.Children.Remove(h);
+            }
+        }
+
+        _handles.Clear();
+    }
+
+    private void CreateHandle(HandleRole role, Cursor cursor, string tip)
+    {
+        var handle = new Rectangle
+        {
+            Width = HandleSize,
+            Height = HandleSize,
+            Fill = new SolidColorBrush(Color.FromArgb(0xE6, 0xFF, 0xFF, 0xFF)),
+            Stroke = new SolidColorBrush(Color.FromArgb(0xE6, 0x35, 0xD0, 0x7F)),
+            StrokeThickness = 1.5,
+            RadiusX = 2,
+            RadiusY = 2,
+            Cursor = cursor,
+            ToolTip = tip,
+        };
+
+        handle.PreviewMouseLeftButtonDown += (_, e) =>
+        {
+            _resizing = role;
+            _resizeOriginWidth = EffectiveWidth;
+            _resizeOriginHeight = EffectiveHeight;
+            _resizeOriginPoint = GetCanvas() is { } c ? e.GetPosition(c) : new Point();
+
+            NotifyResizeStarted(role != HandleRole.South, role != HandleRole.East);
+            handle.CaptureMouse();
+            e.Handled = true;
+        };
+        handle.PreviewMouseMove += (_, e) => OnHandleMove(handle, e);
+        handle.PreviewMouseLeftButtonUp += (_, e) =>
+        {
+            if (_resizing is null)
+            {
+                return;
+            }
+
+            var current = _resizing.Value;
+            _resizing = null;
+            handle.ReleaseMouseCapture();
+
+            PersistSize(current != HandleRole.South, current != HandleRole.East);
+            e.Handled = true;
+        };
+        handle.LostMouseCapture += (_, _) => _resizing = null;
+
+        _handles[role] = handle;
+        GetCanvas()?.Children.Add(handle);
+    }
+
+    private void OnHandleMove(Rectangle handle, MouseEventArgs e)
+    {
+        if (_resizing is not { } current || !handle.IsMouseCaptured)
         {
             return;
         }
 
-        var layer = AdornerLayer.GetAdornerLayer(_el);
-        layer?.Remove(_adorner);
-        _adorner = null;
+        var canvas = GetCanvas();
+        if (canvas is null)
+        {
+            return;
+        }
+
+        var pos = e.GetPosition(canvas);
+        var dx = pos.X - _resizeOriginPoint.X;
+        var dy = pos.Y - _resizeOriginPoint.Y;
+
+        if (current == HandleRole.East)
+        {
+            SetWidth(Math.Max(MinSize, Math.Round(_resizeOriginWidth + dx)));
+        }
+        else if (current == HandleRole.South)
+        {
+            SetHeight(Math.Max(MinSize, Math.Round(_resizeOriginHeight + dy)));
+        }
+        else
+        {
+            // 右下角：按"本次按下时"的长宽比等比缩放（比例被锁定，不随历史操作漂移）
+            var ratio = _resizeOriginWidth / Math.Max(_resizeOriginHeight, 1);
+            var dominantX = Math.Abs(dx) / Math.Max(_resizeOriginWidth, 1)
+                            >= Math.Abs(dy) / Math.Max(_resizeOriginHeight, 1);
+            var scale = dominantX
+                ? 1 + dx / _resizeOriginWidth
+                : 1 + dy / _resizeOriginHeight;
+
+            var w = Math.Max(MinSize, Math.Round(_resizeOriginWidth * scale));
+            var h = Math.Max(MinSize, Math.Round(_resizeOriginHeight * scale));
+            SetWidth(w);
+            SetHeight(h);
+        }
+
+        UpdateHandles();
+        e.Handled = true;
     }
+
+    /// <summary>按当前 Canvas.Left/Top + 实际尺寸重算三个手柄的位置。</summary>
+    private void UpdateHandles()
+    {
+        if (_handles.Count == 0)
+        {
+            return;
+        }
+
+        var canvas = GetCanvas();
+        if (canvas is null)
+        {
+            return;
+        }
+
+        var left = double.IsNaN(Canvas.GetLeft(_el)) ? 0 : Canvas.GetLeft(_el);
+        var top = double.IsNaN(Canvas.GetTop(_el)) ? 0 : Canvas.GetTop(_el);
+        var w = EffectiveWidth;
+        var h = EffectiveHeight;
+
+        foreach (var pair in _handles)
+        {
+            var (role, handle) = (pair.Key, pair.Value);
+            var x = role == HandleRole.South ? left + w / 2 - HandleSize / 2 : left + w - HandleSize / 2;
+            var y = role == HandleRole.East ? top + h / 2 - HandleSize / 2 : top + h - HandleSize / 2;
+            Canvas.SetLeft(handle, x);
+            Canvas.SetTop(handle, y);
+        }
+    }
+
+    #endregion
 
     #region 本体拖动
 
@@ -193,6 +352,7 @@ internal sealed class EditorState
         var pos = e.GetPosition(canvas);
         Canvas.SetLeft(_el, Math.Round(Math.Max(0, _origLeft + pos.X - _dragOrigin.X)));
         Canvas.SetTop(_el, Math.Round(Math.Max(0, _origTop + pos.Y - _dragOrigin.Y)));
+        UpdateHandles();
         e.Handled = true;
     }
 
@@ -211,14 +371,12 @@ internal sealed class EditorState
         e.Handled = true;
     }
 
-    private Canvas? GetCanvas() => VisualTreeHelper.GetParent(_el) as Canvas;
-
     #endregion
 
-    #region 缩放（由 Adorner 手柄回调）
+    #region 尺寸访问与缩放落盘
 
     /// <summary>手柄开始缩放：记录该轴初始尺寸作为指纹。</summary>
-    internal void NotifyResizeStarted(bool widthInvolved, bool heightInvolved)
+    private void NotifyResizeStarted(bool widthInvolved, bool heightInvolved)
     {
         if (widthInvolved)
         {
@@ -235,11 +393,11 @@ internal sealed class EditorState
 
     internal double EffectiveHeight => double.IsNaN(_el.Height) ? _el.ActualHeight : _el.Height;
 
-    internal void SetWidth(double value) => _el.Width = value;
+    private void SetWidth(double value) => _el.Width = value;
 
-    internal void SetHeight(double value) => _el.Height = value;
+    private void SetHeight(double value) => _el.Height = value;
 
-    internal void PersistSize(bool widthChanged, bool heightChanged)
+    private void PersistSize(bool widthChanged, bool heightChanged)
     {
         var updates = new List<KeyValuePair<string, string>>();
         var fingerprints = new List<KeyValuePair<string, string>>();
@@ -258,8 +416,6 @@ internal sealed class EditorState
 
         Schedule(updates, fingerprints);
     }
-
-    #endregion
 
     private void PersistPosition()
     {
@@ -316,153 +472,12 @@ internal sealed class EditorState
             return;
         }
 
-        // 指纹同步为最新已写入值，同一会话内继续拖动仍可定位
+        // 指纹同步为最新已写入值，同一会话内继续操作仍可定位
         foreach (var u in updates)
         {
             _seeds[u.Key] = u.Value;
         }
     }
-}
 
-/// <summary>
-/// 编辑装饰层：虚线选框 + 三个缩放手柄（右缘=宽度、下缘=高度、右下角=宽高）。
-/// </summary>
-internal sealed class GlassEditorAdorner : Adorner
-{
-    private enum HandleRole
-    {
-        East,
-        South,
-        Corner,
-    }
-
-    private const double HandleSize = 10;
-    private const double MinSize = 12;
-
-    private readonly EditorState _state;
-    private readonly VisualCollection _visuals;
-    private readonly Rectangle _frame;
-    private readonly Dictionary<HandleRole, Rectangle> _handles = new();
-    private HandleRole? _resizing;
-    private double _resizeOriginWidth;
-    private double _resizeOriginHeight;
-    private Point _resizeOriginPoint;
-
-    internal GlassEditorAdorner(FrameworkElement adornedElement, EditorState state)
-        : base(adornedElement)
-    {
-        _state = state;
-        _visuals = new VisualCollection(this);
-
-        _frame = new Rectangle
-        {
-            Stroke = new SolidColorBrush(Color.FromArgb(0xB3, 0x35, 0xD0, 0x7F)),
-            StrokeThickness = 1,
-            StrokeDashArray = new DoubleCollection { 4, 2 },
-            IsHitTestVisible = false,
-        };
-        _visuals.Add(_frame);
-
-        CreateHandle(HandleRole.East, Cursors.SizeWE);
-        CreateHandle(HandleRole.South, Cursors.SizeNS);
-        CreateHandle(HandleRole.Corner, Cursors.SizeNWSE);
-
-        adornedElement.LayoutUpdated += (_, _) => InvalidateArrange();
-    }
-
-    private void CreateHandle(HandleRole role, Cursor cursor)
-    {
-        var handle = new Rectangle
-        {
-            Width = HandleSize,
-            Height = HandleSize,
-            Fill = new SolidColorBrush(Color.FromArgb(0xE6, 0xFF, 0xFF, 0xFF)),
-            Stroke = new SolidColorBrush(Color.FromArgb(0xE6, 0x35, 0xD0, 0x7F)),
-            StrokeThickness = 1.5,
-            RadiusX = 2,
-            RadiusY = 2,
-            Cursor = cursor,
-            ToolTip = role switch
-            {
-                HandleRole.East => "拖动调宽度",
-                HandleRole.South => "拖动调高度",
-                _ => "拖动等比缩放宽高",
-            },
-        };
-
-        handle.PreviewMouseLeftButtonDown += (_, e) =>
-        {
-            _resizing = role;
-            _resizeOriginWidth = _state.EffectiveWidth;
-            _resizeOriginHeight = _state.EffectiveHeight;
-            _resizeOriginPoint = e.GetPosition(this);
-
-            _state.NotifyResizeStarted(role != HandleRole.South, role != HandleRole.East);
-            handle.CaptureMouse();
-            e.Handled = true;
-        };
-        handle.PreviewMouseMove += (_, e) =>
-        {
-            if (_resizing is not { } current || !handle.IsMouseCaptured)
-            {
-                return;
-            }
-
-            var pos = e.GetPosition(this);
-            var dx = pos.X - _resizeOriginPoint.X;
-            var dy = pos.Y - _resizeOriginPoint.Y;
-
-            if (current == HandleRole.East || current == HandleRole.Corner)
-            {
-                _state.SetWidth(Math.Max(MinSize, Math.Round(_resizeOriginWidth + dx)));
-            }
-
-            if (current == HandleRole.South || current == HandleRole.Corner)
-            {
-                _state.SetHeight(Math.Max(MinSize, Math.Round(_resizeOriginHeight + dy)));
-            }
-
-            e.Handled = true;
-        };
-        handle.PreviewMouseLeftButtonUp += (_, e) =>
-        {
-            if (_resizing is null)
-            {
-                return;
-            }
-
-            var current = _resizing.Value;
-            _resizing = null;
-            handle.ReleaseMouseCapture();
-
-            _state.PersistSize(current != HandleRole.South, current != HandleRole.East);
-            e.Handled = true;
-        };
-        handle.LostMouseCapture += (_, _) => _resizing = null;
-
-        _handles[role] = handle;
-        _visuals.Add(handle);
-    }
-
-    protected override int VisualChildrenCount => _visuals.Count;
-
-    protected override Visual GetVisualChild(int index) => _visuals[index];
-
-    protected override Size ArrangeOverride(Size finalSize)
-    {
-        var w = ((FrameworkElement)AdornedElement).ActualWidth;
-        var h = ((FrameworkElement)AdornedElement).ActualHeight;
-
-        _frame.Arrange(new Rect(0, 0, w, h));
-
-        foreach (var pair in _handles)
-        {
-            var (role, handle) = (pair.Key, pair.Value);
-            var x = role == HandleRole.South ? w / 2 - HandleSize / 2 : w - HandleSize / 2;
-            var y = role == HandleRole.East ? h / 2 - HandleSize / 2 : h - HandleSize / 2;
-            handle.Arrange(new Rect(x, y, HandleSize, HandleSize));
-        }
-
-        return finalSize;
-    }
+    #endregion
 }
