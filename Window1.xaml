@@ -1,14 +1,15 @@
-﻿<controls:GlassWindow x:Class="CustomControl.Window1"
-                      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                      xmlns:controls="clr-namespace:CustomControl.Controls"
-                      xmlns:effects="clr-namespace:CustomControl.Effects"
-                      Title="CustomControl · 毛玻璃控件库"
-                      Width="1280"
-                      Height="860"
-                      WindowStartupLocation="CenterScreen"
-                      Backdrop="Auto"
-                      GlassOpacity="0.24">
+﻿<controls:GcWindow x:Class="GeneralControl.Window1"
+                   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                   xmlns:controls="clr-namespace:GeneralControl.Controls"
+                   xmlns:wafers="clr-namespace:CustomControls.Controls"
+                   xmlns:effects="clr-namespace:GeneralControl.Effects"
+                   Title="GeneralControl · 毛玻璃控件库"
+                   Width="1280"
+                   Height="1860"
+                   WindowStartupLocation="CenterScreen"
+                   Backdrop="Auto"
+                   GlassOpacity="0.24">
 
     <Window.Resources>
         <!-- 分区大标题 -->
@@ -35,10 +36,10 @@
         </Style>
         <!-- 统一卡片：全宽、统一间距。
              必须基于隐式样式派生（BasedOn），否则显式样式会顶掉隐式样式，
-             GlassCard 将拿不到模板而渲染为空白。 -->
+             Card 将拿不到模板而渲染为空白。 -->
         <Style x:Key="DemoCardStyle"
-               TargetType="controls:GlassCard"
-               BasedOn="{StaticResource {x:Type controls:GlassCard}}">
+               TargetType="controls:GcCard"
+               BasedOn="{StaticResource {x:Type controls:GcCard}}">
             <Setter Property="Margin"
                     Value="0,0,0,16" />
             <Setter Property="HorizontalContentAlignment"
@@ -66,62 +67,88 @@
         </Style>
     </Window.Resources>
     <Grid>
-        <controls:GlassCard Header="关于本库"
-                            Style="{StaticResource DemoCardStyle}"
-                            Background="Brown">
+        <controls:GcCard Header="关于本库"
+                         Style="{StaticResource DemoCardStyle}"
+                         Background="Brown">
 
             <StackPanel>
-                <controls:GlassTextBlock FontSize="13"
-                                         Text="CustomControl 是一套毛玻璃 (Glassmorphism) 质感的 WPF 控件库：支持液体玻璃着色器、系统亚克力 / Mica、模拟玻璃三种渲染路径，内置 25+ 控件与 3D 倾斜、鱼眼等附加效果。" />
+                <controls:GcTextBlock FontSize="13"
+                                      Text="GeneralControl 是一套毛玻璃 (Glassmorphism) 质感的 WPF 控件库：支持液体玻璃着色器、系统亚克力 / Mica、模拟玻璃三种渲染路径，内置 25+ 控件与 3D 倾斜、鱼眼等附加效果。" />
 
                 <Canvas Width="200"
                         Height="200"
                         HorizontalAlignment="Center">
-                    <controls:GlassPump x:Name="Valve1"
-                                        Width="203"
-                                        Height="215"
-                                        controls:GlassEditor.Editing="True"
-                                        IsRunning="True" Canvas.Left="67" Canvas.Top="12" />
-                    <controls:GlassPipe x:Name="Pipe1"
-                                        Width="486"
-                                        IsEditing="True"
-                                        Direction="Forward"
-                                        IsFlowing="True"
-                                        Canvas.Left="214"
-                                        Canvas.Top="24"
-                                        Points="231,25.4 231,153.4 173,124.4"
-                                        HorizontalAlignment="Left"
-                                        VerticalAlignment="Top"
-                                        Height="368" />
+                    <controls:GcPump x:Name="Valve1"
+                                     Width="128"
+                                     Height="127"
+                                     controls:GcEditor.Editing="True"
+                                     InletDirection="Right"
+                                     SpinDirection="Counterclockwise"
+                                     IsRunning="True"
+                                     Canvas.Left="0"
+                                     Canvas.Top="80" />
+                    <controls:GcPipe x:Name="Pipe1"
+                                     Width="486"
+                                     IsEditing="True"
+                                     Direction="Forward"
+                                     IsFlowing="True"
+                                     Canvas.Left="214"
+                                     Canvas.Top="24"
+                                     Points="195,47.4 115,18.4 49,90.4 27,170.4"
+                                     HorizontalAlignment="Left"
+                                     VerticalAlignment="Top"
+                                     Height="368" />
                 </Canvas>
-                <controls:GlassSeparator Margin="0,12,0,12" />
+                <controls:GcSeparator Margin="0,12,0,12" />
                 <WrapPanel>
-                    <controls:GlassPanel CornerRadius="8"
-                                         Padding="10,5"
-                                         Margin="0,0,8,8">
-                        <controls:GlassTextBlock Text="液体玻璃 Glassy"
-                                                 FontSize="11.5" />
-                    </controls:GlassPanel>
-                    <controls:GlassPanel CornerRadius="8"
-                                         Padding="10,5"
-                                         Margin="0,0,8,8">
-                        <controls:GlassTextBlock Text="系统亚克力 Acrylic"
-                                                 FontSize="11.5" />
-                    </controls:GlassPanel>
-                    <controls:GlassPanel CornerRadius="8"
-                                         Padding="10,5"
-                                         Margin="0,0,8,8">
-                        <controls:GlassTextBlock Text="Mica"
-                                                 FontSize="11.5" />
-                    </controls:GlassPanel>
-                    <controls:GlassPanel CornerRadius="8"
-                                         Padding="10,5"
-                                         Margin="0,0,8,8">
-                        <controls:GlassTextBlock Text="模拟玻璃 Simulated"
-                                                 FontSize="11.5" />
-                    </controls:GlassPanel>
+                    <controls:GcPanel CornerRadius="8"
+                                      Padding="10,5"
+                                      Margin="0,0,8,8">
+                        <controls:GcTextBlock Text="液体玻璃 Glassy"
+                                              FontSize="11.5" />
+                    </controls:GcPanel>
+                    <controls:GcPanel CornerRadius="8"
+                                      Padding="10,5"
+                                      Margin="0,0,8,8">
+                        <controls:GcTextBlock Text="系统亚克力 Acrylic"
+                                              FontSize="11.5" />
+                    </controls:GcPanel>
+                    <controls:GcPanel CornerRadius="8"
+                                      Padding="10,5"
+                                      Margin="0,0,8,8">
+                        <controls:GcTextBlock Text="Mica"
+                                              FontSize="11.5" />
+                    </controls:GcPanel>
+                    <controls:GcPanel CornerRadius="8"
+                                      Padding="10,5"
+                                      Margin="0,0,8,8">
+                        <controls:GcTextBlock Text="模拟玻璃 Simulated"
+                                              FontSize="11.5" />
+                    </controls:GcPanel>
                 </WrapPanel>
+                <wafers:WaferRobot Height="200"
+                                   Width="200" />
+                <Canvas Width="320"
+                        Height="260"
+                        Margin="0,14,0,0">
+                    <controls:GcRectifier x:Name="RectifierDemo"
+                                          controls:GcEditor.Editing="True"
+                                          Canvas.Left="-60"
+                                          Canvas.Top="283"
+                                          Width="669" Height="275" />
+                    <controls:GcChiller />
+                </Canvas>
+
             </StackPanel>
-        </controls:GlassCard>
+        </controls:GcCard>
     </Grid>
-</controls:GlassWindow>
+</controls:GcWindow>
+
+
+
+
+
+
+
+
+

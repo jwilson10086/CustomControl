@@ -1,0 +1,124 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:GeneralControl.Controls">
+
+    <!--
+        ================================================================
+        文件说明：Themes\Steel\Controls\SignalTower.xaml
+        SignalTower 工业三色警示灯样式（Andon 信号塔）。
+
+        依赖：Brushes.xaml（画刷资源）。
+        结构：Viewbox(等比缩放) → 24x56 画布
+              → [顶盖 + 三段灯罩(PART_RedLens/PART_YellowLens/PART_GreenLens)
+                 + 立杆 + 底座]
+
+        【点亮逻辑】Trigger 按 Light 值把对应灯罩填充分亮色，
+        其余保持暗态；IsBlinking=true 时三段灯罩整体呼吸闪烁
+        （EnterActions 起故事板 / ExitActions 停止）。
+        ================================================================
+    -->
+
+    <Style TargetType="controls:GcSignalTower">
+        <Setter Property="Width" Value="24" />
+        <Setter Property="Height" Value="56" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="controls:GcSignalTower">
+                    <Viewbox Stretch="Uniform"
+                             HorizontalAlignment="Center"
+                             VerticalAlignment="Center">
+                        <Canvas Width="24" Height="56">
+                            <!-- 底座 + 立杆 -->
+                            <Rectangle Canvas.Left="4" Canvas.Top="50.5"
+                                       Width="16" Height="4"
+                                       RadiusX="1.5" RadiusY="1.5"
+                                       Fill="#4D334155"
+                                       Stroke="#33334155" StrokeThickness="0.8" />
+                            <Rectangle Canvas.Left="10.5" Canvas.Top="44"
+                                       Width="3" Height="7"
+                                       Fill="#66334155" />
+
+                            <!-- 灯罩段（自上而下：红 / 黄 / 绿），暗态为默认 -->
+                            <Rectangle x:Name="PART_RedLens"
+                                       Canvas.Left="5" Canvas.Top="6.5"
+                                       Width="14" Height="11"
+                                       RadiusX="3" RadiusY="3"
+                                       Fill="#14334155"
+                                       Stroke="#33334155" StrokeThickness="1" />
+                            <Rectangle x:Name="PART_YellowLens"
+                                       Canvas.Left="5" Canvas.Top="19"
+                                       Width="14" Height="11"
+                                       RadiusX="3" RadiusY="3"
+                                       Fill="#14334155"
+                                       Stroke="#33334155" StrokeThickness="1" />
+                            <Rectangle x:Name="PART_GreenLens"
+                                       Canvas.Left="5" Canvas.Top="31.5"
+                                       Width="14" Height="11"
+                                       RadiusX="3" RadiusY="3"
+                                       Fill="#14334155"
+                                       Stroke="#33334155" StrokeThickness="1" />
+
+                            <!-- 顶盖 -->
+                            <Rectangle Canvas.Left="6.2" Canvas.Top="3"
+                                       Width="11.6" Height="3.8"
+                                       RadiusX="1.8" RadiusY="1.8"
+                                       Fill="#59334155" />
+                        </Canvas>
+                    </Viewbox>
+                    <ControlTemplate.Triggers>
+                        <!-- 点亮对应灯段 -->
+                        <Trigger Property="Light" Value="Green">
+                            <Setter TargetName="PART_GreenLens" Property="Fill" Value="#35D07F" />
+                            <Setter TargetName="PART_GreenLens" Property="Stroke" Value="#7CE8B0" />
+                        </Trigger>
+                        <Trigger Property="Light" Value="Yellow">
+                            <Setter TargetName="PART_YellowLens" Property="Fill" Value="#F2C94C" />
+                            <Setter TargetName="PART_YellowLens" Property="Stroke" Value="#FFE59A" />
+                        </Trigger>
+                        <Trigger Property="Light" Value="Red">
+                            <Setter TargetName="PART_RedLens" Property="Fill" Value="#EB5757" />
+                            <Setter TargetName="PART_RedLens" Property="Stroke" Value="#FF9A9A" />
+                        </Trigger>
+
+                        <!-- 闪烁：三段灯罩整体呼吸（报警常见） -->
+                        <Trigger Property="IsBlinking" Value="True">
+                            <Trigger.EnterActions>
+                                <BeginStoryboard x:Name="BlinkStoryboard">
+                                    <Storyboard RepeatBehavior="Forever">
+                                        <DoubleAnimation Storyboard.TargetName="PART_RedLens"
+                                                         Storyboard.TargetProperty="Opacity"
+                                                         From="1" To="0.3"
+                                                         AutoReverse="True"
+                                                         Duration="0:0:0.6" />
+                                        <DoubleAnimation Storyboard.TargetName="PART_YellowLens"
+                                                         Storyboard.TargetProperty="Opacity"
+                                                         From="1" To="0.3"
+                                                         AutoReverse="True"
+                                                         Duration="0:0:0.6" />
+                                        <DoubleAnimation Storyboard.TargetName="PART_GreenLens"
+                                                         Storyboard.TargetProperty="Opacity"
+                                                         From="1" To="0.3"
+                                                         AutoReverse="True"
+                                                         Duration="0:0:0.6" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <StopStoryboard BeginStoryboardName="BlinkStoryboard" />
+                            </Trigger.ExitActions>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>
+
+
+
+
+
+
+
+

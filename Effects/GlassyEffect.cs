@@ -2,51 +2,51 @@
 using System.Windows.Media;
 using System.Windows.Media.Effects;
 
-namespace CustomControl.Effects;
+namespace GeneralControl.Effects;
 
 /// <summary>
 /// 液体玻璃（Liquid Glass）像素着色器封装。
 /// 着色器源自 dragosniamtu/WPF-Liquid-Glass-Effect (MIT)，详见 THIRD-PARTY-NOTICES.md。
-/// 将 <see cref="GlassyEffect"/> 应用到任意元素即可获得带折射/色散/高光的液体玻璃质感。
+/// 将 <see cref="GcGlassyEffect"/> 应用到任意元素即可获得带折射/色散/高光的液体玻璃质感。
 /// </summary>
-public sealed class GlassyEffect : ShaderEffect
+public sealed class GcGlassyEffect : ShaderEffect
 {
     public static readonly DependencyProperty InputProperty =
-        RegisterPixelShaderSamplerProperty(nameof(Input), typeof(GlassyEffect), 0);
+        RegisterPixelShaderSamplerProperty(nameof(Input), typeof(GcGlassyEffect), 0);
 
     public static readonly DependencyProperty TextureSizeProperty =
         DependencyProperty.Register(
             nameof(TextureSize),
             typeof(Point),
-            typeof(GlassyEffect),
+            typeof(GcGlassyEffect),
             new UIPropertyMetadata(new Point(1.0, 1.0), PixelShaderConstantCallback(0)));
 
     public static readonly DependencyProperty GlassCenterProperty =
         DependencyProperty.Register(
             nameof(GlassCenter),
             typeof(Point),
-            typeof(GlassyEffect),
+            typeof(GcGlassyEffect),
             new UIPropertyMetadata(new Point(0.0, 0.0), PixelShaderConstantCallback(1)));
 
     public static readonly DependencyProperty GlassSizeProperty =
         DependencyProperty.Register(
             nameof(GlassSize),
             typeof(Point),
-            typeof(GlassyEffect),
+            typeof(GcGlassyEffect),
             new UIPropertyMetadata(new Point(120.0, 80.0), PixelShaderConstantCallback(2)));
 
     public static readonly DependencyProperty BlurIntensityProperty =
         DependencyProperty.Register(
             nameof(BlurIntensity),
             typeof(float),
-            typeof(GlassyEffect),
+            typeof(GcGlassyEffect),
             new UIPropertyMetadata(1.2f, PixelShaderConstantCallback(3)));
 
-    public GlassyEffect()
+    public GcGlassyEffect()
     {
         PixelShader = new PixelShader
         {
-            UriSource = new Uri("pack://application:,,,/CustomControl;component/Effects/GlassyEffect.ps", UriKind.Absolute),
+            UriSource = new Uri("pack://application:,,,/CustomControl;component/Effects/GcGlassyEffect.ps", UriKind.Absolute),
         };
 
         UpdateShaderValue(InputProperty);
@@ -91,3 +91,5 @@ public sealed class GlassyEffect : ShaderEffect
         set => SetValue(BlurIntensityProperty, value);
     }
 }
+
+

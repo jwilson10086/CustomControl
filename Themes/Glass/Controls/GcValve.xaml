@@ -1,0 +1,117 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:GeneralControl.Controls">
+
+    <!--
+        ================================================================
+        文件说明：Themes\Glass\Controls\Valve.xaml
+        Valve 工业阀门样式（对夹式刀闸阀 + 执行器）。
+
+        依赖：Brushes.xaml（画刷资源）。
+        结构：Viewbox(等比缩放) → 40x40 画布
+              → [两侧法兰 + 阀体流道 + 执行器(带状态灯 PART_ActuatorLamp)
+                 + 阀杆 + 弧刃阀板(PART_Disc) + 阀轴心点]
+
+        【造型说明】
+        - 两侧法兰：阀门"装在管路上"的对夹安装感；
+        - PART_Disc：两片内凹弧刃（Q 曲线），比直边三角更接近真实闸板；
+        - 轴心点盖住两刃交汇处，转动铰接感；
+        - PART_ActuatorLamp：执行器状态灯，开=强调色 / 关=暗 / 故障=红。
+
+        【配色规则】
+        - 打开：PART_Disc 填充强调色（介质可通过）
+        - 关闭：暗色填充 + 边框
+        - 故障：整体红色（优先级最高，Trigger 排最后）
+        ================================================================
+    -->
+
+    <Style TargetType="controls:GcValve">
+        <Setter Property="Width" Value="40" />
+        <Setter Property="Height" Value="40" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="controls:GcValve">
+                    <Viewbox Stretch="Uniform">
+                        <Canvas Width="40" Height="40">
+                            <!-- 流道：介质通道底色 -->
+                            <Rectangle Canvas.Left="0" Canvas.Top="16.5"
+                                       Width="40" Height="7"
+                                       Fill="#1FFFFFFF" />
+
+                            <!-- 两侧法兰：对夹安装 -->
+                            <Rectangle Canvas.Left="0" Canvas.Top="12.5"
+                                       Width="3.2" Height="15"
+                                       RadiusX="0.8" RadiusY="0.8"
+                                       Fill="#47FFFFFF"
+                                       Stroke="{DynamicResource GcEdgeHighlightBrush}"
+                                       StrokeThickness="1" />
+                            <Rectangle Canvas.Left="36.8" Canvas.Top="12.5"
+                                       Width="3.2" Height="15"
+                                       RadiusX="0.8" RadiusY="0.8"
+                                       Fill="#47FFFFFF"
+                                       Stroke="{DynamicResource GcEdgeHighlightBrush}"
+                                       StrokeThickness="1" />
+
+                            <!-- 执行器：圆角主体 + 状态灯 -->
+                            <Rectangle Canvas.Left="11" Canvas.Top="0"
+                                       Width="18" Height="8.5"
+                                       RadiusX="2.5" RadiusY="2.5"
+                                       Fill="#3DFFFFFF"
+                                       Stroke="#59FFFFFF"
+                                       StrokeThickness="1" />
+                            <Rectangle x:Name="PART_ActuatorLamp"
+                                       Canvas.Left="16.5" Canvas.Top="3"
+                                       Width="7" Height="2.4"
+                                       RadiusX="1.2" RadiusY="1.2"
+                                       Fill="#35FFFFFF" />
+
+                            <!-- 阀杆 -->
+                            <Rectangle Canvas.Left="19.2" Canvas.Top="7"
+                                       Width="1.6" Height="8"
+                                       Fill="#8CFFFFFF" />
+
+                            <!-- 弧刃阀板：两片内凹弧刃在轴心交汇 -->
+                            <Path x:Name="PART_Disc"
+                                  Data="M4,13 Q13.5,15.5 20,21 Q13.5,26.5 4,29 Z M36,13 Q26.5,15.5 20,21 Q26.5,26.5 36,29 Z"
+                                  Fill="#26FFFFFF"
+                                  Stroke="{DynamicResource GcEdgeHighlightBrush}"
+                                  StrokeThickness="1.4"
+                                  StrokeLineJoin="Round" />
+
+                            <!-- 阀轴心点 -->
+                            <Ellipse Canvas.Left="18" Canvas.Top="19"
+                                     Width="4" Height="4"
+                                     Fill="#B8FFFFFF" />
+                            <Ellipse Canvas.Left="19.3" Canvas.Top="20.3"
+                                     Width="1.4" Height="1.4"
+                                     Fill="#66000000" />
+                        </Canvas>
+                    </Viewbox>
+                    <ControlTemplate.Triggers>
+                        <!-- 打开：阀板与执行器灯填充强调色 -->
+                        <Trigger Property="IsOpen" Value="True">
+                            <Setter TargetName="PART_Disc" Property="Fill" Value="{DynamicResource GcAccentBrush}" />
+                            <Setter TargetName="PART_ActuatorLamp" Property="Fill" Value="{DynamicResource GcAccentBrush}" />
+                        </Trigger>
+                        <!-- 故障：红色警示（放在最后，覆盖上面的状态色） -->
+                        <Trigger Property="IsFault" Value="True">
+                            <Setter TargetName="PART_Disc" Property="Fill" Value="#E85555" />
+                            <Setter TargetName="PART_Disc" Property="Stroke" Value="#FF8080" />
+                            <Setter TargetName="PART_ActuatorLamp" Property="Fill" Value="#FF5555" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>
+
+
+
+
+
+
+

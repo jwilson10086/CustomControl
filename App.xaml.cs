@@ -4,11 +4,11 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Threading;
 
-namespace CustomControl;
+namespace GeneralControl;
 
 public partial class App : Application
 {
-    private static readonly string LogPath = Path.Combine(Path.GetTempPath(), "CustomControl.err.log");
+    private static readonly string LogPath = Path.Combine(Path.GetTempPath(), "GeneralControl.err.log");
 
     public App()
     {
@@ -30,3 +30,4 @@ public partial class App : Application
         File.WriteAllText(LogPath, e.ExceptionObject?.ToString() ?? "unknown exception");
     }
 }
+

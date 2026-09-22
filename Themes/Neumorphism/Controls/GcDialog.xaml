@@ -1,0 +1,163 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:GeneralControl.Controls">
+
+    <!--  高对比度弹窗按钮  -->
+    <Style x:Key="GcDialogButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="#E8E8EC" />
+        <Setter Property="BorderBrush" Value="#D0D0D6" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Foreground" Value="#2D3436" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Padding" Value="24,10" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border
+                        x:Name="Root"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="10"
+                        SnapsToDevicePixels="True">
+                        <ContentPresenter
+                            Margin="{TemplateBinding Padding}"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Root" Property="Background" Value="#F0F0F5" />
+                            <Setter TargetName="Root" Property="BorderBrush" Value="#B8B8C0" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Root" Property="Background" Value="#D8D8DE" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Root" Property="Opacity" Value="0.4" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--  高对比度确认按钮  -->
+    <Style
+        x:Key="GcDialogConfirmStyle"
+        BasedOn="{StaticResource GcDialogButtonStyle}"
+        TargetType="Button">
+        <Setter Property="Background" Value="#88AAE0" />
+        <Setter Property="BorderBrush" Value="#6890D0" />
+        <Setter Property="Foreground" Value="White" />
+    </Style>
+
+    <!--  拟物 Dialog：结构与 Glass 一致  -->
+    <Style TargetType="controls:GcDialog">
+        <Setter Property="Background" Value="{DynamicResource GcControlBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource GcTextBrush}" />
+        <Setter Property="MinWidth" Value="340" />
+        <Setter Property="MaxWidth" Value="480" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="controls:GcDialog">
+                    <Border
+                        Padding="24"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{DynamicResource GcBorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="16">
+                        <Border.Effect>
+                            <DropShadowEffect
+                                BlurRadius="9"
+                                Opacity="0.35"
+                                ShadowDepth="3"
+                                Color="#A0A0A8" />
+                        </Border.Effect>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <TextBlock
+                                Grid.Row="0"
+                                Margin="0,0,0,16"
+                                FontSize="18"
+                                FontWeight="Bold"
+                                Text="{TemplateBinding Title}" />
+                            <ContentPresenter Grid.Row="1" Margin="0,0,0,12" />
+                            <Border
+                                Grid.Row="2"
+                                MaxHeight="300"
+                                Margin="0,0,0,16"
+                                Padding="4"
+                                Background="#0A000000"
+                                CornerRadius="10">
+                                <ListBox
+                                    x:Name="PART_ListBox"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    ItemsSource="{TemplateBinding Items}"
+                                    ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                    <ListBox.ItemContainerStyle>
+                                        <Style TargetType="ListBoxItem">
+                                            <Setter Property="Padding" Value="12,10" />
+                                            <Setter Property="Foreground" Value="{DynamicResource GcTextBrush}" />
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="ListBoxItem">
+                                                        <Border
+                                                            x:Name="Bd"
+                                                            Margin="2"
+                                                            Padding="{TemplateBinding Padding}"
+                                                            Background="Transparent"
+                                                            CornerRadius="8">
+                                                            <ContentPresenter />
+                                                        </Border>
+                                                        <ControlTemplate.Triggers>
+                                                            <Trigger Property="IsMouseOver" Value="True">
+                                                                <Setter TargetName="Bd" Property="Background" Value="#0A000000" />
+                                                            </Trigger>
+                                                            <Trigger Property="IsSelected" Value="True">
+                                                                <Setter TargetName="Bd" Property="Background" Value="#1888AAE0" />
+                                                            </Trigger>
+                                                        </ControlTemplate.Triggers>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </ListBox.ItemContainerStyle>
+                                </ListBox>
+                            </Border>
+                            <Grid Grid.Row="3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Button
+                                    x:Name="PART_CancelButton"
+                                    Grid.Column="1"
+                                    Margin="0,0,12,0"
+                                    Content="{TemplateBinding CancelText}"
+                                    Style="{StaticResource GcDialogButtonStyle}" />
+                                <Button
+                                    x:Name="PART_ConfirmButton"
+                                    Grid.Column="2"
+                                    Content="{TemplateBinding ConfirmText}"
+                                    Style="{StaticResource GcDialogConfirmStyle}" />
+                            </Grid>
+                        </Grid>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>

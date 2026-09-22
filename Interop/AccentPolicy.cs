@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace CustomControl.Interop;
+namespace GeneralControl.Interop;
 
 /// <summary>
 /// 窗口亚克力（毛玻璃）配置策略，对应 SetWindowCompositionAttribute 的 ACCENT_POLICY。
@@ -49,3 +49,4 @@ internal enum SystemBackdropType
     Mica = 2,
     Acrylic = 3,
 }
+

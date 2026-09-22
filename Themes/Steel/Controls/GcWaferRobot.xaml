@@ -1,0 +1,13 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:CustomControls.Controls">
+
+    <!--
+        ================================================================
+        文件说明：Themes\Glass\Controls\WaferRobot 主题桥
+        WaferRobot 为直写式 UserControl 复刻件（原样移植自上位机通用框架），
+        自带完整视觉与右键控制面板，不走 Gc 主题模板体系。
+        此字典仅作占位以保持两套主题合并结构对等。
+        ================================================================
+    -->
+</ResourceDictionary>

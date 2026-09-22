@@ -1,0 +1,190 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:GeneralControl.Controls">
+
+    <!--
+        ================================================================
+        文件说明：Themes\Steel\Controls\ThermoController.xaml
+        ThermoController 温控器样式（显示面板符号）。
+        
+        依赖：Brushes.xaml（画刷资源）。
+        结构：玻璃圆角面板
+        → [温度计(管 + PART_Mercury 液柱 + 玻璃泡 PART_BulbCore)
+        + 读数大字 + SET 设定值 + 状态点/状态文字]
+        
+        【PART_Mercury】RenderTransform 必须是 ScaleTransform，
+        代码后置改 ScaleY（原点在底部）映射温度到液柱高度。
+        
+        【状态配色】Mode 触发器：加热=橙 / 冷却=蓝 / 恒温=灰白。
+        ================================================================
+    -->
+
+    <Style TargetType="controls:GcThermoController">
+        <Setter Property="Width" Value="150" />
+        <Setter Property="Height" Value="56" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="controls:GcThermoController">
+                    <Border
+                        Background="#14334155"
+                        BorderBrush="{DynamicResource GcEdgeHighlightBrush}"
+                        BorderThickness="1"
+                        CornerRadius="10">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <!--
+                                温度计：Viewbox 只包内容实际包围盒（26x46），
+                                无留白死区，垂直方向真正居中
+                            -->
+                            <Viewbox
+                                Grid.Column="0"
+                                Width="34"
+                                Margin="8,6,4,6"
+                                VerticalAlignment="Center"
+                                Stretch="Uniform">
+                                <Canvas Width="26" Height="46">
+                                    <!--  外管  -->
+                                    <Rectangle
+                                        Canvas.Left="9.5"
+                                        Canvas.Top="1"
+                                        Width="7"
+                                        Height="32"
+                                        Fill="#26334155"
+                                        RadiusX="3.5"
+                                        RadiusY="3.5"
+                                        Stroke="#59334155"
+                                        StrokeThickness="1" />
+                                    <!--
+                                        液柱（ScaleY 由代码后置按温度设置，原点在底部，
+                                        下端伸入玻璃泡被泡体盖住衔接）
+                                    -->
+                                    <Rectangle
+                                        x:Name="PART_Mercury"
+                                        Canvas.Left="11"
+                                        Canvas.Top="1"
+                                        Width="4"
+                                        Height="37"
+                                        Fill="#C8FFFFFF"
+                                        RadiusX="2"
+                                        RadiusY="2"
+                                        RenderTransformOrigin="0.5,1">
+                                        <Rectangle.RenderTransform>
+                                            <ScaleTransform ScaleX="1" ScaleY="0.06" />
+                                        </Rectangle.RenderTransform>
+                                    </Rectangle>
+                                    <!--  刻度点 ×3  -->
+                                    <Ellipse
+                                        Canvas.Left="18.5"
+                                        Canvas.Top="6"
+                                        Width="1.6"
+                                        Height="1.6"
+                                        Fill="#59334155" />
+                                    <Ellipse
+                                        Canvas.Left="18.5"
+                                        Canvas.Top="15"
+                                        Width="1.6"
+                                        Height="1.6"
+                                        Fill="#59334155" />
+                                    <Ellipse
+                                        Canvas.Left="18.5"
+                                        Canvas.Top="24"
+                                        Width="1.6"
+                                        Height="1.6"
+                                        Fill="#59334155" />
+                                    <!--  玻璃泡（半透明盖住液柱底端）  -->
+                                    <Ellipse
+                                        Canvas.Left="5"
+                                        Canvas.Top="29"
+                                        Width="16"
+                                        Height="16"
+                                        Fill="#26334155"
+                                        Stroke="#59334155"
+                                        StrokeThickness="1.2" />
+                                    <!--  泡芯：状态色  -->
+                                    <Ellipse
+                                        x:Name="PART_BulbCore"
+                                        Canvas.Left="9"
+                                        Canvas.Top="33"
+                                        Width="8"
+                                        Height="8"
+                                        Fill="#475569" />
+                                </Canvas>
+                            </Viewbox>
+
+                            <!--  读数面板  -->
+                            <StackPanel
+                                Grid.Column="1"
+                                Margin="2,0,10,0"
+                                VerticalAlignment="Center">
+                                <TextBlock
+                                    FontSize="17"
+                                    FontWeight="Bold"
+                                    Foreground="#1F2937"
+                                    Text="{Binding Temperature, RelativeSource={RelativeSource TemplatedParent}, StringFormat={}{0:0.0}°}" />
+                                <StackPanel Margin="0,3,0,0" Orientation="Horizontal">
+                                    <TextBlock
+                                        VerticalAlignment="Center"
+                                        FontSize="9"
+                                        Foreground="#475569"
+                                        Text="SET" />
+                                    <TextBlock
+                                        Margin="4,0,0,0"
+                                        VerticalAlignment="Center"
+                                        FontSize="10"
+                                        Foreground="#475569"
+                                        Text="{Binding SetPoint, RelativeSource={RelativeSource TemplatedParent}, StringFormat={}{0:0.0}°}" />
+                                    <Ellipse
+                                        x:Name="PART_StateDot"
+                                        Width="6"
+                                        Height="6"
+                                        Margin="8,0,4,0"
+                                        VerticalAlignment="Center"
+                                        Fill="#475569" />
+                                    <TextBlock
+                                        x:Name="PART_StateText"
+                                        VerticalAlignment="Center"
+                                        FontSize="10.5"
+                                        Foreground="#475569"
+                                        Text="恒温" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <!--  加热中：橙色  -->
+                        <Trigger Property="Mode" Value="Heating">
+                            <Setter TargetName="PART_BulbCore" Property="Fill" Value="#FFA94D" />
+                            <Setter TargetName="PART_Mercury" Property="Fill" Value="#E8A050" />
+                            <Setter TargetName="PART_StateDot" Property="Fill" Value="#FFA94D" />
+                            <Setter TargetName="PART_StateText" Property="Text" Value="加热中" />
+                        </Trigger>
+                        <!--  冷却中：蓝色  -->
+                        <Trigger Property="Mode" Value="Cooling">
+                            <Setter TargetName="PART_BulbCore" Property="Fill" Value="#4FC3F7" />
+                            <Setter TargetName="PART_Mercury" Property="Fill" Value="#6FCBF5" />
+                            <Setter TargetName="PART_StateDot" Property="Fill" Value="#4FC3F7" />
+                            <Setter TargetName="PART_StateText" Property="Text" Value="冷却中" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>
+
+
+
+
+
+
+
+
+
+
+

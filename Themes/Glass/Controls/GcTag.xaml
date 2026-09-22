@@ -1,0 +1,99 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:GeneralControl.Controls">
+
+    <!--
+        ================================================================
+        文件说明：Themes\Glass\Controls\Tag.xaml
+        Tag 标签（Chip）样式。
+
+        依赖：Brushes.xaml（画刷资源）。
+        结构：Border(胶囊底) → [ContentPresenter + PART_CloseButton]
+        关闭按钮由代码后置（Tag.OnApplyTemplate）挂接 Click，
+        点击后标签自动 Collapsed 并冒泡 Closed 路由事件。
+        ================================================================
+    -->
+
+    <Style TargetType="controls:GcTag">
+        <Setter Property="Background" Value="#1FFFFFFF" />
+        <Setter Property="BorderBrush" Value="{DynamicResource GcEdgeHighlightBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Foreground" Value="{DynamicResource GcTextBrush}" />
+        <Setter Property="FontSize" Value="12.5" />
+        <!-- 注意：不要给样式设 Cursor="Default"——Cursor.Default 语义等同"继承/UnsetValue"，
+             运行时无害，但 VS 设计器会报 XDG0031（UnsetValue 不是 Cursor 的有效值）。 -->
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="controls:GcTag">
+                    <Border x:Name="Root"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="8"
+                            SnapsToDevicePixels="True">
+                        <StackPanel Orientation="Horizontal">
+                            <ContentPresenter Margin="{TemplateBinding Padding}"
+                                              VerticalAlignment="Center"
+                                              RecognizesAccessKey="True" />
+                            <!--
+                                PART_CloseButton：关闭按钮。
+                                默认 Collapsed，IsClosable=True 时显示。
+                                模板极简（透明底 + 叉形 Path），悬停时叉变亮。
+                            -->
+                            <Button x:Name="PART_CloseButton"
+                                    Margin="0,0,6,0"
+                                    Width="16" Height="16"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Cursor="Hand"
+                                    Focusable="False"
+                                    Visibility="Collapsed">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <Grid Background="Transparent">
+                                            <Path x:Name="Cross"
+                                                  Data="M0,0 L7,7 M7,0 L0,7"
+                                                  Stroke="#90FFFFFF"
+                                                  StrokeThickness="1.4"
+                                                  StrokeStartLineCap="Round"
+                                                  StrokeEndLineCap="Round"
+                                                  HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center" />
+                                        </Grid>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="Cross" Property="Stroke" Value="#FFFFFFFF" />
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+                        </StackPanel>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <!-- IsClosable=true 时显示关闭按钮 -->
+                        <Trigger Property="IsClosable" Value="True">
+                            <Setter TargetName="PART_CloseButton" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <!-- 悬停：底色微亮，提示可交互 -->
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Root" Property="Background" Value="#2EFFFFFF" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.5" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>
+
+
+
+
+
+
+

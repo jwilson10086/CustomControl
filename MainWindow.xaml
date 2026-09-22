@@ -1,62 +1,77 @@
-﻿<controls:GlassWindow x:Class="CustomControl.MainWindow"
-                      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                      xmlns:controls="clr-namespace:CustomControl.Controls"
-                      xmlns:effects="clr-namespace:CustomControl.Effects"
-                      Title="CustomControl · 毛玻璃控件库"
-                      Width="1280" Height="860"
-                      WindowStartupLocation="CenterScreen"
-                      Backdrop="Auto"
-                      GlassOpacity="0.24">
+﻿<controls:GcWindow
+    x:Class="GeneralControl.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:GeneralControl.Controls"
+    xmlns:effects="clr-namespace:GeneralControl.Effects"
+    xmlns:wafers="clr-namespace:CustomControls.Controls"
+    Title="GeneralControl · 毛玻璃控件库"
+    Width="1280"
+    Height="860"
+    Backdrop="Simulated"
+    GlassOpacity="0.24"
+    WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
-        <!-- 分区大标题 -->
+        <!--  分区大标题  -->
         <Style x:Key="SectionTitleStyle" TargetType="TextBlock">
             <Setter Property="FontSize" Value="24" />
             <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="Foreground" Value="#F2FFFFFF" />
+            <Setter Property="Foreground" Value="{DynamicResource GcTextBrush}" />
             <Setter Property="Margin" Value="0,0,0,2" />
         </Style>
-        <!-- 分区说明文字 -->
+        <!--  分区说明文字  -->
         <Style x:Key="SectionDescStyle" TargetType="TextBlock">
             <Setter Property="FontSize" Value="12.5" />
-            <Setter Property="Foreground" Value="#96FFFFFF" />
+            <Setter Property="Foreground" Value="{DynamicResource GcTextSecondaryBrush}" />
             <Setter Property="Margin" Value="0,0,0,18" />
         </Style>
-        <!-- 统一卡片：全宽、统一间距。
-             必须基于隐式样式派生（BasedOn），否则显式样式会顶掉隐式样式，
-             GlassCard 将拿不到模板而渲染为空白。 -->
-        <Style x:Key="DemoCardStyle"
-               TargetType="controls:GlassCard"
-               BasedOn="{StaticResource {x:Type controls:GlassCard}}">
+        <!--
+            统一卡片：全宽、统一间距。
+            必须基于隐式样式派生（BasedOn），否则显式样式会顶掉隐式样式，
+            Card 将拿不到模板而渲染为空白。
+        -->
+        <Style
+            x:Key="DemoCardStyle"
+            BasedOn="{StaticResource {x:Type controls:GcCard}}"
+            TargetType="controls:GcCard">
             <Setter Property="Margin" Value="0,0,0,16" />
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         </Style>
-        <!-- 卡片内示例行 -->
+        <!--  卡片内示例行  -->
         <Style x:Key="DemoRowStyle" TargetType="StackPanel">
             <Setter Property="Orientation" Value="Horizontal" />
             <Setter Property="Margin" Value="0,0,0,10" />
         </Style>
-        <!-- 小标签（示例名） -->
+        <!--  小标签（示例名）  -->
         <Style x:Key="SampleTagStyle" TargetType="TextBlock">
             <Setter Property="FontSize" Value="11.5" />
-            <Setter Property="Foreground" Value="#8CFFFFFF" />
+            <Setter Property="Foreground" Value="{DynamicResource GcTextSecondaryBrush}" />
             <Setter Property="VerticalAlignment" Value="Center" />
             <Setter Property="Margin" Value="0,0,14,0" />
         </Style>
     </Window.Resources>
 
-    <Grid>
+    <Grid ClipToBounds="True">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="232" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <!-- ================= 左侧导航栏 ================= -->
-        <Border Grid.Column="0"
-                Background="#26101A30"
-                BorderBrush="#22FFFFFF"
-                BorderThickness="0,0,1,0">
+        <!--  macOS 风格壁纸：离线预渲染位图（Assets/MacWallpaper.png），运行时仅一次贴图，无矢量/特效成本  -->
+        <Image
+            Grid.ColumnSpan="2"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Source="/Assets/MacWallpaper.png"
+            Stretch="UniformToFill" />
+
+        <!--  ================= 左侧导航栏 =================  -->
+        <Border
+            Grid.Column="0"
+            Background="{DynamicResource GcBackdropBrush}"
+            BorderBrush="{DynamicResource GcBorderBrush}"
+            BorderThickness="0,0,1,0">
             <Grid Margin="16,18,16,14">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -64,69 +79,94 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <!-- Logo 区 -->
+                <!--  Logo 区  -->
                 <StackPanel Grid.Row="0" Margin="6,0,0,18">
-                    <TextBlock Text="CustomControl"
-                               FontSize="19" FontWeight="Bold" Foreground="#F2FFFFFF" />
-                    <TextBlock Text="毛玻璃控件库 · WPF"
-                               FontSize="11.5" Foreground="#8CFFFFFF" Margin="1,4,0,0" />
+                    <TextBlock
+                        FontSize="19"
+                        FontWeight="Bold"
+                        Foreground="{DynamicResource GcTextBrush}"
+                        Text="GeneralControl" />
+                    <TextBlock
+                        Margin="1,4,0,0"
+                        FontSize="11.5"
+                        Foreground="{DynamicResource GcTextSecondaryBrush}"
+                        Text="毛玻璃控件库 · WPF" />
                 </StackPanel>
 
-                <!-- 分类导航 -->
-                <controls:GlassListBox Grid.Row="1" x:Name="NavList"
-                                       SelectionChanged="NavList_SelectionChanged"
-                                       BorderThickness="0" Background="Transparent">
-                    <controls:GlassListBoxItem Content="开始 Get Started" IsSelected="True" />
-                    <controls:GlassListBoxItem Content="按钮 Button" />
-                    <controls:GlassListBoxItem Content="输入 Input" />
-                    <controls:GlassListBoxItem Content="选择 Select" />
-                    <controls:GlassListBoxItem Content="滑杆与进度" />
-                    <controls:GlassListBoxItem Content="文本与容器" />
-                    <controls:GlassListBoxItem Content="导航 Navigation" />
-                    <controls:GlassListBoxItem Content="数据表格 DataGrid" />
-                    <controls:GlassListBoxItem Content="效果 Effects" />
-                    <controls:GlassListBoxItem Content="工业 Industrial" />
-                    <controls:GlassListBoxItem Content="提示与弹窗" />
-                </controls:GlassListBox>
+                <!--  分类导航  -->
+                <controls:GcListBox
+                    x:Name="NavList"
+                    Grid.Row="1"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    SelectionChanged="NavList_SelectionChanged">
+                    <controls:GcListBoxItem Content="开始 Get Started" IsSelected="True" />
+                    <controls:GcListBoxItem Content="按钮 Button" />
+                    <controls:GcListBoxItem Content="输入 Input" />
+                    <controls:GcListBoxItem Content="选择 Select" />
+                    <controls:GcListBoxItem Content="滑杆与进度" />
+                    <controls:GcListBoxItem Content="文本与容器" />
+                    <controls:GcListBoxItem Content="导航 Navigation" />
+                    <controls:GcListBoxItem Content="数据表格 DataGrid" />
+                    <controls:GcListBoxItem Content="效果 Effects" />
+                    <controls:GcListBoxItem Content="工业 Industrial" />
+                    <controls:GcListBoxItem Content="提示与弹窗" />
+                </controls:GcListBox>
 
-                <!-- 底部信息 -->
+                <!--  底部信息  -->
                 <StackPanel Grid.Row="2" Margin="6,0,0,0">
-                    <TextBlock Text=".NET 8 · WPF · v1.0.0"
-                               FontSize="11" Foreground="#66FFFFFF" />
+                    <TextBlock
+                        FontSize="11"
+                        Foreground="{DynamicResource GcTextSecondaryBrush}"
+                        Text=".NET 8 · WPF · v1.0.0" />
                 </StackPanel>
             </Grid>
         </Border>
 
-        <!-- ================= 右侧内容区 ================= -->
-        <ScrollViewer Grid.Column="1"
-                      VerticalScrollBarVisibility="Auto"
-                      Padding="28,22,28,30">
+        <!--  ================= 右侧内容区 =================  -->
+        <ScrollViewer
+            Grid.Column="1"
+            Padding="28,22,28,30"
+            VerticalScrollBarVisibility="Auto">
             <StackPanel x:Name="SectionHost">
 
-                <!-- ========== 0 开始 ========== -->
+                <!--  ========== 0 开始 ==========  -->
                 <StackPanel x:Name="SectionStart">
-                    <TextBlock Text="开始 Get Started" Style="{StaticResource SectionTitleStyle}" />
-                    <TextBlock Style="{StaticResource SectionDescStyle}"
-                               Text="窗口背景模式与全局玻璃参数。系统级材质 Acrylic / Mica 需独立窗口演示。" />
+                    <TextBlock Style="{StaticResource SectionTitleStyle}" Text="开始 Get Started" />
+                    <TextBlock Style="{StaticResource SectionDescStyle}" Text="窗口背景模式与全局玻璃参数。系统级材质 Acrylic / Mica 需独立窗口演示。" />
 
-                    <controls:GlassCard Header="窗口背景模式 (GlassWindow.Backdrop)"
-                                        Style="{StaticResource DemoCardStyle}">
+                    <controls:GcCard Header="窗口背景模式 (Window.Backdrop)" Style="{StaticResource DemoCardStyle}">
                         <StackPanel>
                             <WrapPanel>
-                                <controls:GlassButton Content="自动 Auto"
-                                                      Click="BackdropAuto_Click" Width="104" Margin="0,0,8,8" />
-                                <controls:GlassButton Content="模拟玻璃"
-                                                      Click="BackdropSimulated_Click" Width="104" Margin="0,0,8,8" />
-                                <controls:GlassButton Content="液体玻璃 Glassy"
-                                                      Click="BackdropGlassy_Click" Width="120" Margin="0,0,8,8"
-                                                      Style="{StaticResource GlassPrimaryButtonStyle}" />
-                                <controls:GlassButton Content="系统亚克力"
-                                                      Click="BackdropAcrylic_Click" Width="104" Margin="0,0,8,8" />
-                                <controls:GlassButton Content="Mica"
-                                                      Click="BackdropMica_Click" Width="104" Margin="0,0,8,8" />
+                                <controls:GcButton
+                                    Width="104"
+                                    Margin="0,0,8,8"
+                                    Click="BackdropAuto_Click"
+                                    Content="自动 Auto" />
+                                <controls:GcButton
+                                    Width="104"
+                                    Margin="0,0,8,8"
+                                    Click="BackdropSimulated_Click"
+                                    Content="模拟玻璃" />
+                                <controls:GcButton
+                                    Width="120"
+                                    Margin="0,0,8,8"
+                                    Click="BackdropGlassy_Click"
+                                    Content="液体玻璃 Glassy"
+                                    Style="{StaticResource GcPrimaryButtonStyle}" />
+                                <controls:GcButton
+                                    Width="104"
+                                    Margin="0,0,8,8"
+                                    Click="BackdropAcrylic_Click"
+                                    Content="系统亚克力" />
+                                <controls:GcButton
+                                    Width="104"
+                                    Margin="0,0,8,8"
+                                    Click="BackdropMica_Click"
+                                    Content="Mica" />
                             </WrapPanel>
 
-                            <controls:GlassSeparator Margin="0,10,0,12" />
+                            <controls:GcSeparator Margin="0,10,0,12" />
 
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -134,594 +174,1533 @@
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="52" />
                                 </Grid.ColumnDefinitions>
-                                <controls:GlassTextBlock Grid.Column="0" Text="玻璃不透明度" />
-                                <controls:GlassSlider Grid.Column="1"
-                                                      x:Name="OpacitySlider"
-                                                      Minimum="0.05" Maximum="0.5"
-                                                      Value="{Binding GlassOpacity, RelativeSource={RelativeSource AncestorType=controls:GlassWindow}, Mode=TwoWay}" />
-                                <controls:GlassTextBlock Grid.Column="2"
-                                                         Text="{Binding Value, ElementName=OpacitySlider, StringFormat={}{0:F2}}" />
+                                <controls:GcTextBlock Grid.Column="0" Text="玻璃不透明度" />
+                                <controls:GcSlider
+                                    x:Name="OpacitySlider"
+                                    Grid.Column="1"
+                                    Maximum="0.5"
+                                    Minimum="0.05"
+                                    Value="{Binding GlassOpacity, RelativeSource={RelativeSource AncestorType=controls:GcWindow}, Mode=TwoWay}" />
+                                <controls:GcTextBlock Grid.Column="2" Text="{Binding Value, ElementName=OpacitySlider, StringFormat={}{0:F2}}" />
                             </Grid>
                         </StackPanel>
-                    </controls:GlassCard>
+                    </controls:GcCard>
 
-                    <controls:GlassCard Header="关于本库" Style="{StaticResource DemoCardStyle}" Background="Brown">
-                    
+                    <controls:GcCard Header="关于本库" Style="{StaticResource DemoCardStyle}">
+
                         <StackPanel>
-                            <controls:GlassTextBlock FontSize="13"
-                                                     Text="CustomControl 是一套毛玻璃 (Glassmorphism) 质感的 WPF 控件库：支持液体玻璃着色器、系统亚克力 / Mica、模拟玻璃三种渲染路径，内置 25+ 控件与 3D 倾斜、鱼眼等附加效果。" />
-                            <controls:GlassSeparator Margin="0,12,0,12" />
+                            <controls:GcTextBlock FontSize="13" Text="GeneralControl 是一套毛玻璃 (Glassmorphism) 质感的 WPF 控件库：支持液体玻璃着色器、系统亚克力 / Mica、模拟玻璃三种渲染路径，内置 25+ 控件与 3D 倾斜、鱼眼等附加效果。" />
+                            <controls:GcSeparator Margin="0,12,0,12" />
                             <WrapPanel>
-                                <controls:GlassPanel CornerRadius="8" Padding="10,5" Margin="0,0,8,8">
-                                    <controls:GlassTextBlock Text="液体玻璃 Glassy" FontSize="11.5" />
-                                </controls:GlassPanel>
-                                <controls:GlassPanel CornerRadius="8" Padding="10,5" Margin="0,0,8,8">
-                                    <controls:GlassTextBlock Text="系统亚克力 Acrylic" FontSize="11.5" />
-                                </controls:GlassPanel>
-                                <controls:GlassPanel CornerRadius="8" Padding="10,5" Margin="0,0,8,8">
-                                    <controls:GlassTextBlock Text="Mica" FontSize="11.5" />
-                                </controls:GlassPanel>
-                                <controls:GlassPanel CornerRadius="8" Padding="10,5" Margin="0,0,8,8">
-                                    <controls:GlassTextBlock Text="模拟玻璃 Simulated" FontSize="11.5" />
-                                </controls:GlassPanel>
+                                <controls:GcPanel
+                                    Margin="0,0,8,8"
+                                    Padding="10,5"
+                                    CornerRadius="8">
+                                    <controls:GcTextBlock FontSize="11.5" Text="液体玻璃 Glassy" />
+                                </controls:GcPanel>
+                                <controls:GcPanel
+                                    Margin="0,0,8,8"
+                                    Padding="10,5"
+                                    CornerRadius="8">
+                                    <controls:GcTextBlock FontSize="11.5" Text="系统亚克力 Acrylic" />
+                                </controls:GcPanel>
+                                <controls:GcPanel
+                                    Margin="0,0,8,8"
+                                    Padding="10,5"
+                                    CornerRadius="8">
+                                    <controls:GcTextBlock FontSize="11.5" Text="Mica" />
+                                </controls:GcPanel>
+                                <controls:GcPanel
+                                    Margin="0,0,8,8"
+                                    Padding="10,5"
+                                    CornerRadius="8">
+                                    <controls:GcTextBlock FontSize="11.5" Text="模拟玻璃 Simulated" />
+                                </controls:GcPanel>
                             </WrapPanel>
                         </StackPanel>
-                    </controls:GlassCard>
+                    </controls:GcCard>
                 </StackPanel>
 
-                <!-- ========== 1 按钮 ========== -->
+                <!--  ========== 1 按钮 ==========  -->
                 <StackPanel x:Name="SectionButton" Visibility="Collapsed">
-                    <TextBlock Text="按钮 Button" Style="{StaticResource SectionTitleStyle}" />
-                    <TextBlock Style="{StaticResource SectionDescStyle}"
-                               Text="按钮、可选中按钮与开关。悬停查看边框高光反馈。" />
+                    <TextBlock Style="{StaticResource SectionTitleStyle}" Text="按钮 Button" />
+                    <TextBlock Style="{StaticResource SectionDescStyle}" Text="按钮、可选中按钮与开关。悬停查看边框高光反馈。" />
 
-                    <controls:GlassCard Header="GlassButton 按钮状态" Style="{StaticResource DemoCardStyle}">
+                    <controls:GcCard Header="Button 按钮状态" Style="{StaticResource DemoCardStyle}">
                         <StackPanel>
                             <WrapPanel>
-                                <controls:GlassButton Content="默认按钮" Width="110" Margin="0,0,10,8" />
-                                <controls:GlassButton Content="主要按钮" Style="{StaticResource GlassPrimaryButtonStyle}" Width="110" Margin="0,0,10,8" />
-                                <controls:GlassButton Content="幽灵按钮" Style="{StaticResource GlassGhostButtonStyle}" Width="110" Margin="0,0,10,8" />
-                                <controls:GlassButton Content="禁用按钮" IsEnabled="False" Width="110" Margin="0,0,10,8" />
+                                <controls:GcButton
+                                    Width="110"
+                                    Margin="0,0,10,8"
+                                    Content="默认按钮" />
+                                <controls:GcButton
+                                    Width="110"
+                                    Margin="0,0,10,8"
+                                    Content="主要按钮"
+                                    Style="{StaticResource GcPrimaryButtonStyle}" />
+                                <controls:GcButton
+                                    Width="110"
+                                    Margin="0,0,10,8"
+                                    Content="幽灵按钮"
+                                    Style="{StaticResource GcGhostButtonStyle}" />
+                                <controls:GcButton
+                                    Width="110"
+                                    Margin="0,0,10,8"
+                                    Content="禁用按钮"
+                                    IsEnabled="False" />
                             </WrapPanel>
                         </StackPanel>
-                    </controls:GlassCard>
+                    </controls:GcCard>
 
-                    <controls:GlassCard Header="ToggleButton / ToggleSwitch 开关" Style="{StaticResource DemoCardStyle}">
+                    <controls:GcCard Header="ToggleButton / ToggleSwitch 开关" Style="{StaticResource DemoCardStyle}">
                         <WrapPanel>
-                            <controls:GlassToggleButton Content="切换按钮（可选中）" Width="160" Margin="0,0,12,8" />
-                            <controls:GlassToggleSwitch Content="开关 ToggleSwitch" Width="170" Margin="0,0,12,8" />
-                            <controls:GlassToggleSwitch Content="默认开启" IsChecked="True" Width="150" Margin="0,0,12,8" />
+                            <controls:GcToggleButton
+                                Width="160"
+                                Margin="0,0,12,8"
+                                Content="切换按钮（可选中）" />
+                            <controls:GcToggleSwitch
+                                Width="170"
+                                Margin="0,0,12,8"
+                                Content="开关 ToggleSwitch" />
+                            <controls:GcToggleSwitch
+                                Width="150"
+                                Margin="0,0,12,8"
+                                Content="默认开启"
+                                IsChecked="True" />
                         </WrapPanel>
-                    </controls:GlassCard>
+                    </controls:GcCard>
 
-                    <controls:GlassCard Header="GlassBadge 徽标（附加属性，可贴任意控件右上角）" Style="{StaticResource DemoCardStyle}">
+                    <controls:GcCard Header="Badge 徽标（附加属性，可贴任意控件右上角）" Style="{StaticResource DemoCardStyle}">
                         <StackPanel>
                             <StackPanel Style="{StaticResource DemoRowStyle}">
-                                <controls:GlassButton Content="消息" Width="96" Margin="0,0,24,8"
-                                                      controls:GlassBadge.Badge="99+" />
-                                <controls:GlassButton Content="待办" Width="96" Margin="0,0,24,8"
-                                                      controls:GlassBadge.Badge="5"
-                                                      controls:GlassBadge.MaxCount="99" />
-                                <controls:GlassButton Content="通知" Width="96" Margin="0,0,24,8"
-                                                      controls:GlassBadge.IsDot="True" />
-                                <controls:GlassAvatar Text="Z" Diameter="40" VerticalAlignment="Center"
-                                                      controls:GlassBadge.Badge="VIP"
-                                                      controls:GlassBadge.Background="#4FB6FF" />
+                                <controls:GcButton
+                                    Width="96"
+                                    Margin="0,0,24,8"
+                                    controls:GcBadge.Badge="99+"
+                                    Content="消息" />
+                                <controls:GcButton
+                                    Width="96"
+                                    Margin="0,0,24,8"
+                                    controls:GcBadge.Badge="5"
+                                    controls:GcBadge.MaxCount="99"
+                                    Content="待办" />
+                                <controls:GcButton
+                                    Width="96"
+                                    Margin="0,0,24,8"
+                                    controls:GcBadge.IsDot="True"
+                                    Content="通知" />
+                                <controls:GcAvatar
+                                    VerticalAlignment="Center"
+                                    controls:GcBadge.Background="#4FB6FF"
+                                    controls:GcBadge.Badge="VIP"
+                                    Diameter="40"
+                                    Text="Z" />
                             </StackPanel>
-                            <controls:GlassTextBlock FontSize="11.5" Foreground="#8CFFFFFF"
-                                                     Text="用法：controls:GlassBadge.Badge=&quot;内容&quot; / IsDot / MaxCount，支持自定义颜色。" />
+                            <controls:GcTextBlock
+                                FontSize="11.5"
+                                Foreground="{DynamicResource GcTextSecondaryBrush}"
+                                Text="用法：controls:GcBadge.Badge=&quot;内容&quot; / IsDot / MaxCount，支持自定义颜色。" />
                         </StackPanel>
-                    </controls:GlassCard>
+                    </controls:GcCard>
                 </StackPanel>
 
-                <!-- ========== 2 输入 ========== -->
+                <!--  ========== 2 输入 ==========  -->
                 <StackPanel x:Name="SectionInput" Visibility="Collapsed">
-                    <TextBlock Text="输入 Input" Style="{StaticResource SectionTitleStyle}" />
-                    <TextBlock Style="{StaticResource SectionDescStyle}"
-                               Text="文本框、密码框、下拉框与软键盘。点击带键盘图标的输入框会弹出屏幕键盘。" />
+                    <TextBlock Style="{StaticResource SectionTitleStyle}" Text="输入 Input" />
+                    <TextBlock Style="{StaticResource SectionDescStyle}" Text="文本框、密码框、下拉框与软键盘。点击带键盘图标的输入框会弹出屏幕键盘。" />
 
-                    <controls:GlassCard Header="GlassTextBox / GlassPasswordBox" Style="{StaticResource DemoCardStyle}">
+                    <controls:GcCard Header="TextBox / PasswordBox" Style="{StaticResource DemoCardStyle}">
                         <StackPanel>
                             <StackPanel Style="{StaticResource DemoRowStyle}">
-                                <TextBlock Text="文本框" Style="{StaticResource SampleTagStyle}" />
-                                <controls:GlassTextBox Placeholder="请输入用户名 / 邮箱"
-                                                       Width="300" HorizontalAlignment="Left" />
+                                <TextBlock Style="{StaticResource SampleTagStyle}" Text="文本框" />
+                                <controls:GcTextBox
+                                    Width="300"
+                                    HorizontalAlignment="Left"
+                                    Placeholder="请输入用户名 / 邮箱" />
                             </StackPanel>
                             <StackPanel Style="{StaticResource DemoRowStyle}">
-                                <TextBlock Text="密码框" Style="{StaticResource SampleTagStyle}" />
-                                <PasswordBox Style="{StaticResource GlassPasswordBoxStyle}"
-                                             controls:GlassPasswordBox.Placeholder="请输入密码"
-                                             controls:GlassPasswordBox.IsPasswordVisible="True"
-                                             Width="300" HorizontalAlignment="Left" />
-                            </StackPanel>
-                        </StackPanel>
-                    </controls:GlassCard>
-
-                    <controls:GlassCard Header="GlassComboBox 下拉选择框" Style="{StaticResource DemoCardStyle}">
-                        <StackPanel>
-                            <StackPanel Style="{StaticResource DemoRowStyle}">
-                                <TextBlock Text="下拉框" Style="{StaticResource SampleTagStyle}" />
-                                <controls:GlassComboBox Width="300" HorizontalAlignment="Left"
-                                                        SelectedIndex="0">
-                                    <controls:GlassComboBoxItem Content="液体玻璃 Glassy" />
-                                    <controls:GlassComboBoxItem Content="系统亚克力 Acrylic" />
-                                    <controls:GlassComboBoxItem Content="Mica" />
-                                    <controls:GlassComboBoxItem Content="模拟玻璃 Simulated" />
-                                </controls:GlassComboBox>
+                                <TextBlock Style="{StaticResource SampleTagStyle}" Text="密码框" />
+                                <PasswordBox
+                                    Width="300"
+                                    HorizontalAlignment="Left"
+                                    controls:GcPasswordBox.IsPasswordVisible="True"
+                                    controls:GcPasswordBox.Placeholder="请输入密码"
+                                    Style="{StaticResource PasswordBoxStyle}" />
                             </StackPanel>
                         </StackPanel>
-                    </controls:GlassCard>
+                    </controls:GcCard>
 
-                    <controls:GlassCard Header="GlassNumericBox 数字输入框" Style="{StaticResource DemoCardStyle}">
+                    <controls:GcCard Header="ComboBox 下拉选择框" Style="{StaticResource DemoCardStyle}">
                         <StackPanel>
                             <StackPanel Style="{StaticResource DemoRowStyle}">
-                                <TextBlock Text="整数" Style="{StaticResource SampleTagStyle}" />
-                                <controls:GlassNumericBox Width="160" HorizontalAlignment="Left"
-                                                          Value="5" Minimum="0" Maximum="10"
-                                                          Margin="0,0,24,8" />
-                                <TextBlock Text="小数（0.1 步进）" Style="{StaticResource SampleTagStyle}" />
-                                <controls:GlassNumericBox Width="160" HorizontalAlignment="Left"
-                                                          Value="0.5" Minimum="0" Maximum="10"
-                                                          Increment="0.1" DecimalPlaces="1" />
+                                <TextBlock Style="{StaticResource SampleTagStyle}" Text="下拉框" />
+                                <controls:GcComboBox
+                                    Width="300"
+                                    HorizontalAlignment="Left"
+                                    SelectedIndex="0">
+                                    <controls:GcComboBoxItem Content="液体玻璃 Glassy" />
+                                    <controls:GcComboBoxItem Content="系统亚克力 Acrylic" />
+                                    <controls:GcComboBoxItem Content="Mica" />
+                                    <controls:GcComboBoxItem Content="模拟玻璃 Simulated" />
+                                </controls:GcComboBox>
                             </StackPanel>
-                            <controls:GlassTextBlock FontSize="11.5" Foreground="#8CFFFFFF"
-                                                     Text="支持直接输入（回车/失焦提交）、上下方向键与按住按钮连发；越界自动夹回区间。" />
                         </StackPanel>
-                    </controls:GlassCard>
+                    </controls:GcCard>
 
-                    <controls:GlassCard Header="GlassKeyboard 屏幕键盘（点击输入框自动弹出）" Style="{StaticResource DemoCardStyle}">
+                    <controls:GcCard Header="NumericBox 数字输入框" Style="{StaticResource DemoCardStyle}">
                         <StackPanel>
                             <StackPanel Style="{StaticResource DemoRowStyle}">
-                                <TextBlock Text="数字键盘" Style="{StaticResource SampleTagStyle}" />
-                                <controls:GlassTextBox Placeholder="点击此输入框弹出数字键盘"
-                                                       controls:GlassKeyboard.ShowKeyboard="True"
-                                                       controls:GlassKeyboard.KeyboardType="Numeric"
-                                                       controls:GlassKeyboard.DecimalPlaces="2"
-                                                       Width="300" HorizontalAlignment="Left" />
+                                <TextBlock Style="{StaticResource SampleTagStyle}" Text="整数" />
+                                <controls:GcNumericBox
+                                    Width="160"
+                                    Margin="0,0,24,8"
+                                    HorizontalAlignment="Left"
+                                    Maximum="10"
+                                    Minimum="0"
+                                    Value="5" />
+                                <TextBlock Style="{StaticResource SampleTagStyle}" Text="小数（0.1 步进）" />
+                                <controls:GcNumericBox
+                                    Width="160"
+                                    HorizontalAlignment="Left"
+                                    DecimalPlaces="1"
+                                    Increment="0.1"
+                                    Maximum="10"
+                                    Minimum="0"
+                                    Value="0.5" />
+                            </StackPanel>
+                            <controls:GcTextBlock
+                                FontSize="11.5"
+                                Foreground="{DynamicResource GcTextSecondaryBrush}"
+                                Text="支持直接输入（回车/失焦提交）、上下方向键与按住按钮连发；越界自动夹回区间。" />
+                        </StackPanel>
+                    </controls:GcCard>
+
+                    <controls:GcCard Header="Keyboard 屏幕键盘（点击输入框自动弹出）" Style="{StaticResource DemoCardStyle}">
+                        <StackPanel>
+                            <StackPanel Style="{StaticResource DemoRowStyle}">
+                                <TextBlock Style="{StaticResource SampleTagStyle}" Text="数字键盘" />
+                                <controls:GcTextBox
+                                    Width="300"
+                                    HorizontalAlignment="Left"
+                                    controls:GcKeyboard.DecimalPlaces="2"
+                                    controls:GcKeyboard.KeyboardType="Numeric"
+                                    controls:GcKeyboard.ShowKeyboard="True"
+                                    Placeholder="点击此输入框弹出数字键盘" />
                             </StackPanel>
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="全键盘" Style="{StaticResource SampleTagStyle}" />
-                                <controls:GlassTextBox Placeholder="点击此输入框弹出全键盘（26 键 QWERTY）"
-                                                       controls:GlassKeyboard.ShowKeyboard="True"
-                                                       controls:GlassKeyboard.KeyboardType="Full"
-                                                       Width="300" HorizontalAlignment="Left" />
+                                <TextBlock Style="{StaticResource SampleTagStyle}" Text="全键盘" />
+                                <controls:GcTextBox
+                                    Width="300"
+                                    HorizontalAlignment="Left"
+                                    controls:GcKeyboard.KeyboardType="Full"
+                                    controls:GcKeyboard.ShowKeyboard="True"
+                                    Placeholder="点击此输入框弹出全键盘（26 键 QWERTY）" />
                             </StackPanel>
                         </StackPanel>
-                    </controls:GlassCard>
+                    </controls:GcCard>
                 </StackPanel>
 
-                <!-- ========== 3 选择 ========== -->
+                <!--  ========== 3 选择 ==========  -->
                 <StackPanel x:Name="SectionSelect" Visibility="Collapsed">
-                    <TextBlock Text="选择 Select" Style="{StaticResource SectionTitleStyle}" />
-                    <TextBlock Style="{StaticResource SectionDescStyle}"
-                               Text="复选框与单选框，含默认选中与禁用态。" />
+                    <TextBlock Style="{StaticResource SectionTitleStyle}" Text="选择 Select" />
+                    <TextBlock Style="{StaticResource SectionDescStyle}" Text="复选框与单选框，含默认选中与禁用态。" />
 
-                    <controls:GlassCard Header="GlassCheckBox 复选框" Style="{StaticResource DemoCardStyle}">
+                    <controls:GcCard Header="CheckBox 复选框" Style="{StaticResource DemoCardStyle}">
                         <StackPanel>
-                            <controls:GlassCheckBox Content="复选框 A（可选）" Margin="0,0,0,8" />
-                            <controls:GlassCheckBox Content="复选框 B（默认选中）" IsChecked="True" Margin="0,0,0,8" />
-                            <controls:GlassCheckBox Content="复选框 C（禁用）" IsEnabled="False" />
+                            <controls:GcCheckBox Margin="0,0,0,8" Content="复选框 A（可选）" />
+                            <controls:GcCheckBox
+                                Margin="0,0,0,8"
+                                Content="复选框 B（默认选中）"
+                                IsChecked="True" />
+                            <controls:GcCheckBox Content="复选框 C（禁用）" IsEnabled="False" />
                         </StackPanel>
-                    </controls:GlassCard>
+                    </controls:GcCard>
 
-                    <controls:GlassCard Header="GlassRadioButton 单选框" Style="{StaticResource DemoCardStyle}">
+                    <controls:GcCard Header="RadioButton 单选框" Style="{StaticResource DemoCardStyle}">
                         <StackPanel Orientation="Horizontal">
-                            <controls:GlassRadioButton GroupName="g1" Content="单选框 1" IsChecked="True" Margin="0,0,18,0" />
-                            <controls:GlassRadioButton GroupName="g1" Content="单选框 2" Margin="0,0,18,0" />
-                            <controls:GlassRadioButton GroupName="g1" Content="单选框 3" />
+                            <controls:GcRadioButton
+                                Margin="0,0,18,0"
+                                Content="单选框 1"
+                                GroupName="g1"
+                                IsChecked="True" />
+                            <controls:GcRadioButton
+                                Margin="0,0,18,0"
+                                Content="单选框 2"
+                                GroupName="g1" />
+                            <controls:GcRadioButton Content="单选框 3" GroupName="g1" />
                         </StackPanel>
-                    </controls:GlassCard>
+                    </controls:GcCard>
                 </StackPanel>
 
-                <!-- ========== 4 滑杆与进度 ========== -->
+                <!--  ========== 4 滑杆与进度 ==========  -->
                 <StackPanel x:Name="SectionProgress" Visibility="Collapsed">
-                    <TextBlock Text="滑杆与进度 Slider &amp; Progress" Style="{StaticResource SectionTitleStyle}" />
-                    <TextBlock Style="{StaticResource SectionDescStyle}"
-                               Text="拖动滑杆同步进度条；下方为忙碌（不确定进度）形态。" />
+                    <TextBlock Style="{StaticResource SectionTitleStyle}" Text="滑杆与进度 Slider &amp; Progress" />
+                    <TextBlock Style="{StaticResource SectionDescStyle}" Text="拖动滑杆同步进度条；下方为忙碌（不确定进度）形态。" />
 
-                    <controls:GlassCard Header="GlassSlider / GlassProgressBar 联动" Style="{StaticResource DemoCardStyle}">
+                    <controls:GcCard Header="Slider / ProgressBar 联动" Style="{StaticResource DemoCardStyle}">
                         <StackPanel>
-                            <controls:GlassSlider x:Name="ProgressSlider" Minimum="0" Maximum="100" Value="66" />
-                            <controls:GlassTextBlock Text="进度同步演示" Margin="0,4,0,10" FontSize="12" />
-                            <controls:GlassProgressBar Height="8" Value="{Binding Value, ElementName=ProgressSlider}" />
+                            <controls:GcSlider
+                                x:Name="ProgressSlider"
+                                Maximum="100"
+                                Minimum="0"
+                                Value="66" />
+                            <controls:GcTextBlock
+                                Margin="0,4,0,10"
+                                FontSize="12"
+                                Text="进度同步演示" />
+                            <controls:GcProgressBar Height="8" Value="{Binding Value, ElementName=ProgressSlider}" />
                         </StackPanel>
-                    </controls:GlassCard>
+                    </controls:GcCard>
 
-                    <controls:GlassCard Header="不确定进度（忙碌指示）" Style="{StaticResource DemoCardStyle}">
-                        <controls:GlassProgressBar Height="8" IsIndeterminate="True" />
-                    </controls:GlassCard>
+                    <controls:GcCard Header="不确定进度（忙碌指示）" Style="{StaticResource DemoCardStyle}">
+                        <controls:GcProgressBar Height="8" IsIndeterminate="True" />
+                    </controls:GcCard>
                 </StackPanel>
 
-                <!-- ========== 5 文本与容器 ========== -->
+                <!--  ========== 5 文本与容器 ==========  -->
                 <StackPanel x:Name="SectionContainer" Visibility="Collapsed">
-                    <TextBlock Text="文本与容器 Text &amp; Container" Style="{StaticResource SectionTitleStyle}" />
-                    <TextBlock Style="{StaticResource SectionDescStyle}"
-                               Text="标签、文本、分隔线、分组框、折叠面板与通用玻璃面板。" />
+                    <TextBlock Style="{StaticResource SectionTitleStyle}" Text="文本与容器 Text &amp; Container" />
+                    <TextBlock Style="{StaticResource SectionDescStyle}" Text="标签、文本、分隔线、分组框、折叠面板与通用玻璃面板。" />
 
-                    <controls:GlassCard Header="GlassLabel / GlassTextBlock 文本" Style="{StaticResource DemoCardStyle}">
+                    <controls:GcCard Header="Label / TextBlock 文本" Style="{StaticResource DemoCardStyle}">
                         <StackPanel>
                             <StackPanel Style="{StaticResource DemoRowStyle}">
-                                <controls:GlassLabel Content="GlassLabel 标签" />
-                                <controls:GlassTextBlock Text="GlassTextBlock 文本" VerticalAlignment="Center" Margin="18,0,0,0" />
+                                <controls:GcLabel Content="Label 标签" />
+                                <controls:GcTextBlock
+                                    Margin="18,0,0,0"
+                                    VerticalAlignment="Center"
+                                    Text="TextBlock 文本" />
                             </StackPanel>
                             <StackPanel Orientation="Horizontal">
-                                <controls:GlassLabel Content="水平 0°" />
-                                <controls:GlassLabel Content="旋转 90°（垂直标签）" Angle="90" Margin="28,0,0,0" />
-                                <controls:GlassLabel Content="倾斜 30°" Angle="30" Margin="30,0,0,0" />
+                                <controls:GcLabel Content="水平 0°" />
+                                <controls:GcLabel
+                                    Margin="28,0,0,0"
+                                    Angle="90"
+                                    Content="旋转 90°（垂直标签）" />
+                                <controls:GcLabel
+                                    Margin="30,0,0,0"
+                                    Angle="30"
+                                    Content="倾斜 30°" />
                             </StackPanel>
                         </StackPanel>
-                    </controls:GlassCard>
+                    </controls:GcCard>
 
-                    <controls:GlassCard Header="GroupBox / Expander / Separator / Panel 容器" Style="{StaticResource DemoCardStyle}">
+                    <controls:GcCard Header="GroupBox / Expander / Separator / Panel 容器" Style="{StaticResource DemoCardStyle}">
                         <StackPanel>
-                            <controls:GlassGroupBox Header="GlassGroupBox 分组" Padding="12,8" Margin="0,0,0,10">
-                                <controls:GlassTextBlock Text="组内的内容也会呈现毛玻璃质感" FontSize="12.5" />
-                            </controls:GlassGroupBox>
-                            <controls:GlassExpander Header="GlassExpander 折叠面板（点击展开）" Margin="0,0,0,10">
-                                <controls:GlassTextBlock Text="展开后的内容区域" FontSize="12.5" Margin="0,8,0,0" />
-                            </controls:GlassExpander>
-                            <controls:GlassSeparator Margin="0,0,0,10" />
-                            <controls:GlassPanel CornerRadius="10" Padding="12,8">
-                                <controls:GlassTextBlock Text="GlassPanel 玻璃面板（可作为任意容器使用）" FontSize="12.5" />
-                            </controls:GlassPanel>
+                            <controls:GcGroupBox
+                                Margin="0,0,0,10"
+                                Padding="12,8"
+                                Header="GroupBox 分组">
+                                <controls:GcTextBlock FontSize="12.5" Text="组内的内容也会呈现毛玻璃质感" />
+                            </controls:GcGroupBox>
+                            <controls:GcExpander Margin="0,0,0,10" Header="Expander 折叠面板（点击展开）">
+                                <controls:GcTextBlock
+                                    Margin="0,8,0,0"
+                                    FontSize="12.5"
+                                    Text="展开后的内容区域" />
+                            </controls:GcExpander>
+                            <controls:GcSeparator Margin="0,0,0,10" />
+                            <controls:GcPanel Padding="12,8" CornerRadius="10">
+                                <controls:GcTextBlock FontSize="12.5" Text="Panel 玻璃面板（可作为任意容器使用）" />
+                            </controls:GcPanel>
                         </StackPanel>
-                    </controls:GlassCard>
+                    </controls:GcCard>
 
-                    <controls:GlassCard Header="GlassTag 标签（可关闭）" Style="{StaticResource DemoCardStyle}">
+                    <controls:GcCard Header="Tag 标签（可关闭）" Style="{StaticResource DemoCardStyle}">
                         <StackPanel>
                             <WrapPanel>
-                                <controls:GlassTag Content="毛玻璃" Margin="0,0,8,8" />
-                                <controls:GlassTag Content="WPF" Margin="0,0,8,8" />
-                                <controls:GlassTag Content=".NET 8" Margin="0,0,8,8" />
-                                <controls:GlassTag Content="可关闭 ×" IsClosable="True" Margin="0,0,8,8" />
-                                <controls:GlassTag IsClosable="True" Margin="0,0,8,8">
+                                <controls:GcTag Margin="0,0,8,8" Content="毛玻璃" />
+                                <controls:GcTag Margin="0,0,8,8" Content="WPF" />
+                                <controls:GcTag Margin="0,0,8,8" Content=".NET 8" />
+                                <controls:GcTag
+                                    Margin="0,0,8,8"
+                                    Content="可关闭 ×"
+                                    IsClosable="True" />
+                                <controls:GcTag Margin="0,0,8,8" IsClosable="True">
                                     <StackPanel Orientation="Horizontal">
-                                        <Ellipse Width="7" Height="7" Fill="#4CD964" VerticalAlignment="Center" Margin="0,0,6,0" />
-                                        <TextBlock Text="在线" FontSize="12.5" />
+                                        <Ellipse
+                                            Width="7"
+                                            Height="7"
+                                            Margin="0,0,6,0"
+                                            VerticalAlignment="Center"
+                                            Fill="#4CD964" />
+                                        <TextBlock FontSize="12.5" Text="在线" />
                                     </StackPanel>
-                                </controls:GlassTag>
+                                </controls:GcTag>
                             </WrapPanel>
-                            <controls:GlassTextBlock FontSize="11.5" Foreground="#8CFFFFFF"
-                                                     Text="点击 × 关闭标签；IsClosable 控制关闭按钮，Closed 路由事件可供父容器监听。" />
+                            <controls:GcTextBlock
+                                FontSize="11.5"
+                                Foreground="{DynamicResource GcTextSecondaryBrush}"
+                                Text="点击 × 关闭标签；IsClosable 控制关闭按钮，Closed 路由事件可供父容器监听。" />
                         </StackPanel>
-                    </controls:GlassCard>
+                    </controls:GcCard>
 
-                    <controls:GlassCard Header="GlassAvatar 头像（图片 / 文字缩写 / 状态点）" Style="{StaticResource DemoCardStyle}">
+                    <controls:GcCard Header="Avatar 头像（图片 / 文字缩写 / 状态点）" Style="{StaticResource DemoCardStyle}">
                         <StackPanel Orientation="Horizontal">
-                            <controls:GlassAvatar Text="张" Diameter="44" Margin="0,0,14,0" />
-                            <controls:GlassAvatar Text="HC" Diameter="44" Margin="0,0,14,0"
-                                                  IsStatusVisible="True" />
-                            <controls:GlassAvatar Text="OK" Diameter="44" CornerRadius="10" Margin="0,0,14,0"
-                                                  IsStatusVisible="True" StatusBrush="#F2B33C" />
-                            <controls:GlassTextBlock Text="圆形 / 圆角方形，右下角状态点颜色可自定义（黄=离开）"
-                                                     FontSize="11.5" Foreground="#8CFFFFFF"
-                                                     VerticalAlignment="Center" />
+                            <controls:GcAvatar
+                                Margin="0,0,14,0"
+                                Diameter="44"
+                                Text="张" />
+                            <controls:GcAvatar
+                                Margin="0,0,14,0"
+                                Diameter="44"
+                                IsStatusVisible="True"
+                                Text="HC" />
+                            <controls:GcAvatar
+                                Margin="0,0,14,0"
+                                CornerRadius="10"
+                                Diameter="44"
+                                IsStatusVisible="True"
+                                StatusBrush="#F2B33C"
+                                Text="OK" />
+                            <controls:GcTextBlock
+                                VerticalAlignment="Center"
+                                FontSize="11.5"
+                                Foreground="{DynamicResource GcTextSecondaryBrush}"
+                                Text="圆形 / 圆角方形，右下角状态点颜色可自定义（黄=离开）" />
                         </StackPanel>
-                    </controls:GlassCard>
+                    </controls:GcCard>
                 </StackPanel>
 
-                <!-- ========== 6 导航 ========== -->
+                <!--  ========== 6 导航 ==========  -->
                 <StackPanel x:Name="SectionNavigation" Visibility="Collapsed">
-                    <TextBlock Text="导航 Navigation" Style="{StaticResource SectionTitleStyle}" />
-                    <TextBlock Style="{StaticResource SectionDescStyle}"
-                               Text="选项卡、列表与内嵌玻璃页面。左侧分类栏本身就是 GlassListBox。" />
+                    <TextBlock Style="{StaticResource SectionTitleStyle}" Text="导航 Navigation" />
+                    <TextBlock Style="{StaticResource SectionDescStyle}" Text="选项卡、列表与内嵌玻璃页面。左侧分类栏本身就是 ListBox。" />
 
-                    <controls:GlassCard Header="GlassTabControl / GlassListBox / GlassPage" Style="{StaticResource DemoCardStyle}">
-                        <controls:GlassTabControl>
-                            <controls:GlassTabItem Header="页面一">
+                    <controls:GcCard Header="TabControl / ListBox / Page" Style="{StaticResource DemoCardStyle}">
+                        <controls:GcTabControl>
+                            <controls:GcTabItem Header="页面一">
                                 <StackPanel Margin="12">
-                                    <controls:GlassTextBlock Text="Tab 页面一的内容" />
-                                    <controls:GlassListBox Margin="0,10,0,0" Height="76"
-                                                           SelectedIndex="0">
-                                        <controls:GlassListBoxItem Content="列表项 1" />
-                                        <controls:GlassListBoxItem Content="列表项 2" />
-                                        <controls:GlassListBoxItem Content="列表项 3" />
-                                    </controls:GlassListBox>
+                                    <controls:GcTextBlock Text="Tab 页面一的内容" />
+                                    <controls:GcListBox
+                                        Height="76"
+                                        Margin="0,10,0,0"
+                                        SelectedIndex="0">
+                                        <controls:GcListBoxItem Content="列表项 1" />
+                                        <controls:GcListBoxItem Content="列表项 2" />
+                                        <controls:GcListBoxItem Content="列表项 3" />
+                                    </controls:GcListBox>
                                 </StackPanel>
-                            </controls:GlassTabItem>
-                            <controls:GlassTabItem Header="页面二">
+                            </controls:GcTabItem>
+                            <controls:GcTabItem Header="页面二">
                                 <Frame Margin="12">
                                     <Frame.Content>
-                                        <controls:GlassPage GlassPanel="True" CornerRadius="10">
-                                            <controls:GlassTextBlock Text="GlassPage 玻璃页面（嵌套在 Frame 中演示）" Margin="12" />
-                                        </controls:GlassPage>
+                                        <controls:GcPage CornerRadius="10" Panel="True">
+                                            <controls:GcTextBlock Margin="12" Text="Page 玻璃页面（嵌套在 Frame 中演示）" />
+                                        </controls:GcPage>
                                     </Frame.Content>
                                 </Frame>
-                            </controls:GlassTabItem>
-                        </controls:GlassTabControl>
-                    </controls:GlassCard>
+                            </controls:GcTabItem>
+                        </controls:GcTabControl>
+                    </controls:GcCard>
                 </StackPanel>
 
-                <!-- ========== 7 数据表格 ========== -->
+                <!--  ========== 7 数据表格 ==========  -->
                 <StackPanel x:Name="SectionDataGrid" Visibility="Collapsed">
-                    <TextBlock Text="数据表格 DataGrid" Style="{StaticResource SectionTitleStyle}" />
-                    <TextBlock Style="{StaticResource SectionDescStyle}"
-                               Text="玻璃滚动条为全局样式，ListBox / DataGrid 自动生效；支持列宽拖拽。" />
+                    <TextBlock Style="{StaticResource SectionTitleStyle}" Text="数据表格 DataGrid" />
+                    <TextBlock Style="{StaticResource SectionDescStyle}" Text="玻璃滚动条为全局样式，ListBox / DataGrid 自动生效；支持列宽拖拽。" />
 
-                    <controls:GlassCard Header="GlassDataGrid 员工演示数据" Style="{StaticResource DemoCardStyle}">
-                        <controls:GlassDataGrid x:Name="DemoGrid"
-                                                Height="240"
-                                                AutoGenerateColumns="False"
-                                                CanUserResizeColumns="True">
-                            <controls:GlassDataGrid.Columns>
-                                <DataGridTextColumn Header="姓名" Binding="{Binding Name}" Width="80" />
-                                <DataGridTextColumn Header="部门" Binding="{Binding Department}" Width="80" />
-                                <DataGridTextColumn Header="职位" Binding="{Binding Role}" Width="80" />
-                                <DataGridTextColumn Header="薪资" Binding="{Binding Salary, StringFormat={}{0:N0}}" Width="110" />
-                                <DataGridTextColumn Header="入职日期" Binding="{Binding Joined, StringFormat={}{0:yyyy-MM-dd}}" Width="130" />
-                            </controls:GlassDataGrid.Columns>
-                        </controls:GlassDataGrid>
-                    </controls:GlassCard>
+                    <controls:GcCard Header="DataGrid 员工演示数据" Style="{StaticResource DemoCardStyle}">
+                        <controls:GcDataGrid
+                            x:Name="DemoGrid"
+                            Height="240"
+                            AutoGenerateColumns="False"
+                            CanUserResizeColumns="True">
+                            <controls:GcDataGrid.Columns>
+                                <DataGridTextColumn
+                                    Width="80"
+                                    Binding="{Binding Name}"
+                                    Header="姓名" />
+                                <DataGridTextColumn
+                                    Width="80"
+                                    Binding="{Binding Department}"
+                                    Header="部门" />
+                                <DataGridTextColumn
+                                    Width="80"
+                                    Binding="{Binding Role}"
+                                    Header="职位" />
+                                <DataGridTextColumn
+                                    Width="110"
+                                    Binding="{Binding Salary, StringFormat={}{0:N0}}"
+                                    Header="薪资" />
+                                <DataGridTextColumn
+                                    Width="130"
+                                    Binding="{Binding Joined, StringFormat={}{0:yyyy-MM-dd}}"
+                                    Header="入职日期" />
+                            </controls:GcDataGrid.Columns>
+                        </controls:GcDataGrid>
+                    </controls:GcCard>
                 </StackPanel>
 
-                <!-- ========== 8 效果 ========== -->
+                <!--  ========== 8 效果 ==========  -->
                 <StackPanel x:Name="SectionEffects" Visibility="Collapsed">
-                    <TextBlock Text="效果 Effects" Style="{StaticResource SectionTitleStyle}" />
-                    <TextBlock Style="{StaticResource SectionDescStyle}"
-                               Text="鼠标悬停体验类附加效果：3D 倾斜与鱼眼放大，均为纯托管实现。" />
+                    <TextBlock Style="{StaticResource SectionTitleStyle}" Text="效果 Effects" />
+                    <TextBlock Style="{StaticResource SectionDescStyle}" Text="鼠标悬停体验类附加效果：3D 倾斜与鱼眼放大，均为纯托管实现。" />
 
-                    <controls:GlassCard Header="TiltBehavior · 3D 倾斜（旋转 + 斜切 + 缩放）" Style="{StaticResource DemoCardStyle}">
+                    <controls:GcCard Header="TiltBehavior · 3D 倾斜（旋转 + 斜切 + 缩放）" Style="{StaticResource DemoCardStyle}">
                         <UniformGrid Columns="3">
-                            <Border Margin="0,0,14,0"
-                                    effects:TiltBehavior.Tilt="True"
-                                    effects:TiltBehavior.MaxAngle="10"
-                                    effects:TiltBehavior.MaxSkew="10"
-                                    effects:TiltBehavior.HoverScale="1.05"
-                                    CornerRadius="16" Padding="18">
+                            <Border
+                                Margin="0,0,14,0"
+                                Padding="18"
+                                effects:GcTiltBehavior.HoverScale="1.05"
+                                effects:GcTiltBehavior.MaxAngle="10"
+                                effects:GcTiltBehavior.MaxSkew="10"
+                                effects:GcTiltBehavior.Tilt="True"
+                                CornerRadius="16">
                                 <Border.Background>
                                     <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                        <GradientStop Color="#55FFFFFF" Offset="0" />
-                                        <GradientStop Color="#223D5AFE" Offset="1" />
+                                        <GradientStop Offset="0" Color="#4D334155" />
+                                        <GradientStop Offset="1" Color="#223D5AFE" />
                                     </LinearGradientBrush>
                                 </Border.Background>
                                 <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="3D 倾斜" FontSize="17" FontWeight="SemiBold" Foreground="#F0FFFFFF" />
-                                    <TextBlock Text="MaxAngle=10 · MaxSkew=10" FontSize="11.5" Foreground="#B0FFFFFF" Margin="0,6,0,0" />
-                                </StackPanel>
-                            </Border>
-
-                            <Border Margin="0,0,14,0"
-                                    effects:TiltBehavior.Tilt="True"
-                                    effects:TiltBehavior.MaxAngle="12"
-                                    effects:TiltBehavior.HoverScale="1.06"
-                                    CornerRadius="16" Padding="18">
-                                <Border.Background>
-                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                        <GradientStop Color="#55FFFFFF" Offset="0" />
-                                        <GradientStop Color="#7C3AED" Offset="1" />
-                                    </LinearGradientBrush>
-                                </Border.Background>
-                                <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="渐变玻璃" FontSize="17" FontWeight="SemiBold" Foreground="#F0FFFFFF" />
-                                    <TextBlock Text="MaxAngle=12 · HoverScale=1.06" FontSize="11.5" Foreground="#B0FFFFFF" Margin="0,6,0,0" />
+                                    <TextBlock
+                                        FontSize="17"
+                                        FontWeight="SemiBold"
+                                        Foreground="{DynamicResource GcTextBrush}"
+                                        Text="3D 倾斜" />
+                                    <TextBlock
+                                        Margin="0,6,0,0"
+                                        FontSize="11.5"
+                                        Foreground="{DynamicResource GcTextSecondaryBrush}"
+                                        Text="MaxAngle=10 · MaxSkew=10" />
                                 </StackPanel>
                             </Border>
 
                             <Border
-                                effects:TiltBehavior.Tilt="True"
-                                effects:TiltBehavior.MaxSkew="14"
-                                effects:TiltBehavior.HoverScale="1.04"
-                                CornerRadius="16" Padding="18">
+                                Margin="0,0,14,0"
+                                Padding="18"
+                                effects:GcTiltBehavior.HoverScale="1.06"
+                                effects:GcTiltBehavior.MaxAngle="12"
+                                effects:GcTiltBehavior.Tilt="True"
+                                CornerRadius="16">
                                 <Border.Background>
                                     <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                        <GradientStop Color="#55FFFFFF" Offset="0" />
-                                        <GradientStop Color="#0891B2" Offset="1" />
+                                        <GradientStop Offset="0" Color="#4D334155" />
+                                        <GradientStop Offset="1" Color="#7C3AED" />
                                     </LinearGradientBrush>
                                 </Border.Background>
                                 <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="玻璃卡片" FontSize="17" FontWeight="SemiBold" Foreground="#F0FFFFFF" />
-                                    <TextBlock Text="任意元素都可附加倾斜行为" FontSize="11.5" Foreground="#B0FFFFFF" Margin="0,6,0,0" />
+                                    <TextBlock
+                                        FontSize="17"
+                                        FontWeight="SemiBold"
+                                        Foreground="{DynamicResource GcTextBrush}"
+                                        Text="渐变玻璃" />
+                                    <TextBlock
+                                        Margin="0,6,0,0"
+                                        FontSize="11.5"
+                                        Foreground="{DynamicResource GcTextSecondaryBrush}"
+                                        Text="MaxAngle=12 · HoverScale=1.06" />
+                                </StackPanel>
+                            </Border>
+
+                            <Border
+                                Padding="18"
+                                effects:GcTiltBehavior.HoverScale="1.04"
+                                effects:GcTiltBehavior.MaxSkew="14"
+                                effects:GcTiltBehavior.Tilt="True"
+                                CornerRadius="16">
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                        <GradientStop Offset="0" Color="#4D334155" />
+                                        <GradientStop Offset="1" Color="#0891B2" />
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock
+                                        FontSize="17"
+                                        FontWeight="SemiBold"
+                                        Foreground="{DynamicResource GcTextBrush}"
+                                        Text="玻璃卡片" />
+                                    <TextBlock
+                                        Margin="0,6,0,0"
+                                        FontSize="11.5"
+                                        Foreground="{DynamicResource GcTextSecondaryBrush}"
+                                        Text="任意元素都可附加倾斜行为" />
                                 </StackPanel>
                             </Border>
                         </UniformGrid>
-                    </controls:GlassCard>
+                    </controls:GcCard>
 
-                    <controls:GlassCard Header="FishEye · 鱼眼放大（悬停按距离衰减放大）" Style="{StaticResource DemoCardStyle}">
-                        <StackPanel Orientation="Horizontal"
-                                    controls:FishEye.IsEnabled="True"
-                                    controls:FishEye.MaxScale="1.6"
-                                    controls:FishEye.Range="140">
-                            <Border Background="#30FF7BD6" CornerRadius="12" Width="92" Height="92" Margin="6,0">
-                                <TextBlock Text="液体" FontSize="15" FontWeight="SemiBold" Foreground="White"
-                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    <controls:GcCard Header="FishEye · 鱼眼放大（悬停按距离衰减放大）" Style="{StaticResource DemoCardStyle}">
+                        <StackPanel
+                            controls:GcFishEye.IsEnabled="True"
+                            controls:GcFishEye.MaxScale="1.6"
+                            controls:GcFishEye.Range="140"
+                            Orientation="Horizontal">
+                            <Border
+                                Width="92"
+                                Height="92"
+                                Margin="6,0"
+                                Background="#30FF7BD6"
+                                CornerRadius="12">
+                                <TextBlock
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    FontSize="15"
+                                    FontWeight="SemiBold"
+                                    Foreground="White"
+                                    Text="液体" />
                             </Border>
-                            <Border Background="#307B68EE" CornerRadius="12" Width="92" Height="92" Margin="6,0">
-                                <TextBlock Text="平滑" FontSize="15" FontWeight="SemiBold" Foreground="White"
-                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <Border
+                                Width="92"
+                                Height="92"
+                                Margin="6,0"
+                                Background="#307B68EE"
+                                CornerRadius="12">
+                                <TextBlock
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    FontSize="15"
+                                    FontWeight="SemiBold"
+                                    Foreground="White"
+                                    Text="平滑" />
                             </Border>
-                            <Border Background="#3087CEEB" CornerRadius="12" Width="92" Height="92" Margin="6,0">
-                                <TextBlock Text="亚克力" FontSize="15" FontWeight="SemiBold" Foreground="White"
-                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <Border
+                                Width="92"
+                                Height="92"
+                                Margin="6,0"
+                                Background="#3087CEEB"
+                                CornerRadius="12">
+                                <TextBlock
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    FontSize="15"
+                                    FontWeight="SemiBold"
+                                    Foreground="White"
+                                    Text="亚克力" />
                             </Border>
-                            <Border Background="#30E0A060" CornerRadius="12" Width="92" Height="92" Margin="6,0">
-                                <TextBlock Text="Mica" FontSize="15" FontWeight="SemiBold" Foreground="White"
-                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <Border
+                                Width="92"
+                                Height="92"
+                                Margin="6,0"
+                                Background="#30E0A060"
+                                CornerRadius="12">
+                                <TextBlock
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    FontSize="15"
+                                    FontWeight="SemiBold"
+                                    Foreground="White"
+                                    Text="Mica" />
                             </Border>
-                            <Border Background="#304FB6FF" CornerRadius="12" Width="92" Height="92" Margin="6,0">
-                                <TextBlock Text="辉光" FontSize="15" FontWeight="SemiBold" Foreground="White"
-                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <Border
+                                Width="92"
+                                Height="92"
+                                Margin="6,0"
+                                Background="#304FB6FF"
+                                CornerRadius="12">
+                                <TextBlock
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    FontSize="15"
+                                    FontWeight="SemiBold"
+                                    Foreground="White"
+                                    Text="辉光" />
                             </Border>
                         </StackPanel>
-                    </controls:GlassCard>
+                    </controls:GcCard>
                 </StackPanel>
 
-                <!-- ========== 9 工业 ========== -->
+                <!--  ========== 9 工业 ==========  -->
                 <StackPanel x:Name="SectionIndustrial" Visibility="Collapsed">
-                    <TextBlock Text="工业元件 Industrial" Style="{StaticResource SectionTitleStyle}" />
-                    <TextBlock Style="{StaticResource SectionDescStyle}"
-                               Text="半导体 / 工控 HMI 元件符号：阀门、泵（排出口四方向、正反转）、槽体液位、拐弯管路、气缸、流量计、温控器。状态属性可直接绑定设备数据。" />
+                    <TextBlock Style="{StaticResource SectionTitleStyle}" Text="工业元件 Industrial" />
+                    <TextBlock Style="{StaticResource SectionDescStyle}" Text="半导体 / 工控 HMI 元件符号：阀门、泵（排出口四方向、正反转）、槽体液位、拐弯管路、气缸、流量计、温控器。状态属性可直接绑定设备数据。" />
 
-                    <controls:GlassCard Header="工艺流程示意：储罐 → 管路 → 泵 → 阀门 → 目标罐" Style="{StaticResource DemoCardStyle}">
-                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <controls:GlassTank Level="72" Width="80" Height="110"
-                                                ToolTip="源罐 Level=72" />
-                            <controls:GlassPipe IsFlowing="True" Width="64" VerticalAlignment="Center" />
-                            <controls:GlassPump IsRunning="True" Margin="2,0"
-                                                ToolTip="输送泵 IsRunning=True" Height="130" Width="130" />
-                            <controls:GlassPipe IsFlowing="True" Width="44" VerticalAlignment="Center" />
-                            <controls:GlassValve IsOpen="True" Margin="2,0"
-                                                 ToolTip="切换阀 IsOpen=True" />
-                            <controls:GlassPipe IsFlowing="True" Width="64" VerticalAlignment="Center" />
-                            <controls:GlassTank Level="28" Width="80" Height="110"
-                                                ToolTip="目标罐 Level=28" />
+                    <controls:GcCard Header="工艺流程示意：储罐 → 管路 → 泵 → 阀门 → 目标罐" Style="{StaticResource DemoCardStyle}">
+                        <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                            <controls:GcTank
+                                Width="80"
+                                Height="110"
+                                Level="72"
+                                ToolTip="源罐 Level=72" />
+                            <controls:GcPipe
+                                Width="64"
+                                VerticalAlignment="Center"
+                                IsFlowing="True" />
+                            <controls:GcPump
+                                Width="130"
+                                Height="130"
+                                Margin="2,0"
+                                controls:GcEditor.Editing="True"
+                                IsRunning="True"
+                                ToolTip="输送泵 IsRunning=True" />
+                            <controls:GcPipe
+                                Width="44"
+                                VerticalAlignment="Center"
+                                IsFlowing="True" />
+                            <controls:GcValve
+                                Margin="2,0"
+                                IsOpen="True"
+                                ToolTip="切换阀 IsOpen=True" />
+                            <controls:GcPipe
+                                Width="64"
+                                VerticalAlignment="Center"
+                                IsFlowing="True" />
+                            <controls:GcTank
+                                Width="80"
+                                Height="110"
+                                Level="28"
+                                ToolTip="目标罐 Level=28" />
                         </StackPanel>
-                    </controls:GlassCard>
+                    </controls:GcCard>
 
-                    <controls:GlassCard Header="GlassPump 排出口方向 / 叶轮转向" Style="{StaticResource DemoCardStyle}">
+                    <controls:GcCard Header="Pump 排出口方向 / 叶轮转向" Style="{StaticResource DemoCardStyle}">
                         <StackPanel>
-                            <StackPanel Style="{StaticResource DemoRowStyle}" Margin="0,0,0,10">
-                                <TextBlock Text="出口　" Style="{StaticResource SampleTagStyle}" />
-                                <controls:GlassPump IsRunning="True" OutletDirection="Right" ToolTip="OutletDirection=Right（默认）" Margin="0,0,18,0" />
-                                <controls:GlassPump IsRunning="True" OutletDirection="Down" ToolTip="OutletDirection=Down" Margin="0,0,18,0" />
-                                <controls:GlassPump IsRunning="True" OutletDirection="Left" ToolTip="OutletDirection=Left" Margin="0,0,18,0" />
-                                <controls:GlassPump IsRunning="True" OutletDirection="Up" ToolTip="OutletDirection=Up" Margin="0,0,18,0" />
-                                <TextBlock Text="右 / 下 / 左 / 上" FontSize="11.5" Foreground="#8CFFFFFF"
-                                           VerticalAlignment="Center" Margin="6,0,0,0" />
+                            <StackPanel Margin="0,0,0,10" Style="{StaticResource DemoRowStyle}">
+                                <TextBlock Style="{StaticResource SampleTagStyle}" Text="出口　" />
+                                <controls:GcPump
+                                    Margin="0,0,18,0"
+                                    IsRunning="True"
+                                    OutletDirection="Right"
+                                    ToolTip="OutletDirection=Right（默认）" />
+                                <controls:GcPump
+                                    Margin="0,0,18,0"
+                                    IsRunning="True"
+                                    OutletDirection="Down"
+                                    ToolTip="OutletDirection=Down" />
+                                <controls:GcPump
+                                    Margin="0,0,18,0"
+                                    IsRunning="True"
+                                    OutletDirection="Left"
+                                    ToolTip="OutletDirection=Left" />
+                                <controls:GcPump
+                                    Margin="0,0,18,0"
+                                    IsRunning="True"
+                                    OutletDirection="Up"
+                                    ToolTip="OutletDirection=Up" />
+                                <TextBlock
+                                    Margin="6,0,0,0"
+                                    VerticalAlignment="Center"
+                                    FontSize="11.5"
+                                    Foreground="{DynamicResource GcTextSecondaryBrush}"
+                                    Text="右 / 下 / 左 / 上" />
+                            </StackPanel>
+                            <StackPanel Margin="0,10,0,10" Style="{StaticResource DemoRowStyle}">
+                                <TextBlock Style="{StaticResource SampleTagStyle}" Text="进口　" />
+                                <controls:GcPump
+                                    Margin="0,0,18,0"
+                                    InletDirection="Left"
+                                    IsRunning="True"
+                                    ToolTip="InletDirection=Left（默认）" />
+                                <controls:GcPump
+                                    Margin="0,0,18,0"
+                                    InletDirection="Right"
+                                    IsRunning="True"
+                                    ToolTip="InletDirection=Right" />
+                                <controls:GcPump
+                                    Margin="0,0,18,0"
+                                    InletDirection="Up"
+                                    IsRunning="True"
+                                    ToolTip="InletDirection=Up" />
+                                <controls:GcPump
+                                    Margin="0,0,18,0"
+                                    InletDirection="Down"
+                                    IsRunning="True"
+                                    ToolTip="InletDirection=Down" />
+                                <TextBlock
+                                    Margin="6,0,0,0"
+                                    VerticalAlignment="Center"
+                                    FontSize="11.5"
+                                    Foreground="{DynamicResource GcTextSecondaryBrush}"
+                                    Text="左 / 右 / 上 / 下" />
                             </StackPanel>
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="转向　" Style="{StaticResource SampleTagStyle}" />
-                                <controls:GlassPump IsRunning="True" SpinDirection="Clockwise" ToolTip="SpinDirection=Clockwise 顺时针" Margin="0,0,18,0" />
-                                <controls:GlassPump IsRunning="True" SpinDirection="Counterclockwise" ToolTip="SpinDirection=Counterclockwise 逆时针" Margin="0,0,18,0" />
-                                <controls:GlassPump IsRunning="False" ToolTip="停止（ExitActions 已停掉动画）" Margin="0,0,18,0" />
-                                <TextBlock Text="顺时针 / 逆时针 / 停止" FontSize="11.5" Foreground="#8CFFFFFF"
-                                           VerticalAlignment="Center" Margin="6,0,0,0" />
+                                <TextBlock Style="{StaticResource SampleTagStyle}" Text="转向　" />
+                                <controls:GcPump
+                                    Margin="0,0,18,0"
+                                    IsRunning="True"
+                                    SpinDirection="Clockwise"
+                                    ToolTip="SpinDirection=Clockwise 顺时针" />
+                                <controls:GcPump
+                                    Margin="0,0,18,0"
+                                    IsRunning="True"
+                                    SpinDirection="Counterclockwise"
+                                    ToolTip="SpinDirection=Counterclockwise 逆时针" />
+                                <controls:GcPump
+                                    Margin="0,0,18,0"
+                                    IsRunning="False"
+                                    ToolTip="停止（ExitActions 已停掉动画）" />
+                                <TextBlock
+                                    Margin="6,0,0,0"
+                                    VerticalAlignment="Center"
+                                    FontSize="11.5"
+                                    Foreground="{DynamicResource GcTextSecondaryBrush}"
+                                    Text="顺时针 / 逆时针 / 停止" />
                             </StackPanel>
                         </StackPanel>
-                    </controls:GlassCard>
+                    </controls:GcCard>
 
-                    <controls:GlassCard Header="GlassPipe 拐弯管路：泵下出口 → 圆弧弯头 → 阀门 → 目标罐" Style="{StaticResource DemoCardStyle}">
-                        <Canvas Width="340" Height="168" HorizontalAlignment="Center">
-                            <!-- 管层先画：Points 用相对包围盒原点的局部坐标，
-                                 元素定位在包围盒左上角，几何始终在自身布局槽内（防卡片裁剪）；
-                                 端点伸入相邻符号端口下方，实体搭接无缝隙 -->
-                            <!-- 泵吸入段：全局 64,65 → 101,65 -->
-                            <controls:GlassPipe Canvas.Left="64" Canvas.Top="65"
-                                                Points="7,0 37,0" IsFlowing="True" />
-                            <!-- 泵下出口 → 竖管 → 弯头 → 水平段穿过阀门 → 目标罐：
-                                 全局 (118,86)→(118,116)→(248,116) -->
-                            <controls:GlassPipe Canvas.Left="118" Canvas.Top="86"
-                                                Points="0,0 0,30 130,30" IsFlowing="True" />
+                    <controls:GcCard Header="Pipe 拐弯管路：泵下出口 → 圆弧弯头 → 阀门 → 目标罐" Style="{StaticResource DemoCardStyle}">
+                        <Canvas
+                            Width="340"
+                            Height="168"
+                            HorizontalAlignment="Center">
+                            <!--
+                                管层先画：Points 用相对包围盒原点的局部坐标，
+                                元素定位在包围盒左上角，几何始终在自身布局槽内（防卡片裁剪）；
+                                端点伸入相邻符号端口下方，实体搭接无缝隙
+                            -->
+                            <!--  泵吸入段：全局 64,65 → 101,65  -->
+                            <controls:GcPipe
+                                Canvas.Left="64"
+                                Canvas.Top="65"
+                                IsFlowing="True"
+                                Points="7,0 37,0" />
+                            <!--
+                                泵下出口 → 竖管 → 弯头 → 水平段穿过阀门 → 目标罐：
+                                全局 (118,86)→(118,116)→(248,116)
+                            -->
+                            <controls:GcPipe
+                                Canvas.Left="118"
+                                Canvas.Top="86"
+                                IsEditing="True"
+                                IsFlowing="True"
+                                PipeWidth="6"
+                                Points="28.5,-19.4 72.5,-17.4 0,30 124.5,32.6" />
 
-                            <!-- 设备层后画，压住管端 -->
-                            <controls:GlassTank Canvas.Left="6" Canvas.Top="20" Width="64" Height="90"
-                                                Level="72" ToolTip="源罐 Level=72" />
-                            <controls:GlassPump Canvas.Left="96" Canvas.Top="41"
-                                                IsRunning="True" OutletDirection="Down"
-                                                ToolTip="输送泵：OutletDirection=Down" />
-                            <controls:GlassValve Canvas.Left="170" Canvas.Top="96"
-                                                 IsOpen="True" ToolTip="切换阀 IsOpen=True" />
-                            <controls:GlassTank Canvas.Left="244" Canvas.Top="71" Width="64" Height="90"
-                                                Level="28" ToolTip="目标罐 Level=28" />
+                            <!--  设备层后画，压住管端  -->
+                            <controls:GcTank
+                                Canvas.Left="6"
+                                Canvas.Top="20"
+                                Width="64"
+                                Height="90"
+                                Level="72"
+                                ToolTip="源罐 Level=72" />
+                            <controls:GcPump
+                                Canvas.Left="96"
+                                Canvas.Top="41"
+                                IsRunning="True"
+                                OutletDirection="Down"
+                                ToolTip="输送泵：OutletDirection=Down" />
+                            <controls:GcValve
+                                Canvas.Left="170"
+                                Canvas.Top="96"
+                                IsOpen="True"
+                                ToolTip="切换阀 IsOpen=True" />
+                            <controls:GcTank
+                                Canvas.Left="244"
+                                Canvas.Top="71"
+                                Width="64"
+                                Height="90"
+                                Level="28"
+                                ToolTip="目标罐 Level=28" />
                         </Canvas>
-                    </controls:GlassCard>
+                    </controls:GcCard>
 
-                    <controls:GlassCard Header="GlassFlowMeter 流量计 / GlassThermoController 温控器" Style="{StaticResource DemoCardStyle}">
+                    <controls:GcCard Header="FlowMeter 流量计 / ThermoController 温控器" Style="{StaticResource DemoCardStyle}">
                         <StackPanel>
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <controls:GlassFlowMeter Value="0" ToolTip="Value=0 无流量" Margin="0,0,16,0"  />
-                                <controls:GlassFlowMeter Value="45" IsFlowing="True" ToolTip="45 L/min 流动中" Margin="0,0,16,0" />
-                                <controls:GlassFlowMeter Value="88" Unit="m³/h" IsFlowing="True" ToolTip="88 m³/h 流动中" Margin="0,0,28,0" />
-                                <controls:GlassThermoController x:Name="DemoThermo"
-                                                                Temperature="36" SetPoint="40"
-                                                                RangeMin="0" RangeMax="100"
-                                                                VerticalAlignment="Center" />
+                            <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                                <controls:GcFlowMeter
+                                    Margin="0,0,16,0"
+                                    ToolTip="Value=0 无流量"
+                                    Value="0" />
+                                <controls:GcFlowMeter
+                                    Margin="0,0,16,0"
+                                    IsFlowing="True"
+                                    ToolTip="45 L/min 流动中"
+                                    Value="45" />
+                                <controls:GcFlowMeter
+                                    Margin="0,0,16,0"
+                                    IsFlowing="True"
+                                    ToolTip="88 m³/h 流动中"
+                                    Unit="m³/h"
+                                    Value="88" />
+                                <controls:GcFlowMeter
+                                    Margin="0,0,16,0"
+                                    AlarmPercent="90"
+                                    IsFlowing="True"
+                                    Setpoint="60"
+                                    ShowAlarm="True"
+                                    ShowSetpoint="True"
+                                    ToolTip="显示设定流量 SP60 + 报警 AL90%"
+                                    Unit="L/min"
+                                    Value="55" />
+                                <controls:GcFlowMeter
+                                    Margin="0,0,28,0"
+                                    AlarmPercent="90"
+                                    IsFlowing="True"
+                                    Setpoint="80"
+                                    ShowAlarm="True"
+                                    ShowSetpoint="True"
+                                    ToolTip="越限报警：当前95 &gt; 报警90%"
+                                    Unit="L/min"
+                                    Value="95" />
+                                <controls:GcThermoController
+                                    x:Name="DemoThermo"
+                                    VerticalAlignment="Center"
+                                    RangeMax="100"
+                                    RangeMin="0"
+                                    SetPoint="40"
+                                    Temperature="36" />
                             </StackPanel>
-                            <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
-                                <TextBlock Text="温度" Style="{StaticResource SampleTagStyle}" VerticalAlignment="Center" />
-                                <controls:GlassSlider Width="170" Minimum="0" Maximum="100"
-                                                      Value="{Binding Temperature, ElementName=DemoThermo, Mode=TwoWay}"
-                                                      VerticalAlignment="Center" Margin="8,0,0,0" />
-                                <TextBlock Text="设定" Style="{StaticResource SampleTagStyle}" Margin="22,0,0,0" VerticalAlignment="Center" />
-                                <controls:GlassSlider Width="170" Minimum="0" Maximum="100"
-                                                      Value="{Binding SetPoint, ElementName=DemoThermo, Mode=TwoWay}"
-                                                      VerticalAlignment="Center" Margin="8,0,0,0" />
+                            <StackPanel Margin="0,12,0,0" Orientation="Horizontal">
+                                <TextBlock
+                                    VerticalAlignment="Center"
+                                    Style="{StaticResource SampleTagStyle}"
+                                    Text="温度" />
+                                <controls:GcSlider
+                                    Width="170"
+                                    Margin="8,0,0,0"
+                                    VerticalAlignment="Center"
+                                    Maximum="100"
+                                    Minimum="0"
+                                    Value="{Binding Temperature, ElementName=DemoThermo, Mode=TwoWay}" />
+                                <TextBlock
+                                    Margin="22,0,0,0"
+                                    VerticalAlignment="Center"
+                                    Style="{StaticResource SampleTagStyle}"
+                                    Text="设定" />
+                                <controls:GcSlider
+                                    Width="170"
+                                    Margin="8,0,0,0"
+                                    VerticalAlignment="Center"
+                                    Maximum="100"
+                                    Minimum="0"
+                                    Value="{Binding SetPoint, ElementName=DemoThermo, Mode=TwoWay}" />
                             </StackPanel>
                         </StackPanel>
-                    </controls:GlassCard>
+                    </controls:GcCard>
 
-                    <controls:GlassCard Header="阀门 / 泵 状态一览" Style="{StaticResource DemoCardStyle}">
+                    <controls:GcCard Header="Motor 电机 / SignalTower 三色警示灯" Style="{StaticResource DemoCardStyle}">
                         <StackPanel>
                             <StackPanel Style="{StaticResource DemoRowStyle}">
-                                <TextBlock Text="阀门" Style="{StaticResource SampleTagStyle}" />
-                                <controls:GlassValve IsOpen="True" ToolTip="打开" Margin="0,0,22,0" />
-                                <controls:GlassValve IsOpen="False" ToolTip="关闭" Margin="0,0,22,0" />
-                                <controls:GlassValve IsFault="True" ToolTip="故障" />
-                                <TextBlock Text="开 / 关 / 故障" FontSize="11.5" Foreground="#8CFFFFFF"
-                                           VerticalAlignment="Center" Margin="18,0,0,0" />
+                                <TextBlock Style="{StaticResource SampleTagStyle}" Text="电机" />
+                                <controls:GcMotor
+                                    Margin="0,0,16,4"
+                                    IsRunning="True"
+                                    ToolTip="IsRunning=True 转子旋转" />
+                                <controls:GcMotor
+                                    Margin="0,0,16,4"
+                                    IsRunning="False"
+                                    ToolTip="停止" />
+                                <controls:GcMotor
+                                    Margin="0,0,26,4"
+                                    IsFault="True"
+                                    ToolTip="IsFault=True 故障" />
+                            </StackPanel>
+                            <StackPanel Margin="0,8,0,0" Orientation="Horizontal">
+                                <TextBlock
+                                    Margin="0,10,0,0"
+                                    VerticalAlignment="Top"
+                                    Style="{StaticResource SampleTagStyle}"
+                                    Text="整流器" />
+                                <controls:GcRectifier
+                                    Margin="0,0,12,0"
+                                    AlarmHighVoltage="240"
+                                    AlarmLowVoltage="180"
+                                    CurrentCurrent="9.8"
+                                    CurrentVoltage="224.5"
+                                    IsOn="True"
+                                    SetCurrent="10"
+                                    SetVoltage="220"
+                                    ToolTip="运行：设定220V/10A，当前224V/9.8A" />
+                                <controls:GcRectifier
+                                    Margin="0,0,14,0"
+                                    AlarmHighVoltage="240"
+                                    AlarmLowVoltage="180"
+                                    CurrentCurrent="9.8"
+                                    CurrentVoltage="256"
+                                    IsAlarm="True"
+                                    IsOn="True"
+                                    SetCurrent="10"
+                                    SetVoltage="220"
+                                    ToolTip="越限报警：当前电压256V 超出上限240V" />
+                            </StackPanel>
+                            <StackPanel Style="{StaticResource DemoRowStyle}">
+                                <TextBlock Style="{StaticResource SampleTagStyle}" Text="警示灯" />
+                                <controls:GcSignalTower
+                                    Margin="0,0,12,6"
+                                    Light="Green"
+                                    ToolTip="Light=Green 正常运行" />
+                                <controls:GcSignalTower
+                                    Margin="0,0,12,6"
+                                    IsBlinking="True"
+                                    Light="Yellow"
+                                    ToolTip="Light=Yellow + IsBlinking 待机闪烁" />
+                                <controls:GcSignalTower
+                                    Margin="0,0,14,6"
+                                    Light="Red"
+                                    ToolTip="Light=Red 报警" />
+                                <controls:GcSignalTower Light="Off" ToolTip="Light=Off 全灭" />
+                            </StackPanel>
+                            <controls:GcTextBlock
+                                FontSize="11.5"
+                                Foreground="{DynamicResource GcTextSecondaryBrush}"
+                                Text="电机：IsRunning 驱动转子虚线环旋转；警示灯：Light 选点亮段；整流器：设定/当前电压电流 + 开关，设定与报警上下限可输入编辑，报警灯呼吸闪烁（第二台演示越限报警）。" />
+                        </StackPanel>
+                    </controls:GcCard>
+
+                    <controls:GcCard Header="冰水机 / 日历筛选" Style="{StaticResource DemoCardStyle}">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Style="{StaticResource SampleTagStyle}" Text="时钟" />
+                                <controls:GcClock Margin="0,0,22,4" ToolTip="实时时间：Format 自定义格式，ShowDate 显隐日期行" />
+                                <TextBlock
+                                    Margin="0,22,0,0"
+                                    VerticalAlignment="Top"
+                                    Style="{StaticResource SampleTagStyle}"
+                                    Text="冰水机" />
+                                <controls:GcChiller
+                                    Margin="0,0,12,4"
+                                    ActualTemp="7.8"
+                                    IsRunning="True"
+                                    SetTemp="7.0"
+                                    ToolTip="IsRunning=True 运行中；开关可交互" />
+                                <controls:GcChiller
+                                    Margin="0,0,14,4"
+                                    ActualTemp="26.8"
+                                    IsFault="True"
+                                    IsRunning="True"
+                                    SetTemp="7.0"
+                                    ToolTip="IsFault=True 高温报警（开关可交互）" />
+                            </StackPanel>
+                            <StackPanel Margin="0,8,0,0" Orientation="Horizontal">
+                                <TextBlock
+                                    VerticalAlignment="Center"
+                                    Style="{StaticResource SampleTagStyle}"
+                                    Text="日历筛选" />
+                                <StackPanel Margin="10,0,0,0" VerticalAlignment="Center">
+                                    <StackPanel Margin="0,0,0,6" Orientation="Horizontal">
+                                        <TextBlock
+                                            Margin="0,0,6,0"
+                                            VerticalAlignment="Center"
+                                            FontSize="11"
+                                            Foreground="#96FFFFFF"
+                                            Text="开始" />
+                                        <controls:GcDatePicker Width="150" SelectedDate="2026-08-01" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock
+                                            Margin="0,0,6,0"
+                                            VerticalAlignment="Center"
+                                            FontSize="11"
+                                            Foreground="#96FFFFFF"
+                                            Text="结束" />
+                                        <controls:GcDatePicker Width="150" DateFormat="yyyy-MM-dd HH:mm" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </StackPanel>
+                            <controls:GcTextBlock
+                                Margin="0,10,0,0"
+                                FontSize="11.5"
+                                Foreground="#8CFFFFFF"
+                                Text="冰水机：开关 IsRunning 启停风扇、设置温度 SetTemp 可编辑、实际温度 ActualTemp 只读；日历：点击弹出选择，SelectedDate 可绑定查询条件，DateFormat 控制显示格式。" />
+                        </StackPanel>
+                    </controls:GcCard>
+
+                    <controls:GcCard Header="机械手：双臂晶圆搬运 / SCARA 四轴" Style="{StaticResource DemoCardStyle}">
+                        <WrapPanel>
+                            <StackPanel Margin="0,0,24,8">
+                                <wafers:WaferRobot
+                                    Width="70"
+                                    Height="70"
+                                    Arm1_1Angle="0"
+                                    Arm1_2Angle="0"
+                                    Arm1_3Angle="0"
+                                    Arm2_1Angle="0"
+                                    Arm2_2Angle="0"
+                                    Arm2_3Angle="0"
+                                    BaseAngle="0"
+                                    ToolTip="Home 姿态：J1-J8 全0" />
+                                <TextBlock
+                                    Margin="0,4,0,0"
+                                    HorizontalAlignment="Center"
+                                    FontSize="11"
+                                    Foreground="#8CFFFFFF"
+                                    Text="Wafer Robot · Home" />
+                            </StackPanel>
+
+                            <StackPanel Margin="0,0,24,8">
+                                <controls:GcScaraRobot
+                                    Width="160"
+                                    Height="160"
+                                    ElbowAngle="70"
+                                    HoldingWafer="True"
+                                    ShoulderAngle="-35"
+                                    ToolTip="SCARA 吸附晶圆状态" />
+                                <TextBlock
+                                    Margin="0,4,0,0"
+                                    HorizontalAlignment="Center"
+                                    FontSize="11"
+                                    Foreground="#8CFFFFFF"
+                                    Text="SCARA · 吸附晶圆" />
+                            </StackPanel>
+                            <StackPanel Margin="0,0,24,8">
+                                <controls:GcScaraRobot
+                                    Width="160"
+                                    Height="160"
+                                    ElbowAngle="-55"
+                                    HoldingWafer="False"
+                                    IsServoOn="False"
+                                    ShoulderAngle="25"
+                                    ToolTip="SCARA 释放晶圆 + 伺服下电" />
+                                <TextBlock
+                                    Margin="0,4,0,0"
+                                    HorizontalAlignment="Center"
+                                    FontSize="11"
+                                    Foreground="#8CFFFFFF"
+                                    Text="SCARA · 释放/伺服断电" />
+                            </StackPanel>
+                        </WrapPanel>
+                    </controls:GcCard>
+
+                    <controls:GcCard Header="阀门 / 泵 状态一览" Style="{StaticResource DemoCardStyle}">
+                        <StackPanel>
+                            <StackPanel Style="{StaticResource DemoRowStyle}">
+                                <TextBlock Style="{StaticResource SampleTagStyle}" Text="阀门" />
+                                <controls:GcValve
+                                    Margin="0,0,22,0"
+                                    IsOpen="True"
+                                    ToolTip="打开" />
+                                <controls:GcValve
+                                    Margin="0,0,22,0"
+                                    IsOpen="False"
+                                    ToolTip="关闭" />
+                                <controls:GcValve IsFault="True" ToolTip="故障" />
+                                <TextBlock
+                                    Margin="18,0,0,0"
+                                    VerticalAlignment="Center"
+                                    FontSize="11.5"
+                                    Foreground="{DynamicResource GcTextSecondaryBrush}"
+                                    Text="开 / 关 / 故障" />
                             </StackPanel>
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="泵　　" Style="{StaticResource SampleTagStyle}" />
-                                <controls:GlassPump IsRunning="True" ToolTip="运行中" Margin="0,0,22,0" />
-                                <controls:GlassPump IsRunning="False" ToolTip="停止" Margin="0,0,22,0" />
-                                <controls:GlassPump IsFault="True" ToolTip="故障" />
-                                <TextBlock Text="运行 / 停止 / 故障" FontSize="11.5" Foreground="#8CFFFFFF"
-                                           VerticalAlignment="Center" Margin="18,0,0,0" />
+                                <TextBlock Style="{StaticResource SampleTagStyle}" Text="泵　　" />
+                                <controls:GcPump
+                                    Margin="0,0,22,0"
+                                    IsRunning="True"
+                                    ToolTip="运行中" />
+                                <controls:GcPump
+                                    Margin="0,0,22,0"
+                                    IsRunning="False"
+                                    ToolTip="停止" />
+                                <controls:GcPump IsFault="True" ToolTip="故障" />
+                                <TextBlock
+                                    Margin="18,0,0,0"
+                                    VerticalAlignment="Center"
+                                    FontSize="11.5"
+                                    Foreground="{DynamicResource GcTextSecondaryBrush}"
+                                    Text="运行 / 停止 / 故障" />
                             </StackPanel>
                         </StackPanel>
-                    </controls:GlassCard>
+                    </controls:GcCard>
 
-                    <controls:GlassCard Header="GlassCylinder 气缸（拖动滑杆控制伸出位置）" Style="{StaticResource DemoCardStyle}">
+                    <controls:GcCard Header="Cylinder 气缸（拖动滑杆控制伸出位置）" Style="{StaticResource DemoCardStyle}">
                         <StackPanel Orientation="Horizontal">
-                            <controls:GlassCylinder x:Name="DemoCylinder" Extension="30"
-                                                    VerticalAlignment="Center" Margin="0,0,20,0" />
-                            <controls:GlassSlider Width="180" Minimum="0" Maximum="100"
-                                                  Value="{Binding Extension, ElementName=DemoCylinder, Mode=TwoWay}"
-                                                  VerticalAlignment="Center" />
-                            <controls:GlassTextBlock Text="{Binding Extension, ElementName=DemoCylinder, StringFormat={}{0:0}%}"
-                                                     VerticalAlignment="Center" Margin="12,0,0,0" />
+                            <controls:GcCylinder
+                                x:Name="DemoCylinder"
+                                Margin="0,0,20,0"
+                                VerticalAlignment="Center"
+                                Extension="30" />
+                            <controls:GcSlider
+                                Width="180"
+                                VerticalAlignment="Center"
+                                Maximum="100"
+                                Minimum="0"
+                                Value="{Binding Extension, ElementName=DemoCylinder, Mode=TwoWay}" />
+                            <controls:GcTextBlock
+                                Margin="12,0,0,0"
+                                VerticalAlignment="Center"
+                                Text="{Binding Extension, ElementName=DemoCylinder, StringFormat={}{0:0}%}" />
                         </StackPanel>
-                    </controls:GlassCard>
+                    </controls:GcCard>
+
+                    <controls:GcCard Header="PlatingChamber 水平电镀腔（升降/旋转/开合/液位/感应器）" Style="{StaticResource DemoCardStyle}">
+                        <StackPanel>
+                            <StackPanel VerticalAlignment="Top" Orientation="Horizontal">
+                                <controls:GcPlatingChamber
+                                    x:Name="DemoPlating"
+                                    Width="170"
+                                    Height="240"
+                                    controls:GcEditor.Editing="True"
+                                    HasWafer="true"
+                                    HeadLift="75"
+                                    Level="46"
+                                    ToolTip="半导体水平电镀腔：升降腔头 + 阳极塔 + 蓝色回收罩" />
+
+                                <StackPanel
+                                    Width="330"
+                                    Margin="16,0,0,0"
+                                    VerticalAlignment="Top">
+                                    <StackPanel Margin="0,0,0,10" Orientation="Horizontal">
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            Style="{StaticResource SampleTagStyle}"
+                                            Text="自动模拟" />
+                                        <controls:GcToggleSwitch
+                                            x:Name="DemoPlatingAuto"
+                                            VerticalAlignment="Center"
+                                            Checked="PlatingAuto_Checked"
+                                            Content="盖下→下降→旋转下降→回正→旋转5秒→边转边升→停转开盖"
+                                            Unchecked="PlatingAuto_Unchecked" />
+                                        <controls:GcButton
+                                            Width="96"
+                                            Margin="12,0,0,0"
+                                            Click="PlatingCycle_Click"
+                                            Content="循环一次" />
+                                    </StackPanel>
+
+                                    <StackPanel Margin="0,0,0,8" Orientation="Horizontal">
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            Style="{StaticResource SampleTagStyle}"
+                                            Text="升降" />
+                                        <controls:GcSlider
+                                            Width="150"
+                                            Margin="8,0,0,0"
+                                            VerticalAlignment="Center"
+                                            Maximum="100"
+                                            Minimum="0"
+                                            Value="{Binding HeadLift, ElementName=DemoPlating, Mode=TwoWay}" />
+                                        <controls:GcButton
+                                            Width="52"
+                                            Margin="8,0,0,0"
+                                            Click="PlatingLiftUp_Click"
+                                            Content="升 ↑" />
+                                        <controls:GcButton
+                                            Width="52"
+                                            Margin="8,0,0,0"
+                                            Click="PlatingLiftDown_Click"
+                                            Content="降 ↓" />
+                                    </StackPanel>
+
+                                    <StackPanel Margin="0,0,0,8" Orientation="Horizontal">
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            Style="{StaticResource SampleTagStyle}"
+                                            Text="倾斜" />
+                                        <controls:GcSlider
+                                            Width="150"
+                                            Margin="8,0,0,0"
+                                            VerticalAlignment="Center"
+                                            Maximum="20"
+                                            Minimum="0"
+                                            Value="{Binding Tilt, ElementName=DemoPlating, Mode=TwoWay}" />
+                                        <controls:GcButton
+                                            Width="48"
+                                            Margin="8,0,0,0"
+                                            Click="PlatingTiltLeft_Click"
+                                            Content="左倾" />
+                                        <controls:GcButton
+                                            Width="48"
+                                            Margin="8,0,0,0"
+                                            Click="PlatingTiltRight_Click"
+                                            Content="右倾" />
+                                        <controls:GcButton
+                                            Width="48"
+                                            Margin="8,0,0,0"
+                                            Click="PlatingTiltReset_Click"
+                                            Content="回正" />
+                                    </StackPanel>
+
+                                    <StackPanel Margin="0,0,0,8" Orientation="Horizontal">
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            Style="{StaticResource SampleTagStyle}"
+                                            Text="液位" />
+                                        <controls:GcSlider
+                                            Width="150"
+                                            Margin="8,0,0,0"
+                                            VerticalAlignment="Center"
+                                            Maximum="100"
+                                            Minimum="0"
+                                            Value="{Binding Level, ElementName=DemoPlating, Mode=TwoWay}" />
+                                        <controls:GcToggleSwitch
+                                            x:Name="DemoPlatingRotate"
+                                            Margin="12,0,0,0"
+                                            VerticalAlignment="Center"
+                                            Checked="PlatingRotate_Changed"
+                                            Content="旋转"
+                                            Unchecked="PlatingRotate_Changed" />
+                                        <controls:GcToggleSwitch
+                                            x:Name="DemoPlatingOpen"
+                                            Margin="12,0,0,0"
+                                            VerticalAlignment="Center"
+                                            Checked="PlatingOpen_Changed"
+                                            Content="开合"
+                                            Unchecked="PlatingOpen_Changed" />
+                                    </StackPanel>
+
+                                    <StackPanel Margin="0,0,0,4" Orientation="Horizontal">
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            Style="{StaticResource SampleTagStyle}"
+                                            Text="感应" />
+                                        <controls:GcTextBlock
+                                            Margin="8,0,0,0"
+                                            VerticalAlignment="Center"
+                                            FontSize="11.5"
+                                            Foreground="{DynamicResource GcTextSecondaryBrush}"
+                                            Text="高/低液位随液位自动点亮" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </StackPanel>
+                            <controls:GcTextBlock
+                                FontSize="11.5"
+                                Foreground="{DynamicResource GcTextSecondaryBrush}"
+                                Text="升降/倾斜支持按钮平滑缓动（升↑降↓、左倾右倾回正）。自动模拟：1 盖板盖下 → 2 下降30%并倾斜 → 3 旋转下降到底+水位上升 → 4 倾斜回正+水位再升 → 5 保持旋转5秒 → 6 边旋转边上升+排液 → 7 停转（复位回初始姿态）+开盖，循环往复。动画全部挂渲染帧驱动（vsync 同拍）。" />
+                        </StackPanel>
+                    </controls:GcCard>
+
+                    <controls:GcCard Header="AptChamber APT 腔" Style="{StaticResource DemoCardStyle}">
+                        <StackPanel>
+                            <StackPanel VerticalAlignment="Top" Orientation="Horizontal">
+                                <controls:GcAptChamber
+                                    x:Name="DemoApt"
+                                    Width="170"
+                                    Height="240"
+                                    HasWafer="False"
+                                    HeadLift="0"
+                                    SprayLength="70"
+                                    ToolTip="APT 腔：升降 HeadLift + 喷雾 Spray / SprayLength + V 型卡盘 »旋转 IsRotating" />
+
+                                <StackPanel
+                                    Width="300"
+                                    Margin="16,0,0,0"
+                                    VerticalAlignment="Top">
+                                    <StackPanel Margin="0,0,0,10" Orientation="Horizontal">
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            Style="{StaticResource SampleTagStyle}"
+                                            Text="自动模拟" />
+                                        <controls:GcToggleSwitch
+                                            x:Name="DemoAptAuto"
+                                            VerticalAlignment="Center"
+                                            Checked="AptAuto_Checked"
+                                            Content="有片→升降→旋转→臂到位→喷雾→关雾回臂→停转→下降"
+                                            Unchecked="AptAuto_Unchecked" />
+                                    </StackPanel>
+
+                                    <StackPanel Margin="0,0,0,8" Orientation="Horizontal">
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            Style="{StaticResource SampleTagStyle}"
+                                            Text="升降" />
+                                        <controls:GcSlider
+                                            Width="170"
+                                            Margin="8,0,0,0"
+                                            VerticalAlignment="Center"
+                                            Maximum="100"
+                                            Minimum="0"
+                                            Value="{Binding HeadLift, ElementName=DemoApt, Mode=TwoWay}" />
+                                    </StackPanel>
+
+                                    <StackPanel Margin="0,0,0,8" Orientation="Horizontal">
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            Style="{StaticResource SampleTagStyle}"
+                                            Text="长度" />
+                                        <controls:GcSlider
+                                            Width="170"
+                                            Margin="8,0,0,0"
+                                            VerticalAlignment="Center"
+                                            Maximum="100"
+                                            Minimum="0"
+                                            Value="{Binding SprayLength, ElementName=DemoApt, Mode=TwoWay}" />
+                                    </StackPanel>
+
+                                    <StackPanel Margin="0,0,0,4" Orientation="Horizontal">
+                                        <controls:GcToggleSwitch
+                                            x:Name="DemoAptRotate"
+                                            Margin="0,0,12,0"
+                                            VerticalAlignment="Center"
+                                            Checked="AptRotate_Changed"
+                                            Content="旋转"
+                                            Unchecked="AptRotate_Changed" />
+                                        <controls:GcToggleSwitch
+                                            x:Name="DemoAptSpray"
+                                            Margin="0,0,12,0"
+                                            VerticalAlignment="Center"
+                                            Checked="AptSpray_Changed"
+                                            Content="喷雾"
+                                            Unchecked="AptSpray_Changed" />
+                                        <controls:GcToggleSwitch
+                                            x:Name="DemoAptOpen"
+                                            VerticalAlignment="Center"
+                                            Checked="AptOpen_Changed"
+                                            Content="开合"
+                                            Unchecked="AptOpen_Changed" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </StackPanel>
+                            <controls:GcTextBlock
+                                FontSize="11.5"
+                                Foreground="{DynamicResource GcTextSecondaryBrush}"
+                                Text="APT 腔：升降 HeadLift、喷头长度 SprayLength（0~100）、喷雾 Spray=true 才喷（雾滴下落动画）、旋转 IsRotating 时整根刚体 ∨120° 卡盘（chuck，夹角恒定不重叠）绕锥尖恒速整圈转、端帽焊死随 V 转（静止时水平开口朝上）+ 顶压板渐变扫光（喷头区不扫光）。" />
+                        </StackPanel>
+                    </controls:GcCard>
+
+                    <controls:GcCard Header="SrdChamber SRD 腔" Style="{StaticResource DemoCardStyle}">
+                        <StackPanel>
+                            <StackPanel VerticalAlignment="Top" Orientation="Horizontal">
+                                <Canvas>
+                                    <controls:GcSrdChamber
+                                        x:Name="DemoSrd"
+                                        Width="254"
+                                        Height="240"
+                                        controls:GcEditor.Editing="True"
+                                        HasWafer="True"
+                                        HeadLift="0"
+                                        SprayLength="70"
+                                        ToolTip="SRD 腔：升降 HeadLift + 喷雾 Spray / SprayLength + 卡盘旋转 IsRotating" Canvas.Left="302" Canvas.Top="0" />
+                                </Canvas>
+                                <StackPanel
+                                    Width="300"
+                                    Margin="16,0,0,0"
+                                    VerticalAlignment="Top">
+                                    <StackPanel Margin="0,0,0,10" Orientation="Horizontal">
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            Style="{StaticResource SampleTagStyle}"
+                                            Text="自动模拟" />
+                                        <controls:GcToggleSwitch
+                                            x:Name="DemoSrdAuto"
+                                            VerticalAlignment="Center"
+                                            Checked="SrdAuto_Checked"
+                                            Content="有片→升降→旋转→喷雾臂到位→喷雾→关雾回臂→停转→下降"
+                                            Unchecked="SrdAuto_Unchecked" />
+                                    </StackPanel>
+
+                                    <StackPanel Margin="0,0,0,8" Orientation="Horizontal">
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            Style="{StaticResource SampleTagStyle}"
+                                            Text="升降" />
+                                        <controls:GcSlider
+                                            Width="170"
+                                            Margin="8,0,0,0"
+                                            VerticalAlignment="Center"
+                                            Maximum="100"
+                                            Minimum="0"
+                                            Value="{Binding HeadLift, ElementName=DemoSrd, Mode=TwoWay}" />
+                                    </StackPanel>
+
+                                    <StackPanel Margin="0,0,0,8" Orientation="Horizontal">
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            Style="{StaticResource SampleTagStyle}"
+                                            Text="长度" />
+                                        <controls:GcSlider
+                                            Width="170"
+                                            Margin="8,0,0,0"
+                                            VerticalAlignment="Center"
+                                            Maximum="100"
+                                            Minimum="0"
+                                            Value="{Binding SprayLength, ElementName=DemoSrd, Mode=TwoWay}" />
+                                    </StackPanel>
+
+                                    <StackPanel Margin="0,0,0,4" Orientation="Horizontal">
+                                        <controls:GcToggleSwitch
+                                            x:Name="DemoSrdRotate"
+                                            Margin="0,0,12,0"
+                                            VerticalAlignment="Center"
+                                            Checked="SrdRotate_Changed"
+                                            Content="旋转"
+                                            Unchecked="SrdRotate_Changed" />
+                                        <controls:GcToggleSwitch
+                                            x:Name="DemoSrdSpray"
+                                            Margin="0,0,12,0"
+                                            VerticalAlignment="Center"
+                                            Checked="SrdSpray_Changed"
+                                            Content="喷雾"
+                                            Unchecked="SrdSpray_Changed" />
+                                        <controls:GcToggleSwitch
+                                            x:Name="DemoSrdOpen"
+                                            Margin="0,0,12,0"
+                                            VerticalAlignment="Center"
+                                            Checked="SrdOpen_Changed"
+                                            Content="开合"
+                                            Unchecked="SrdOpen_Changed" />
+                                        <controls:GcToggleSwitch
+                                            x:Name="DemoSrdWafer"
+                                            VerticalAlignment="Center"
+                                            Checked="SrdWafer_Changed"
+                                            Content="有片"
+                                            IsChecked="True"
+                                            Unchecked="SrdWafer_Changed" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </StackPanel>
+                           
+                        </StackPanel>
+                    </controls:GcCard>
                 </StackPanel>
-
-                <!-- ========== 10 提示与弹窗 ========== -->
                 <StackPanel x:Name="SectionFeedback" Visibility="Collapsed">
-                    <TextBlock Text="提示与弹窗 Feedback" Style="{StaticResource SectionTitleStyle}" />
-                    <TextBlock Style="{StaticResource SectionDescStyle}"
-                               Text="气泡提示、右键菜单与模态弹窗。弹窗结果会显示在右侧文本中。" />
+                    <TextBlock Style="{StaticResource SectionTitleStyle}" Text="提示与弹窗 Feedback" />
+                    <TextBlock Style="{StaticResource SectionDescStyle}" Text="气泡提示、右键菜单与模态弹窗。弹窗结果会显示在右侧文本中。" />
 
-                    <controls:GlassCard Header="ToolTip / ContextMenu 提示" Style="{StaticResource DemoCardStyle}">
+                    <controls:GcCard Header="ToolTip / ContextMenu 提示" Style="{StaticResource DemoCardStyle}">
                         <StackPanel>
                             <StackPanel Style="{StaticResource DemoRowStyle}">
-                                <controls:GlassButton Content="悬停查看毛玻璃 ToolTip" Width="200" Margin="0,0,12,0">
-                                    <controls:GlassButton.ToolTip>
-                                        <controls:GlassToolTip>毛玻璃质感的提示气泡</controls:GlassToolTip>
-                                    </controls:GlassButton.ToolTip>
-                                    <controls:GlassButton.ContextMenu>
-                                        <controls:GlassContextMenu>
+                                <controls:GcButton
+                                    Width="200"
+                                    Margin="0,0,12,0"
+                                    Content="悬停查看毛玻璃 ToolTip">
+                                    <controls:GcButton.ToolTip>
+                                        <controls:GcToolTip>毛玻璃质感的提示气泡</controls:GcToolTip>
+                                    </controls:GcButton.ToolTip>
+                                    <controls:GcButton.ContextMenu>
+                                        <controls:GcContextMenu>
                                             <MenuItem Header="菜单项一" />
                                             <MenuItem Header="菜单项二" />
                                             <MenuItem Header="—" />
-                                            <MenuItem Header="退出" Click="Exit_Click" />
-                                        </controls:GlassContextMenu>
-                                    </controls:GlassButton.ContextMenu>
-                                </controls:GlassButton>
-                                <controls:GlassTextBlock Text="右键该按钮打开毛玻璃菜单" FontSize="12" Foreground="#A0FFFFFF" VerticalAlignment="Center" />
+                                            <MenuItem Click="Exit_Click" Header="退出" />
+                                        </controls:GcContextMenu>
+                                    </controls:GcButton.ContextMenu>
+                                </controls:GcButton>
+                                <controls:GcTextBlock
+                                    VerticalAlignment="Center"
+                                    FontSize="12"
+                                    Foreground="{DynamicResource GcTextSecondaryBrush}"
+                                    Text="右键该按钮打开毛玻璃菜单" />
                             </StackPanel>
                         </StackPanel>
-                    </controls:GlassCard>
+                    </controls:GcCard>
 
-                    <controls:GlassCard Header="GlassDialog / GlassInputDialog 模态弹窗" Style="{StaticResource DemoCardStyle}">
+                    <controls:GcCard Header="Dialog / InputDialog 模态弹窗" Style="{StaticResource DemoCardStyle}">
                         <StackPanel Orientation="Horizontal">
-                            <controls:GlassButton Content="列表选择弹窗"
-                                                  Click="ShowListDialog_Click"
-                                                  controls:DialogProperties.DialogTitle="选择背景模式"
-                                                  controls:DialogProperties.DialogItems="液体玻璃 Glassy,系统亚克力 Acrylic,Mica,模拟玻璃 Simulated"
-                                                  Width="150" Margin="0,0,12,0"
-                                                  Style="{StaticResource GlassPrimaryButtonStyle}" />
-                            <controls:GlassButton Content="文本输入弹窗"
-                                                  Click="ShowInputDialog_Click"
-                                                  controls:DialogProperties.DialogTitle="输入用户名"
-                                                  controls:DialogProperties.DialogMessage="请输入您的用户名（2-20个字符）："
-                                                  Width="150" Margin="0,0,12,0" />
-                            <controls:GlassTextBlock x:Name="DialogResultText"
-                                                     Text="尚未触发弹窗"
-                                                     VerticalAlignment="Center"
-                                                     FontSize="13" Foreground="#A0FFFFFF" />
+                            <controls:GcButton
+                                Width="150"
+                                Margin="0,0,12,0"
+                                controls:GcDialogProperties.DialogItems="液体玻璃 Glassy,系统亚克力 Acrylic,Mica,模拟玻璃 Simulated"
+                                controls:GcDialogProperties.DialogTitle="选择背景模式"
+                                Click="ShowListDialog_Click"
+                                Content="列表选择弹窗"
+                                Style="{StaticResource GcPrimaryButtonStyle}" />
+                            <controls:GcButton
+                                Width="150"
+                                Margin="0,0,12,0"
+                                controls:GcDialogProperties.DialogMessage="请输入您的用户名（2-20个字符）："
+                                controls:GcDialogProperties.DialogTitle="输入用户名"
+                                Click="ShowInputDialog_Click"
+                                Content="文本输入弹窗" />
+                            <controls:GcTextBlock
+                                x:Name="DialogResultText"
+                                VerticalAlignment="Center"
+                                FontSize="13"
+                                Foreground="{DynamicResource GcTextSecondaryBrush}"
+                                Text="尚未触发弹窗" />
                         </StackPanel>
-                    </controls:GlassCard>
+                    </controls:GcCard>
                 </StackPanel>
 
             </StackPanel>
         </ScrollViewer>
     </Grid>
-</controls:GlassWindow>
+</controls:GcWindow>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

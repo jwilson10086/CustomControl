@@ -1,0 +1,80 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:GeneralControl.Controls">
+
+    <!--
+        ================================================================
+        文件说明：Themes\Steel\Controls\Tank.xaml
+        Tank 工业槽体 / 液位罐样式。
+        
+        依赖：Brushes.xaml（画刷资源）。
+        结构：Border(罐体，上直角下圆角) → Grid
+        → [PART_Liquid(底部锚定液位块) + PART_Percent(百分比)]
+        
+        【液位高度】由代码后置（Tank.UpdateLevel）按 Level 百分比换算，
+        并随控件 SizeChanged 自动重算。
+        ================================================================
+    -->
+
+    <Style TargetType="controls:GcTank">
+        <Setter Property="Width" Value="90" />
+        <Setter Property="Height" Value="120" />
+        <!--  默认液体画刷：强调色渐变（半透明，玻璃质感）  -->
+        <Setter Property="LiquidBrush">
+            <Setter.Value>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Offset="0" Color="#664FB6FF" />
+                    <GradientStop Offset="1" Color="#8C189A4A" />
+                </LinearGradientBrush>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="controls:GcTank">
+                    <Border
+                        x:Name="Root"
+                        Background="#1F334155"
+                        BorderBrush="{DynamicResource GcEdgeHighlightBrush}"
+                        BorderThickness="1"
+                        ClipToBounds="True"
+                        CornerRadius="6,6,14,14"
+                        SnapsToDevicePixels="True">
+                        <Grid>
+                            <!--  液位块：底部锚定，高度由代码控制  -->
+                            <Border
+                                x:Name="PART_Liquid"
+                                Margin="1"
+                                VerticalAlignment="Bottom"
+                                Background="{TemplateBinding LiquidBrush}"
+                                CornerRadius="0,0,13,13" />
+
+                            <!--  百分比文字  -->
+                            <TextBlock
+                                x:Name="PART_Percent"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                FontSize="14"
+                                FontWeight="SemiBold"
+                                Foreground="#1F2937"
+                                IsHitTestVisible="False"
+                                Text="0%" />
+                        </Grid>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>
+
+
+
+
+
+
+
+
+
+
+

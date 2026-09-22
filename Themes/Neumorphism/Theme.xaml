@@ -1,0 +1,66 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--
+        ================================================================
+        文件说明：Themes\Neumorphism\Theme.xaml
+        拟物（Neumorphism）主题入口。
+        风格：柔和双向阴影、圆角12-16、浅蓝灰底、蓝色强调。
+        ================================================================
+    -->
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="Brushes.xaml" />
+        <ResourceDictionary Source="GcWindow.xaml" />
+        <ResourceDictionary Source="Controls\GcButton.xaml" />
+        <ResourceDictionary Source="Controls\GcToggleButton.xaml" />
+        <ResourceDictionary Source="Controls\GcTextBox.xaml" />
+        <ResourceDictionary Source="Controls\GcPasswordBox.xaml" />
+        <ResourceDictionary Source="Controls\GcCheckBox.xaml" />
+        <ResourceDictionary Source="Controls\GcRadioButton.xaml" />
+        <ResourceDictionary Source="Controls\GcToggleSwitch.xaml" />
+        <ResourceDictionary Source="Controls\GcComboBoxItem.xaml" />
+        <ResourceDictionary Source="Controls\GcComboBox.xaml" />
+        <ResourceDictionary Source="Controls\GcSlider.xaml" />
+        <ResourceDictionary Source="Controls\GcProgressBar.xaml" />
+        <ResourceDictionary Source="Controls\GcTextBlock.xaml" />
+        <ResourceDictionary Source="Controls\GcLabel.xaml" />
+        <ResourceDictionary Source="Controls\GcGroupBox.xaml" />
+        <ResourceDictionary Source="Controls\GcSeparator.xaml" />
+        <ResourceDictionary Source="Controls\GcExpander.xaml" />
+        <ResourceDictionary Source="Controls\GcToolTip.xaml" />
+        <ResourceDictionary Source="Controls\GcMenuItem.xaml" />
+        <ResourceDictionary Source="Controls\GcContextMenu.xaml" />
+        <ResourceDictionary Source="Controls\GcListBoxItem.xaml" />
+        <ResourceDictionary Source="Controls\GcListBox.xaml" />
+        <ResourceDictionary Source="Controls\GcTabItem.xaml" />
+        <ResourceDictionary Source="Controls\GcTabControl.xaml" />
+        <ResourceDictionary Source="Controls\GcScrollBar.xaml" />
+        <ResourceDictionary Source="Controls\GcDataGrid.xaml" />
+        <ResourceDictionary Source="Controls\GcCard.xaml" />
+        <ResourceDictionary Source="Controls\GcPanel.xaml" />
+        <ResourceDictionary Source="Controls\GcDialog.xaml" />
+        <ResourceDictionary Source="Controls\GcInputDialog.xaml" />
+        <ResourceDictionary Source="Controls\GcKeyboardPopup.xaml" />
+        <ResourceDictionary Source="Controls\GcTag.xaml" />
+        <ResourceDictionary Source="Controls\GcNumericBox.xaml" />
+        <ResourceDictionary Source="Controls\GcAvatar.xaml" />
+        <ResourceDictionary Source="Controls\GcValve.xaml" />
+        <ResourceDictionary Source="Controls\GcPump.xaml" />
+        <ResourceDictionary Source="Controls\GcTank.xaml" />
+        <ResourceDictionary Source="Controls\GcPipe.xaml" />
+        <ResourceDictionary Source="Controls\GcCylinder.xaml" />
+        <ResourceDictionary Source="Controls\GcFlowMeter.xaml" />
+        <ResourceDictionary Source="Controls\GcThermoController.xaml" />
+        <ResourceDictionary Source="Controls\GcMotor.xaml" />
+        <ResourceDictionary Source="Controls\GcRectifier.xaml" />
+        <ResourceDictionary Source="Controls\GcSignalTower.xaml" />
+        <ResourceDictionary Source="Controls\GcChiller.xaml" />
+        <ResourceDictionary Source="Controls\GcDatePicker.xaml" />
+        <ResourceDictionary Source="Controls\GcWaferRobot.xaml" />
+        <ResourceDictionary Source="Controls\GcScaraRobot.xaml" />
+        <ResourceDictionary Source="Controls\GcClock.xaml" />
+        <ResourceDictionary Source="Controls\GcPlatingChamber.xaml" />
+        <ResourceDictionary Source="Controls\GcAptChamber.xaml" />
+        <ResourceDictionary Source="Controls\GcSrdChamber.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+</ResourceDictionary>

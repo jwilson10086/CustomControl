@@ -2,16 +2,18 @@
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using CustomControl.Interop;
+using GeneralControl.Interop;
 
-namespace CustomControl.Effects;
+using GeneralControl.Controls;
+
+namespace GeneralControl.Effects;
 
 /// <summary>
 /// 桌面背景捕获：捕获整个虚拟屏幕，并把窗口所在区域实时裁切为 ImageBrush，
 /// 作为液体玻璃着色器的输入。
 /// 参考：https://github.com/dragosniamtu/WPF-Liquid-Glass-Effect (MIT)
 /// </summary>
-internal sealed class BackdropCapture : IDisposable
+internal sealed class GcBackdropCapture : IDisposable
 {
     private static BitmapSource? _fullScreenSnapshot;
     private static int _virtualX;
@@ -19,11 +21,11 @@ internal sealed class BackdropCapture : IDisposable
     private static int _virtualWidth;
     private static int _virtualHeight;
 
-    private readonly Window _window;
+    private readonly GcWindow _window;
     private ImageBrush? _brush;
     private bool _disposed;
 
-    public BackdropCapture(Window window)
+    public GcBackdropCapture(GcWindow window)
     {
         _window = window;
     }
@@ -158,3 +160,6 @@ internal sealed class BackdropCapture : IDisposable
         _disposed = true;
     }
 }
+
+
+

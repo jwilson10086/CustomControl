@@ -2,7 +2,9 @@
 using System.Windows;
 using System.Windows.Interop;
 
-namespace CustomControl.Interop;
+using GeneralControl.Controls;
+
+namespace GeneralControl.Interop;
 
 /// <summary>
 /// Win32/DWM/GDI 原生调用集合：窗口拖动、缩放、亚克力背景、系统背景材质、屏幕捕获。
@@ -80,7 +82,7 @@ internal static class NativeMethods
     public static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref int attrValue, int attrSize);
 
     /// <summary>从 WPF 元素直接发出系统命令拖动窗口。</summary>
-    public static void DragMove(Window window)
+    public static void DragMove(GcWindow window)
     {
         if (window is null)
         {
@@ -97,7 +99,7 @@ internal static class NativeMethods
         _ = SendMessage(hwnd, WM_NCLBUTTONDOWN, (IntPtr)HT_CAPTION, IntPtr.Zero);
     }
 
-    public static void BeginResize(Window window, int direction)
+    public static void BeginResize(GcWindow window, int direction)
     {
         if (window is null)
         {
@@ -114,7 +116,7 @@ internal static class NativeMethods
     }
 
     /// <summary>Win10/11 亚克力模糊（SetWindowCompositionAttribute）。</summary>
-    public static bool SetAcrylic(Window window, bool enabled, byte opacity, byte r, byte g, byte b)
+    public static bool SetAcrylic(GcWindow window, bool enabled, byte opacity, byte r, byte g, byte b)
     {
         var hwnd = new WindowInteropHelper(window).Handle;
         if (hwnd == IntPtr.Zero)
@@ -148,7 +150,7 @@ internal static class NativeMethods
     }
 
     /// <summary>Windows 11 系统背景材质（Mica / Acrylic / Tabbed）。</summary>
-    public static bool SetSystemBackdrop(Window window, SystemBackdropType type)
+    public static bool SetSystemBackdrop(GcWindow window, SystemBackdropType type)
     {
         var hwnd = new WindowInteropHelper(window).Handle;
         if (hwnd == IntPtr.Zero)
@@ -161,3 +163,6 @@ internal static class NativeMethods
     }
 
 }
+
+
+

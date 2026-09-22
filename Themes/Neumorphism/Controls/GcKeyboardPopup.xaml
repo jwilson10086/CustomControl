@@ -1,0 +1,253 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:GeneralControl.Controls">
+
+    <!--  高对比度键盘按键  -->
+    <Style x:Key="GcKeyboardKeyStyle" TargetType="Button">
+        <Setter Property="Background" Value="#E8E8EC" />
+        <Setter Property="BorderBrush" Value="#D0D0D6" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Foreground" Value="#1A1A2E" />
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border
+                        x:Name="Root"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="8"
+                        SnapsToDevicePixels="True">
+                        <ContentPresenter
+                            Margin="{TemplateBinding Padding}"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Root" Property="Background" Value="#F0F0F5" />
+                            <Setter TargetName="Root" Property="BorderBrush" Value="#B8B8C0" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Root" Property="Background" Value="#D0D0D8" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Root" Property="Opacity" Value="0.4" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style
+        x:Key="KeyboardConfirmStyle"
+        BasedOn="{StaticResource GcKeyboardKeyStyle}"
+        TargetType="Button">
+        <Setter Property="Background" Value="#88AAE0" />
+        <Setter Property="BorderBrush" Value="#6890D0" />
+        <Setter Property="Foreground" Value="White" />
+    </Style>
+
+    <!--  数字键盘滑块  -->
+    <Style x:Key="GcNumericSliderStyle" TargetType="Slider">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Slider">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Border
+                            Grid.Row="0"
+                            Grid.RowSpan="3"
+                            Width="8"
+                            HorizontalAlignment="Center"
+                            Background="#D0D0D6"
+                            CornerRadius="4" />
+                        <Border
+                            x:Name="PART_SelectionRange"
+                            Grid.Row="0"
+                            Grid.RowSpan="3"
+                            Width="8"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Bottom"
+                            Background="{DynamicResource GcAccentBrush}"
+                            CornerRadius="4" />
+                        <Track
+                            x:Name="PART_Track"
+                            Grid.Row="0"
+                            Grid.RowSpan="3"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Stretch"
+                            IsDirectionReversed="True"
+                            Maximum="{TemplateBinding Maximum}"
+                            Minimum="{TemplateBinding Minimum}"
+                            Orientation="Vertical"
+                            Value="{TemplateBinding Value}">
+                            <Track.Thumb>
+                                <Thumb
+                                    Width="22"
+                                    Height="18"
+                                    Cursor="SizeNS">
+                                    <Thumb.Template>
+                                        <ControlTemplate TargetType="Thumb">
+                                            <Border
+                                                x:Name="ThumbBorder"
+                                                Width="22"
+                                                Height="18"
+                                                Background="{DynamicResource GcAccentBrush}"
+                                                BorderBrush="#6890D0"
+                                                BorderThickness="2"
+                                                CornerRadius="4" />
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="ThumbBorder" Property="Background" Value="#9BB8E8" />
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Thumb.Template>
+                                </Thumb>
+                            </Track.Thumb>
+                            <Track.DecreaseRepeatButton>
+                                <RepeatButton Command="Slider.DecreaseLarge">
+                                    <RepeatButton.Template>
+                                        <ControlTemplate TargetType="RepeatButton">
+                                            <Border Background="{DynamicResource GcAccentBrush}" CornerRadius="1" />
+                                        </ControlTemplate>
+                                    </RepeatButton.Template>
+                                </RepeatButton>
+                            </Track.DecreaseRepeatButton>
+                            <Track.IncreaseRepeatButton>
+                                <RepeatButton Command="Slider.IncreaseLarge">
+                                    <RepeatButton.Template>
+                                        <ControlTemplate TargetType="RepeatButton">
+                                            <Border Background="Transparent" />
+                                        </ControlTemplate>
+                                    </RepeatButton.Template>
+                                </RepeatButton>
+                            </Track.IncreaseRepeatButton>
+                        </Track>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--  拟物 KeyboardPopup：结构与 Glass 一致  -->
+    <Style TargetType="controls:GcKeyboardPopup">
+        <Setter Property="Background" Value="{DynamicResource GcControlBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource GcTextBrush}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="controls:GcKeyboardPopup">
+                    <Border
+                        MinWidth="260"
+                        Padding="16"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{DynamicResource GcBorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="16">
+                        <Border.Effect>
+                            <DropShadowEffect
+                                BlurRadius="9"
+                                Opacity="0.35"
+                                ShadowDepth="3"
+                                Color="#A0A0A8" />
+                        </Border.Effect>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0" Margin="0,0,0,12">
+                                <Border
+                                    Padding="2"
+                                    Background="#0A000000"
+                                    CornerRadius="10">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBox
+                                            x:Name="PART_PreviewBox"
+                                            MinHeight="32"
+                                            Margin="12,4,4,4"
+                                            VerticalAlignment="Center"
+                                            HorizontalContentAlignment="Right"
+                                            Background="Transparent"
+                                            BorderThickness="0"
+                                            FontSize="20"
+                                            FontWeight="SemiBold"
+                                            Foreground="{DynamicResource GcTextBrush}"
+                                            IsReadOnly="True" />
+                                        <Button
+                                            x:Name="PART_ClearButton"
+                                            Grid.Column="1"
+                                            Padding="8,4"
+                                            VerticalAlignment="Center"
+                                            Background="Transparent"
+                                            BorderThickness="0"
+                                            Content="&#x2716;"
+                                            Cursor="Hand"
+                                            FocusVisualStyle="{x:Null}"
+                                            FontSize="14"
+                                            Foreground="{DynamicResource GcTextSecondaryBrush}">
+                                            <Button.Style>
+                                                <Style TargetType="Button">
+                                                    <Style.Triggers>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter Property="Foreground" Value="{DynamicResource GcTextBrush}" />
+                                                        </Trigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                    </Grid>
+                                </Border>
+                            </Grid>
+                            <StackPanel
+                                x:Name="PART_KeysHost"
+                                Grid.Row="1"
+                                Margin="0,0,0,12"
+                                HorizontalAlignment="Center" />
+                            <Grid Grid.Row="2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Button
+                                    x:Name="PART_CancelButton"
+                                    Grid.Column="0"
+                                    Margin="0,0,6,0"
+                                    Padding="18,10"
+                                    Content="取消"
+                                    FontSize="14"
+                                    Style="{DynamicResource GcDialogButtonStyle}" />
+                                <Button
+                                    x:Name="PART_ConfirmButton"
+                                    Grid.Column="1"
+                                    Margin="6,0,0,0"
+                                    Padding="18,10"
+                                    Content="确认"
+                                    FontSize="14"
+                                    Style="{DynamicResource GcDialogConfirmStyle}" />
+                            </Grid>
+                        </Grid>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>

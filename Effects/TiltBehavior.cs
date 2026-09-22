@@ -3,7 +3,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 
-namespace CustomControl.Effects;
+namespace GeneralControl.Effects;
 
 /// <summary>
 /// 3D 倾斜行为：让任意元素（卡片/按钮/面板）以 3D 透视感跟随鼠标倾斜，
@@ -11,41 +11,41 @@ namespace CustomControl.Effects;
 /// （.NET Core WPF 已移除 PlanarProjection，此为等价实现）。
 /// 用法：<c>CustomControl:Behavior.Tilt="True"</c>
 /// </summary>
-public static class TiltBehavior
+public static class GcTiltBehavior
 {
     public static readonly DependencyProperty TiltProperty =
         DependencyProperty.RegisterAttached(
             "Tilt",
             typeof(bool),
-            typeof(TiltBehavior),
+            typeof(GcTiltBehavior),
             new PropertyMetadata(false, OnTiltChanged));
 
     public static readonly DependencyProperty MaxAngleProperty =
         DependencyProperty.RegisterAttached(
             "MaxAngle",
             typeof(double),
-            typeof(TiltBehavior),
+            typeof(GcTiltBehavior),
             new PropertyMetadata(8.0));
 
     public static readonly DependencyProperty MaxSkewProperty =
         DependencyProperty.RegisterAttached(
             "MaxSkew",
             typeof(double),
-            typeof(TiltBehavior),
+            typeof(GcTiltBehavior),
             new PropertyMetadata(9.0));
 
     public static readonly DependencyProperty HoverScaleProperty =
         DependencyProperty.RegisterAttached(
             "HoverScale",
             typeof(double),
-            typeof(TiltBehavior),
+            typeof(GcTiltBehavior),
             new PropertyMetadata(1.04));
 
     private static readonly DependencyProperty TiltStateProperty =
         DependencyProperty.RegisterAttached(
             "TiltState",
             typeof(TiltState),
-            typeof(TiltBehavior),
+            typeof(GcTiltBehavior),
             new PropertyMetadata(null));
 
     public static bool GetTilt(DependencyObject obj) => (bool)obj.GetValue(TiltProperty);
@@ -179,3 +179,5 @@ public static class TiltBehavior
         private static double Lerp(double from, double to, double t) => from + (to - from) * t;
     }
 }
+
+

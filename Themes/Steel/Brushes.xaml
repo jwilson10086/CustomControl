@@ -1,0 +1,101 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--
+        ================================================================
+        文件说明：Themes\Steel\Brushes.xaml
+        工业·拟物钢灰主题（Neumorphism / Industrial Steel）核心画刷。
+
+        【设计依据】ui-ux-pro-max 设计系统引擎推荐：
+        - 风格：Neumorphism —— 单色系、浮雕/凹刻、柔和双向明暗、圆角 12-16；
+        - 配色：深板岩灰工业面板 —— 底 #E8ECF1、面板 #F2F5F8→#DCE2E9、
+          边框 #C3CCD6、文字 #1F2937、强调绿 #22C55E、警示红 #EF4444。
+
+        【键名约定】刻意沿用与 Brushes.xaml 完全相同的资源键名：
+        所有控件模板通过 DynamicResource 引用，两套主题字典可整体互换，
+        切换主题时无需改动任何模板文件。全部为不透明实色/渐变，无透明底。
+        ================================================================
+    -->
+
+    <!-- 主文字：近黑板岩 -->
+    <SolidColorBrush x:Key="GcTextBrush" Color="#1F2937" />
+    <!-- 次要文字 -->
+    <SolidColorBrush x:Key="GcTextSecondaryBrush" Color="#5B6B7E" />
+
+    <!-- 卡片背景：145° 浮雕渐变（左上亮、右下暗，光从左上来） -->
+    <LinearGradientBrush x:Key="GcBackdropBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#F2F5F8" Offset="0" />
+        <GradientStop Color="#E9EDF2" Offset="0.5" />
+        <GradientStop Color="#DCE2E9" Offset="1" />
+    </LinearGradientBrush>
+
+    <!-- 控件默认背景：凸起浮雕（上亮下暗） -->
+    <LinearGradientBrush x:Key="GcControlBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#F0F3F7" Offset="0" />
+        <GradientStop Color="#DFE5EC" Offset="1" />
+    </LinearGradientBrush>
+
+    <!-- 悬停：整体提亮一档 -->
+    <LinearGradientBrush x:Key="GcControlHoverBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#F8FAFC" Offset="0" />
+        <GradientStop Color="#E6ECF3" Offset="1" />
+    </LinearGradientBrush>
+
+    <!-- 按下：凹刻（反转渐变 上暗下亮 + 更深的灰调） -->
+    <LinearGradientBrush x:Key="GcControlPressedBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#CBD4DE" Offset="0" />
+        <GradientStop Color="#DDE4EB" Offset="1" />
+    </LinearGradientBrush>
+
+    <!-- 强调色：工业运行绿（主按钮/选中态） -->
+    <LinearGradientBrush x:Key="GcAccentBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#2FBF63" Offset="0" />
+        <GradientStop Color="#189A4A" Offset="1" />
+    </LinearGradientBrush>
+
+    <!-- 默认边框 -->
+    <SolidColorBrush x:Key="GcBorderBrush" Color="#C3CCD6" />
+    <!-- 悬停边框 -->
+    <SolidColorBrush x:Key="GcBorderHoverBrush" Color="#93A1B0" />
+
+    <!-- 顶部高光：浅色系上的柔和高光（弱化，避免过曝） -->
+    <LinearGradientBrush x:Key="GcTopHighlightBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#66FFFFFF" Offset="0" />
+        <GradientStop Color="#14FFFFFF" Offset="0.55" />
+        <GradientStop Color="#00FFFFFF" Offset="1" />
+    </LinearGradientBrush>
+
+    <!-- 边缘高光 → 边缘浮雕：左上受光白、右下背光影（模拟斜面） -->
+    <LinearGradientBrush x:Key="GcEdgeHighlightBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#FFFFFF" Offset="0" />
+        <GradientStop Color="#D5DCE4" Offset="0.45" />
+        <GradientStop Color="#B9C3CE" Offset="0.75" />
+        <GradientStop Color="#98A5B3" Offset="1" />
+    </LinearGradientBrush>
+
+    <!-- ===================== 钢灰主题扩展令牌 ===================== -->
+
+    <!-- 凹刻表面（输入框/列表内嵌区域）：内凹渐变 -->
+    <LinearGradientBrush x:Key="SteelInsetBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#CFD7E0" Offset="0" />
+        <GradientStop Color="#E4EAEF" Offset="0.12" />
+        <GradientStop Color="#E4EAEF" Offset="1" />
+    </LinearGradientBrush>
+    <!-- 受光侧描边（左上亮棱） -->
+    <SolidColorBrush x:Key="SteelRimLightBrush" Color="#FFFFFF" />
+    <!-- 背光侧描边（右下暗棱） -->
+    <SolidColorBrush x:Key="SteelRimShadowBrush" Color="#A6B2BF" />
+    <!-- 投影色（卡片/弹窗外阴影用） -->
+    <SolidColorBrush x:Key="SteelDropShadowBrush" Color="#66808E9E" />
+    <!-- 状态色：运行/警告/故障/信息 -->
+    <SolidColorBrush x:Key="SteelRunBrush" Color="#22C55E" />
+    <SolidColorBrush x:Key="SteelWarnBrush" Color="#F59E0B" />
+    <SolidColorBrush x:Key="SteelFaultBrush" Color="#EF4444" />
+    <SolidColorBrush x:Key="SteelInfoBrush" Color="#3B82F6" />
+
+    <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+
+</ResourceDictionary>
+
+
+

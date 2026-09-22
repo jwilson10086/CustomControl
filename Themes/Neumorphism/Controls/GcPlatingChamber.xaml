@@ -1,0 +1,259 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:GeneralControl.Controls">
+
+    <!--
+        ================================================================
+        文件说明：Themes\Neumorphism\Controls\PlatingChamber.xaml
+        PlatingChamber 水平电镀腔样式（新拟态灰色主题）。
+
+        PART_Head 的 RenderTransform 由模板自带：
+          TransformGroup「旋转(倾斜 Tilt) + 平移(升降 HeadLift)」，代码只就地更新
+          内部变换值（Tilt ⇨ RotateTransform.Angle；HeadLift ⇨ PART_HeadLift.Y）。
+
+        【动画 / 状态】
+        Tilt       ⇨ PART_Head 倾斜（RotateTransform）；
+        HeadLift   ⇨ PART_Head 升降（PART_HeadLift.Y，代码后置计算，合严时沉入槽内）；
+        IsRotating ⇨ 正视 Y 轴伪 3D 旋转：仅【连接柱×2】对称内收/外放（10px 整宽保持，
+                    完全收拢时两柱在中心重叠≈8px）；宽压板/盖板/顶压板几何不动，
+                    一条平滑高斯光廓（33 段无暗边无段带）每帧连续相位右扫、复位无缝重扫；
+        HeadOpen   ⇨ 工艺条盖板下移=关盖(110)，上移=开盖(80)（代码后置动画）；
+        Level      ⇨ 液位高度；感应器点亮。
+        ================================================================
+    -->
+
+    <Style TargetType="controls:GcPlatingChamber">
+        <Setter Property="Width" Value="200" />
+        <Setter Property="Height" Value="300" />
+        <Setter Property="LiquidBrush">
+            <Setter.Value>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Color="#8C4FB6FF" Offset="0" />
+                    <GradientStop Color="#B36AE3FF" Offset="1" />
+                </LinearGradientBrush>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="controls:GcPlatingChamber">
+                    <Viewbox Stretch="Uniform">
+                        <Canvas Width="200"
+                                Height="300"
+                               >
+
+                            <!-- ====== ② 可升降腔头【最后层】：位于槽子之下，沉入后透见 ====== -->
+                            <Canvas x:Name="PART_Head" Width="200" Height="300" Canvas.Top="20">
+                                <Canvas.RenderTransform>
+                                    <TransformGroup>
+                                        <!-- 先旋转（绕联动区中心 100,73），再整体升降 -->
+                                        <RotateTransform CenterX="100"
+                                                         CenterY="73"
+                                                         Angle="10" />
+                                        <TranslateTransform x:Name="PART_HeadLift"
+                                                            X="0"
+                                                            Y="0" />
+                                    </TransformGroup>
+                                </Canvas.RenderTransform>
+                                <!-- 头 -->
+                                <Rectangle Canvas.Left="72"
+                                           Canvas.Top="20"
+                                           Width="56"
+                                           Height="20"
+                                           Stroke="#2E3B4C"
+                                           StrokeThickness="1">
+                                    <Rectangle.Fill>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                            <GradientStop Color="#9FB0C4" Offset="0" />
+                                            <GradientStop Color="#5C6B80" Offset="1" />
+                                        </LinearGradientBrush>
+                                    </Rectangle.Fill>
+                                </Rectangle>
+                                <!-- 连接颈 -->
+                                <Rectangle Canvas.Left="87"
+                                           Canvas.Top="40"
+                                           Width="26"
+                                           Height="26"
+                                           Stroke="#2E3B4C"
+                                           StrokeThickness="1">
+                                    <Rectangle.Fill>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                            <GradientStop Color="#8EA0B6" Offset="0" />
+                                            <GradientStop Color="#4B5B70" Offset="1" />
+                                        </LinearGradientBrush>
+                                    </Rectangle.Fill>
+                                </Rectangle>
+                                <!-- 宽压板（旋转时位置不变，仅渐变明暗呼吸） -->
+                                <Rectangle x:Name="PART_SpinBoard"
+                                           Canvas.Left="34"
+                                           Canvas.Top="66"
+                                           Width="132"
+                                           Height="14"
+                                           RadiusX="4"
+                                           RadiusY="4"
+                                           Stroke="#2E3B4C"
+                                           StrokeThickness="1">
+                                    <Rectangle.RenderTransform>
+                                        <ScaleTransform CenterX="100" CenterY="7" ScaleX="1" />
+                                    </Rectangle.RenderTransform>
+                                    <Rectangle.Fill>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                            <GradientStop Color="#EAF4FF" Offset="0" />
+                                            <GradientStop Color="#24324A" Offset="1" />
+                                        </LinearGradientBrush>
+                                    </Rectangle.Fill>
+                                </Rectangle>
+                                <!-- 工艺条 = 盖板（PART_OpenGroup，开/关盖滑动部件；旋转时位置不变，仅渐变明暗呼吸）
+                                     Canvas.Top=110 关盖 / Canvas.Top=80 开盖 -->
+                                <Rectangle x:Name="PART_OpenGroup"
+                                           Canvas.Left="28"
+                                           Canvas.Top="110"
+                                           Width="144"
+                                           Height="14"
+                                           RadiusX="3"
+                                           RadiusY="3"
+                                           Panel.ZIndex="1"
+                                           Stroke="#6E4E1D"
+                                           StrokeThickness="1">
+                                    <Rectangle.RenderTransform>
+                                        <ScaleTransform CenterX="100" CenterY="7" ScaleX="1" />
+                                    </Rectangle.RenderTransform>
+                                    <Rectangle.Fill>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                            <GradientStop Color="#FFF3C4" Offset="0" />
+                                            <GradientStop Color="#6E4A12" Offset="1" />
+                                        </LinearGradientBrush>
+                                    </Rectangle.Fill>
+                                </Rectangle>
+                                <!-- 连接柱 左（旋转唯一动件：水平对称内收/外放，整宽不变、幅度有界） -->
+                                <Rectangle x:Name="PART_SpinPost1"
+                                           Canvas.Left="36"
+                                           Canvas.Top="80"
+                                           Panel.ZIndex="-1"
+                                           Width="10"
+                                           Height="40"
+                                           Stroke="#2E3B4C"
+                                           StrokeThickness="1">
+                                    <Rectangle.RenderTransform>
+                                        <TranslateTransform X="0" Y="0" />
+                                    </Rectangle.RenderTransform>
+                                    <Rectangle.Fill>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                            <GradientStop Color="#93A6BE" Offset="0" />
+                                            <GradientStop Color="#1C2A3F" Offset="1" />
+                                        </LinearGradientBrush>
+                                    </Rectangle.Fill>
+                                </Rectangle>
+                                <!-- 连接柱 右（旋转唯一动件：水平对称内收/外放，整宽不变、幅度有界） -->
+                                <Rectangle x:Name="PART_SpinPost2"
+                                           Canvas.Left="150"
+                                           Panel.ZIndex="-1"
+                                           Canvas.Top="80"
+                                           Width="10"
+                                           Height="40"
+                                           Stroke="#2E3B4C"
+                                           StrokeThickness="1">
+                                    <Rectangle.RenderTransform>
+                                        <TranslateTransform X="0" Y="0" />
+                                    </Rectangle.RenderTransform>
+                                    <Rectangle.Fill>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                            <GradientStop Color="#6F8098" Offset="0" />
+                                            <GradientStop Color="#2B374A" Offset="1" />
+                                        </LinearGradientBrush>
+                                    </Rectangle.Fill>
+                                </Rectangle>
+                                <!-- 顶压板（旋转时位置不变，仅渐变明暗呼吸） -->
+                                <Path x:Name="PART_SpinBase"
+                                      Data="M 28 120 L 172 120 L 172 130 L 162 140 L 38 140 L 28 130 Z"
+                                      Stroke="#2E3B4C"
+                                      StrokeThickness="1.2">
+                                    <Path.RenderTransform>
+                                        <ScaleTransform CenterX="100" CenterY="10" ScaleX="1" />
+                                    </Path.RenderTransform>
+                                    <Path.Fill>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                            <GradientStop Color="#E2EDFB" Offset="0" />
+                                            <GradientStop Color="#26354C" Offset="1" />
+                                        </LinearGradientBrush>
+                                    </Path.Fill>
+                                </Path>
+                                <!--  晶圆（PART 命名 wafer；HasWafer=true 显示）：
+                                     位于“盖板盖下去的地方”——盖板(PART_OpenGroup)关盖处下方。
+                                     放置在 PART_Head 内：随腔头一起升降、倾斜（继承 PART_HeadLift
+                                     /Tilt 变换），自身再带一个固定倾角。正视近俯视=扁条状带倒角
+                                     矩形，深色金属硅灰渐变。  -->
+                                <Rectangle
+                                    x:Name="wafer"
+                                    Canvas.Left="54"
+                                    Canvas.Top="126"
+                                    Width="92"
+                                    Height="4"
+                                    RadiusX="7"
+                                    RadiusY="7"
+                                    Stroke="#1D2836"
+                                    StrokeThickness="1">
+                                   
+                                    <Rectangle.Fill>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                            <GradientStop Offset="0" Color="#A8BACF" />
+                                            <GradientStop Offset="0.5" Color="#55657E" />
+                                            <GradientStop Offset="1" Color="#222D40" />
+                                        </LinearGradientBrush>
+                                    </Rectangle.Fill>
+                                </Rectangle>
+                            </Canvas>
+
+                            <!-- ======== ① 槽体（半透明，腔头沉入后仍透见） ======== -->
+                            <Path Data="M 10 190 L 190 190 L 200 210 L 200 290 L 0 290 L 0 210 Z"
+                                  StrokeThickness="1.4">
+                                <Path.Fill>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                        <GradientStop Color="#4A5B6E38" Offset="0" />
+                                        <GradientStop Color="#2A354526" Offset="1" />
+                                    </LinearGradientBrush>
+                                </Path.Fill>
+                                <Path.Stroke>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                        <GradientStop Color="#7A8AA05E" Offset="0" />
+                                        <GradientStop Color="#3F4C6038" Offset="1" />
+                                    </LinearGradientBrush>
+                                </Path.Stroke>
+                            </Path>
+
+                            <!-- ======== ⑥ 镀液填充（槽体下部） ======== -->
+                            <Grid Canvas.Left="28" Canvas.Top="208" Width="144" Height="80">
+                                <Border x:Name="PART_Liquid"
+                                        VerticalAlignment="Bottom"
+                                        CornerRadius="0,0,8,8"
+                                        Background="{TemplateBinding LiquidBrush}" />
+                            </Grid>
+
+                            <!-- ======== ⑤ 蓝色透明回收罩（槽体上部，最前层） ======== -->
+                            <Path Data="M 10 190 L 190 190 L 200 210 L 0 210 Z">
+                                <Path.Fill>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                        <GradientStop Color="#6BBDFFFF" Offset="0" />
+                                        <GradientStop Color="#3A82D9E0" Offset="1" />
+                                    </LinearGradientBrush>
+                                </Path.Fill>
+                            </Path>
+                        </Canvas>
+                    </Viewbox>
+                    <ControlTemplate.Triggers>
+                        <!--  HasWafer=true 才显示晶圆（默认隐藏） -->
+                        <Trigger Property="HasWafer" Value="True">
+                            <Setter TargetName="wafer" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <Trigger Property="HasWafer" Value="False">
+                            <Setter TargetName="wafer" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.5" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>

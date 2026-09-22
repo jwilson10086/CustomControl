@@ -1,0 +1,52 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:GeneralControl.Controls">
+
+    <!--  拟物 Avatar：圆形凸起  -->
+    <Style TargetType="controls:GcAvatar">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="controls:GcAvatar">
+                    <Grid
+                        Width="{TemplateBinding Width}"
+                        Height="{TemplateBinding Height}"
+                        SnapsToDevicePixels="True">
+                        <!--  暗面  -->
+                        <Ellipse>
+                            <Ellipse.Effect>
+                                <DropShadowEffect
+                                    BlurRadius="5"
+                                    Direction="315"
+                                    Opacity="0.4"
+                                    RenderingBias="Quality"
+                                    ShadowDepth="2"
+                                    Color="#A0A0A8" />
+                            </Ellipse.Effect>
+                        </Ellipse>
+                        <Ellipse>
+                            <Ellipse.Effect>
+                                <DropShadowEffect
+                                    BlurRadius="5"
+                                    Direction="135"
+                                    Opacity="0.5"
+                                    RenderingBias="Quality"
+                                    ShadowDepth="2"
+                                    Color="#FFFFFF" />
+                            </Ellipse.Effect>
+                        </Ellipse>
+                        <Ellipse x:Name="BgEllipse" Fill="{DynamicResource GcControlBrush}" />
+                        <Ellipse Fill="{DynamicResource GcTopHighlightBrush}" IsHitTestVisible="False" />
+                        <!--  内容  -->
+                        <ContentPresenter
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            SnapsToDevicePixels="True"
+                            TextOptions.TextRenderingMode="ClearType" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>

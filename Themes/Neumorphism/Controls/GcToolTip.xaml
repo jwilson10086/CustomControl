@@ -1,0 +1,52 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:GeneralControl.Controls">
+
+    <!--  拟物 ToolTip：小圆角凸起  -->
+    <Style TargetType="ToolTip">
+        <Setter Property="Background" Value="{DynamicResource GcControlBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource GcTextBrush}" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Padding" Value="10,6" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToolTip">
+                    <Grid SnapsToDevicePixels="True">
+                        <Border Background="Transparent" CornerRadius="8">
+                            <Border.Effect>
+                                <DropShadowEffect
+                                    BlurRadius="5"
+                                    Direction="315"
+                                    Opacity="0.4"
+                                    RenderingBias="Quality"
+                                    ShadowDepth="2"
+                                    Color="#A0A0A8" />
+                            </Border.Effect>
+                        </Border>
+                        <Border Background="Transparent" CornerRadius="8">
+                            <Border.Effect>
+                                <DropShadowEffect
+                                    BlurRadius="5"
+                                    Direction="135"
+                                    Opacity="0.5"
+                                    RenderingBias="Quality"
+                                    ShadowDepth="2"
+                                    Color="#FFFFFF" />
+                            </Border.Effect>
+                        </Border>
+                        <Border
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="8"
+                            SnapsToDevicePixels="True" />
+                        <ContentPresenter
+                            Margin="{TemplateBinding Padding}"
+                            SnapsToDevicePixels="True"
+                            TextOptions.TextRenderingMode="ClearType" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>

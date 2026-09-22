@@ -1,0 +1,111 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:GeneralControl.Controls">
+
+    <!--
+        ================================================================
+        文件说明：Themes\Glass\Controls\Avatar.xaml
+        Avatar 头像样式。
+
+        依赖：Brushes.xaml（画刷资源）。
+        结构：Grid → [Border(裁剪容器) → Image/TextBlock + 状态点]
+
+        【图片与文字互斥显示】
+        Source 有值显示 Image，否则显示 Text 缩写。
+        用两个 Trigger 互斥切换可见性，无需转换器。
+
+        【状态点】
+        右下角小圆点（IsStatusVisible 控制），带一圈深色描边
+        与头像边缘分离，颜色由 StatusBrush 决定。
+        ================================================================
+    -->
+
+    <Style TargetType="controls:GcAvatar">
+        <Setter Property="Foreground" Value="{DynamicResource GcTextBrush}" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="controls:GcAvatar">
+                    <Grid Width="{TemplateBinding Diameter}"
+                          Height="{TemplateBinding Diameter}">
+                        <!-- 头像主体：圆角裁剪 -->
+                        <Border x:Name="Clip"
+                                Background="#2EFFFFFF"
+                                BorderBrush="{DynamicResource GcEdgeHighlightBrush}"
+                                BorderThickness="1"
+                                CornerRadius="{TemplateBinding CornerRadius}"
+                                ClipToBounds="True">
+                            <Grid>
+                                <!-- 图片模式 -->
+                                <Image Source="{TemplateBinding Source}"
+                                       Stretch="UniformToFill">
+                                    <Image.Style>
+                                        <Style TargetType="Image">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Source, RelativeSource={RelativeSource TemplatedParent}}"
+                                                             Value="{x:Null}">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Image.Style>
+                                </Image>
+                                <!-- 文字缩写模式 -->
+                                <TextBlock Text="{TemplateBinding Text}"
+                                           Foreground="{TemplateBinding Foreground}"
+                                           FontSize="{TemplateBinding FontSize}"
+                                           FontWeight="{TemplateBinding FontWeight}"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Source, RelativeSource={RelativeSource TemplatedParent}}"
+                                                             Value="{x:Null}">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </Grid>
+                        </Border>
+
+                        <!-- 在线状态点：右下角悬浮 -->
+                        <Ellipse x:Name="StatusDot"
+                                 Width="10" Height="10"
+                                 Fill="{TemplateBinding StatusBrush}"
+                                 Stroke="#E6101727"
+                                 StrokeThickness="2"
+                                 HorizontalAlignment="Right"
+                                 VerticalAlignment="Bottom"
+                                 Margin="0,0,1,1"
+                                 Visibility="Collapsed" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsStatusVisible" Value="True">
+                            <Setter TargetName="StatusDot" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.5" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>
+
+
+
+
+
+
+
+
+

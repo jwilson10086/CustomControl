@@ -1,0 +1,585 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:GeneralControl.Controls">
+
+    <!--
+        ================================================================
+        文件说明：Themes\Neumorphism\Controls\GcSrdChamber.xaml
+        SRD 腔样式 —— 旋转喷淋甩干腔（由 GcAptChamber 模板改型而来）。
+        
+        【结构】下半部分（PART_Head）原样保留；上半部分：
+        - 去掉上盖（原 APT 的整片半透明腔盖 Path）；
+        - 喷雾臂（PART_OpenGroup）+ 导向套 + 喷头 + 喷锥 与 APT 完全一致；
+        - 气罩（PART_Shroud）由升降 HeadLift 驱动上下：自槽口升起罩住晶圆。
+        
+        【动画 / 状态约定】
+        HeadOpen   ⇨ 喷雾臂（PART_OpenGroup）向右拉长（Width 20→65，左端固定）；
+        导向套不动，喷头（sprayNozzle）与喷锥（spray）随臂尖平移；
+        Spray      ⇨ 喷雾属性：true 才显示喷头喷锥，雾滴做下落动画（false 隐藏）；
+        SprayLength⇨ 喷头长度 0~100（喷锥 Y 向缩放 0.2x~1.6x，代码驱动）；
+        HeadLift   ⇨ 气罩（PART_Shroud）升降（代码后置平移：0=收在槽口 / 100=升到顶，
+        升到顶时罩顶不高于喷头）；
+        IsRotating ⇨ 正视 Y 轴旋转：三条腿绕竖直轴均布 120° 的卡盘（chuck）——
+        静止正视 = 一根居中在前（透视稍短）+ 左右两侧两根；旋转时如真实3D投影呼吸：
+        腿长出/缩短、两两在投影面重叠交叉；端帽（chuckCapL/C/R）恒水平、
+        随腿尖端部平移；仅顶压板做渐变扫光——喷头/喷雾区永不参与扫光；
+        两端驻留+淡入淡出+静默回绕。
+        ================================================================
+    -->
+
+    <Style TargetType="controls:GcSrdChamber">
+        <Setter Property="Width" Value="200" />
+        <Setter Property="Height" Value="300" />
+        <Setter Property="LiquidBrush">
+            <Setter.Value>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Offset="0" Color="#8C4FB6FF" />
+                    <GradientStop Offset="1" Color="#B36AE3FF" />
+                </LinearGradientBrush>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="controls:GcSrdChamber">
+                    <Viewbox Stretch="Uniform">
+                        <Canvas Width="200" Height="300">
+
+                            <!--  ====== ② 上半部分：去上盖，喷雾臂（与 APT 相同）+ 气罩  ======  -->
+                            <Canvas
+                                x:Name="PART_Up"
+                                Canvas.Top="0"
+                                Width="200"
+                                Height="100"
+                                Panel.ZIndex="1">
+
+                                <!--
+                                    ======== 气罩（PART_Shroud）：升降 HeadLift 驱动其上下，
+                                    自槽口升起罩住晶圆；升到顶时罩顶(逻辑 y=20)不高于喷头  ========
+                                -->
+                                <Canvas
+                                    x:Name="PART_Shroud"
+                                    Canvas.Left="0"
+                                    Canvas.Top="20"
+                                    Width="210"
+                                    Height="58">
+                                    <!--  罩体：半透明罩壁（升到顶时罩住晶圆）  -->
+                                    <Rectangle
+                                        Canvas.Left="10"
+                                        Canvas.Top="0"
+                                        Width="180"
+                                        Height="58"
+                                        RadiusX="4"
+                                        RadiusY="4"
+                                        Stroke="#4A5F7C"
+                                        StrokeThickness="1.2">
+                                        <Rectangle.Fill>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                                <GradientStop Offset="0" Color="#2A3B52AA" />
+                                                <GradientStop Offset="0.5" Color="#7FA0C6AA" />
+                                                <GradientStop Offset="1" Color="#22304AAA" />
+                                            </LinearGradientBrush>
+                                        </Rectangle.Fill>
+                                    </Rectangle>
+                                </Canvas>
+
+                                <!--
+                                    喷雾臂（PART_OpenGroup，HeadOpen ⇨ 只拉长 Width 20→65，左端固定、右端伸出。
+                                    臂根部套一个固定的导向套，臂从套筒中滑出，
+                                    喷头(sprayNozzle)与喷锥(spray)随臂尖一起移动）
+                                -->
+                                <Rectangle
+                                    x:Name="PART_OpenGroup"
+                                    Canvas.Left="34"
+                                    Canvas.Top="0"
+                                    Width="20"
+                                    Height="9"
+                                    RadiusX="4"
+                                    RadiusY="4"
+                                    Stroke="#223041"
+                                    StrokeThickness="0.8">
+                                    <Rectangle.Fill>
+                                        <!--  金属圆管质感：高光+中调+暗部三段柔化，拉长像一根抛光圆柱伸出  -->
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                            <GradientStop Offset="0" Color="#2B3B52" />
+                                            <GradientStop Offset="0.26" Color="#AFC3DD" />
+                                            <GradientStop Offset="0.55" Color="#EDF4FD" />
+                                            <GradientStop Offset="0.8" Color="#6E86A3" />
+                                            <GradientStop Offset="1" Color="#16213A" />
+                                        </LinearGradientBrush>
+                                    </Rectangle.Fill>
+                                </Rectangle>
+                                <!--  固定导向套（不随臂动）：盖住臂根部，臂从其中滑出  -->
+                                <Rectangle
+                                    Canvas.Left="0"
+                                    Canvas.Top="-1.5"
+                                    Width="11"
+                                    Height="82"
+                                    RadiusX="2.5"
+                                    RadiusY="2.5"
+                                    Stroke="#1F2A38"
+                                    StrokeThickness="1">
+                                    <Rectangle.Fill>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                            <GradientStop Offset="0" Color="#44556E" />
+                                            <GradientStop Offset="0.55" Color="#202D42" />
+                                            <GradientStop Offset="1" Color="#0A131F" />
+                                        </LinearGradientBrush>
+                                    </Rectangle.Fill>
+                                </Rectangle>
+                                <Rectangle
+                                    Canvas.Left="0"
+                                    Canvas.Top="-1.5"
+                                    Width="40"
+                                    Height="12"
+                                    RadiusX="2.5"
+                                    RadiusY="2.5"
+                                    Stroke="#1F2A38"
+                                    StrokeThickness="1">
+                                    <Rectangle.Fill>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                            <GradientStop Offset="0" Color="#44556E" />
+                                            <GradientStop Offset="0.55" Color="#202D42" />
+                                            <GradientStop Offset="1" Color="#0A131F" />
+                                        </LinearGradientBrush>
+                                    </Rectangle.Fill>
+                                </Rectangle>
+                                <!--
+                                    喷头（sprayNozzle，随臂尖平移；中心对齐臂尖）：
+                                    上宽下窄的漏斗主体 + 出口唇沿 + 暗色出雾口 + 顶部高光圈
+                                -->
+                                <Canvas
+                                    x:Name="sprayNozzle"
+                                    Canvas.Left="47"
+                                    Canvas.Top="-4">
+                                    <Path
+                                        Data="M -7 0 L 7 0 L 4 9 L 3 12 L -3 12 L -4 9 Z"
+                                        Stroke="#172030"
+                                        StrokeThickness="1.1">
+                                        <Path.Fill>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                                <GradientStop Offset="0" Color="#D7E4F6" />
+                                                <GradientStop Offset="0.4" Color="#839AB6" />
+                                                <GradientStop Offset="1" Color="#27354C" />
+                                            </LinearGradientBrush>
+                                        </Path.Fill>
+                                    </Path>
+                                    <!--  出口唇沿：比主体略窄，收口带一圈内影  -->
+                                    <Path
+                                        Data="M -3 12 L 3 12 L 2.4 14.5 L -2.4 14.5 Z"
+                                        Stroke="#172030"
+                                        StrokeThickness="0.9">
+                                        <Path.Fill>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                                <GradientStop Offset="0" Color="#96ABC4" />
+                                                <GradientStop Offset="1" Color="#1A2438" />
+                                            </LinearGradientBrush>
+                                        </Path.Fill>
+                                    </Path>
+                                    <!--  出雾口：暗色扁孔  -->
+                                    <Ellipse
+                                        Canvas.Left="-2.4"
+                                        Canvas.Top="13.5"
+                                        Width="4.8"
+                                        Height="1.5"
+                                        Fill="#070D15" />
+                                    <!--  顶部高光圈：模拟受光面  -->
+                                    <Ellipse
+                                        Canvas.Left="-4.4"
+                                        Canvas.Top="1.4"
+                                        Width="8.8"
+                                        Height="2"
+                                        Fill="#D8FFFFFF"
+                                        Opacity="0.55" />
+                                </Canvas>
+                                <!--
+                                    圆锥形喷雾（喷头 spray，随臂尖平移；中轴=臂尖−漏斗半宽，与喷头漏斗对齐；
+                                    Spray=True 才显示、喷头长度= SprayLength 属性 0~100，Y 向缩放；雾滴下落动画见触发器）
+                                -->
+                                <Canvas
+                                    x:Name="spray"
+                                    Canvas.Left="47"
+                                    Canvas.Top="8"
+                                    Opacity="0">
+                                    <!--  外层宽雾  -->
+                                    <Path Data="M 0 3 L 20 66 L -20 66 Z">
+                                        <Path.Fill>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                                <GradientStop Offset="0" Color="#336BBDFF" />
+                                                <GradientStop Offset="1" Color="#006BBDFF" />
+                                            </LinearGradientBrush>
+                                        </Path.Fill>
+                                    </Path>
+                                    <!--  中层雾  -->
+                                    <Path Data="M 0 3 L 15 62 L -15 62 Z">
+                                        <Path.Fill>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                                <GradientStop Offset="0" Color="#66CBE7FF" />
+                                                <GradientStop Offset="1" Color="#00CBE7FF" />
+                                            </LinearGradientBrush>
+                                        </Path.Fill>
+                                    </Path>
+                                    <!--  核心亮雾  -->
+                                    <Path Data="M 0 3 L 10 56 L -10 56 Z">
+                                        <Path.Fill>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                                <GradientStop Offset="0" Color="#AAE8F6FF" />
+                                                <GradientStop Offset="1" Color="#00E8F6FF" />
+                                            </LinearGradientBrush>
+                                        </Path.Fill>
+                                    </Path>
+                                    <!--  雾滴（x:Name 供触发器做下落动画；Canvas.Top 动画不冻结、可循环）  -->
+                                    <Ellipse
+                                        x:Name="d1"
+                                        Canvas.Left="-8"
+                                        Canvas.Top="50"
+                                        Width="7"
+                                        Height="7"
+                                        Fill="#CCFFFFFF" />
+                                    <Ellipse
+                                        x:Name="d2"
+                                        Canvas.Left="2"
+                                        Canvas.Top="56"
+                                        Width="5.6"
+                                        Height="5.6"
+                                        Fill="#AAFFFFFF" />
+                                    <Ellipse
+                                        x:Name="d3"
+                                        Canvas.Left="-12"
+                                        Canvas.Top="36"
+                                        Width="4.6"
+                                        Height="4.6"
+                                        Fill="#99FFFFFF" />
+                                    <Ellipse
+                                        x:Name="d4"
+                                        Canvas.Left="9"
+                                        Canvas.Top="46"
+                                        Width="5"
+                                        Height="5"
+                                        Fill="#88FFFFFF" />
+                                    <Ellipse
+                                        x:Name="d5"
+                                        Canvas.Left="-4"
+                                        Canvas.Top="30"
+                                        Width="4"
+                                        Height="4"
+                                        Fill="#77FFFFFF" />
+                                </Canvas>
+
+
+                            </Canvas>
+                            <Canvas
+                                x:Name="PART_Head"
+                                Canvas.Top="68"
+                                Width="200"
+                                Height="200">
+                                <!--  ======== ① 槽体（半透明，腔头沉入后仍透见） ========  -->
+                                <Path Data="M 0 10 L 200 10 L 200 90 L 0 90 L 0 10 Z" StrokeThickness="1.4">
+                                    <Path.Fill>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                            <GradientStop Offset="0" Color="#4A5B6E38" />
+                                            <GradientStop Offset="1" Color="#2A354526" />
+                                        </LinearGradientBrush>
+                                    </Path.Fill>
+                                    <Path.Stroke>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                            <GradientStop Offset="0" Color="#7A8AA05E" />
+                                            <GradientStop Offset="1" Color="#3F4C6038" />
+                                        </LinearGradientBrush>
+                                    </Path.Stroke>
+                                </Path>
+
+                                <Rectangle
+                                    Canvas.Left="28"
+                                    Canvas.Top="5"
+                                    Width="144"
+                                    Height="14"
+                                    Panel.ZIndex="-1"
+                                    RadiusX="3"
+                                    RadiusY="3"
+                                    Stroke="#6E4E1D"
+                                    StrokeThickness="1">
+                                    <Rectangle.RenderTransform>
+                                        <ScaleTransform CenterX="100" CenterY="7" ScaleX="1" />
+                                    </Rectangle.RenderTransform>
+                                    <Rectangle.Fill>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                            <GradientStop Offset="0" Color="#FFF3C4" />
+                                            <GradientStop Offset="1" Color="#6E4A12" />
+                                        </LinearGradientBrush>
+                                    </Rectangle.Fill>
+                                </Rectangle>
+                                <!--
+                                    顶压板（PART_SpinBase，旋转时几何不动，仅渐变明暗呼吸；
+                                    置前层，支撑柱从它下方伸出成 V 型）
+                                -->
+                                <Path
+                                    x:Name="PART_SpinBase"
+                                    Panel.ZIndex="-2"
+                                    Data="M 60 0 L 140 1 L 170 20 L 30 20 Z "
+                                    Stroke="#2E3B4C"
+                                    StrokeThickness="1">
+                                    <Path.RenderTransform>
+                                        <ScaleTransform CenterX="100" CenterY="10" ScaleX="1" />
+                                    </Path.RenderTransform>
+                                    <Path.Fill>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                            <GradientStop Offset="0" Color="#E2EDFB" />
+                                            <GradientStop Offset="1" Color="#26354C" />
+                                        </LinearGradientBrush>
+                                    </Path.Fill>
+                                </Path>
+
+                                <!--
+                                    ===== ③ 三条腿卡盘 chuck（静止正视=居中一根在前+左右两根，位于腔体上方）=====
+                                    真实3D投影呼吸式：三腿绕竖直锥尖轴均布 120°、恒速整圈转，
+                                    每条腿与竖直轴成 60°；正视投影里腿长出/缩短（透视）+左
+                                    右摆动，旋转到某些相位两腿投影重合（重叠）。端帽恒水平、
+                                    随腿尖端部平移。锥尖(apex)=(100,46)、腿长 50/腿宽 4/端帽(16×5)。
+                                    三腿明暗略异做深度提示。顺序：左腿(L)→居中腿(C)→右腿(R)。
+                                -->
+                                <Canvas
+                                    x:Name="chuck"
+                                    Canvas.Top="-40"
+                                    Panel.ZIndex="-4">
+                                    <!--  左腿（L）：枢轴=底边中点(10,50)，位置随代码缩放/摆角  -->
+                                    <Canvas
+                                        x:Name="chuckLegL"
+                                        Canvas.Left="90"
+                                        Canvas.Top="-4"
+                                        Width="20"
+                                        Height="50"
+                                        Panel.ZIndex="1">
+
+                                        <Rectangle
+                                            Canvas.Left="8"
+                                            Canvas.Top="0"
+                                            Width="4"
+                                            Height="50"
+                                            Stroke="#2E3B4C"
+                                            StrokeThickness="1">
+                                            <Rectangle.Fill>
+                                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                                    <GradientStop Offset="0" Color="#3A4A60" />
+                                                    <GradientStop Offset="0.5" Color="#93A6BE" />
+                                                    <GradientStop Offset="1" Color="#1C2A3F" />
+                                                </LinearGradientBrush>
+                                            </Rectangle.Fill>
+                                        </Rectangle>
+                                        <Canvas.RenderTransform>
+                                            <RotateTransform Angle="0" CenterX="10" CenterY="50" />
+                                        </Canvas.RenderTransform>
+                                    </Canvas>
+                                    <!--  居中腿（C，静止时在前、透视稍短；明暗介于左右腿之间）  -->
+                                    <Canvas
+                                        x:Name="chuckLegC"
+                                        Canvas.Left="90"
+                                        Canvas.Top="-4"
+                                        Width="20"
+                                        Height="50"
+                                        Panel.ZIndex="2">
+                                        <Rectangle
+                                            Canvas.Left="8"
+                                            Canvas.Top="0"
+                                            Width="4"
+                                            Height="50"
+                                            Stroke="#2E3B4C"
+                                            StrokeThickness="1">
+                                            <Rectangle.Fill>
+                                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                                    <GradientStop Offset="0" Color="#314256" />
+                                                    <GradientStop Offset="0.5" Color="#7E92AA" />
+                                                    <GradientStop Offset="1" Color="#56687E" />
+                                                </LinearGradientBrush>
+                                            </Rectangle.Fill>
+                                        </Rectangle>
+                                        <Canvas.RenderTransform>
+                                            <RotateTransform Angle="0" CenterX="10" CenterY="50" />
+                                        </Canvas.RenderTransform>
+                                    </Canvas>
+                                    <!--  右腿（R）：明暗与左腿略异（做深度提示）  -->
+                                    <Canvas
+                                        x:Name="chuckLegR"
+                                        Canvas.Left="90"
+                                        Canvas.Top="-4"
+                                        Width="20"
+                                        Height="50"
+                                        Panel.ZIndex="3">
+                                        <Rectangle
+                                            Canvas.Left="8"
+                                            Canvas.Top="0"
+                                            Width="4"
+                                            Height="50"
+                                            Stroke="#2E3B4C"
+                                            StrokeThickness="1">
+                                            <Rectangle.Fill>
+                                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                                    <GradientStop Offset="0" Color="#2B374A" />
+                                                    <GradientStop Offset="0.5" Color="#6F8098" />
+                                                    <GradientStop Offset="1" Color="#93A6BE" />
+                                                </LinearGradientBrush>
+                                            </Rectangle.Fill>
+                                        </Rectangle>
+                                        <Canvas.RenderTransform>
+                                            <RotateTransform Angle="0" CenterX="10" CenterY="50" />
+                                        </Canvas.RenderTransform>
+                                    </Canvas>
+                                    <!--  左端帽（恒水平、随左腿尖端平移；位置由代码每帧改写）  -->
+                                    <Rectangle
+                                        x:Name="chuckCapL"
+                                        Canvas.Left="49"
+                                        Canvas.Top="19"
+                                        Width="16"
+                                        Height="5"
+                                        RadiusX="2"
+                                        RadiusY="2"
+                                        Stroke="#2E3B4C"
+                                        StrokeThickness="1">
+                                        <Rectangle.Fill>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                                <GradientStop Offset="0" Color="#EAF4FF" />
+                                                <GradientStop Offset="1" Color="#5A6B85" />
+                                            </LinearGradientBrush>
+                                        </Rectangle.Fill>
+                                    </Rectangle>
+                                    <!--  中端帽（随居中腿尖端平移）  -->
+                                    <Rectangle
+                                        x:Name="chuckCapC"
+                                        Canvas.Left="92"
+                                        Canvas.Top="19"
+                                        Width="16"
+                                        Height="5"
+                                        RadiusX="2"
+                                        RadiusY="2"
+                                        Stroke="#2E3B4C"
+                                        StrokeThickness="1">
+                                        <Rectangle.Fill>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                                <GradientStop Offset="0" Color="#D3E0F2" />
+                                                <GradientStop Offset="1" Color="#6E8096" />
+                                            </LinearGradientBrush>
+                                        </Rectangle.Fill>
+                                    </Rectangle>
+                                    <!--  右端帽（随右腿尖端平移）  -->
+                                    <Rectangle
+                                        x:Name="chuckCapR"
+                                        Canvas.Left="135"
+                                        Canvas.Top="19"
+                                        Width="16"
+                                        Height="5"
+                                        RadiusX="2"
+                                        RadiusY="2"
+                                        Stroke="#2E3B4C"
+                                        StrokeThickness="1">
+                                        <Rectangle.Fill>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                                <GradientStop Offset="0" Color="#C3D2E6" />
+                                                <GradientStop Offset="1" Color="#EAF4FF" />
+                                            </LinearGradientBrush>
+                                        </Rectangle.Fill>
+                                    </Rectangle>
+                                </Canvas>
+                                <!--
+                                    晶圆（PART 命名 wafer；HasWafer=true 显示：卡盘三只端帽上
+                                    搁置的硅片。正视近俯视=扁条状，带倒角的矩形，金属硅灰渐变。
+                                    中心 (100,-21.5) 对准端帽上沿）
+                                -->
+                                <Rectangle
+                                    x:Name="wafer"
+                                    Canvas.Left="56"
+                                    Canvas.Top="-22.5"
+                                    Width="88"
+                                    Height="3"
+                                    RadiusX="6"
+                                    RadiusY="6"
+                                    Stroke="#26354C"
+                                    StrokeThickness="1.2">
+                                    <Rectangle.Fill>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                            <GradientStop Offset="0" Color="#E9F0FA" />
+                                            <GradientStop Offset="0.5" Color="#93A6BE" />
+                                            <GradientStop Offset="1" Color="#4A5A72" />
+                                        </LinearGradientBrush>
+                                    </Rectangle.Fill>
+                                </Rectangle>
+                            </Canvas>
+
+                        </Canvas>
+                    </Viewbox>
+                    <ControlTemplate.Triggers>
+                        <!--  HasWafer=true 才显示晶圆（默认隐藏）  -->
+                        <Trigger Property="HasWafer" Value="True">
+                            <Setter TargetName="wafer" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <Trigger Property="HasWafer" Value="False">
+                            <Setter TargetName="wafer" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="Spray" Value="True">
+                            <Setter TargetName="spray" Property="Opacity" Value="0.9" />
+                            <Trigger.EnterActions>
+                                <BeginStoryboard x:Name="SprayDrops">
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                            AutoReverse="True"
+                                            RepeatBehavior="Forever"
+                                            Storyboard.TargetName="d1"
+                                            Storyboard.TargetProperty="(Canvas.Top)"
+                                            From="50"
+                                            To="72"
+                                            Duration="0:0:1.8" />
+                                        <DoubleAnimation
+                                            AutoReverse="True"
+                                            BeginTime="0:0:0.35"
+                                            RepeatBehavior="Forever"
+                                            Storyboard.TargetName="d2"
+                                            Storyboard.TargetProperty="(Canvas.Top)"
+                                            From="56"
+                                            To="76"
+                                            Duration="0:0:1.9" />
+                                        <DoubleAnimation
+                                            AutoReverse="True"
+                                            BeginTime="0:0:0.7"
+                                            RepeatBehavior="Forever"
+                                            Storyboard.TargetName="d3"
+                                            Storyboard.TargetProperty="(Canvas.Top)"
+                                            From="36"
+                                            To="60"
+                                            Duration="0:0:2.0" />
+                                        <DoubleAnimation
+                                            AutoReverse="True"
+                                            BeginTime="0:0:1.05"
+                                            RepeatBehavior="Forever"
+                                            Storyboard.TargetName="d4"
+                                            Storyboard.TargetProperty="(Canvas.Top)"
+                                            From="46"
+                                            To="68"
+                                            Duration="0:0:1.7" />
+                                        <DoubleAnimation
+                                            AutoReverse="True"
+                                            BeginTime="0:0:1.4"
+                                            RepeatBehavior="Forever"
+                                            Storyboard.TargetName="d5"
+                                            Storyboard.TargetProperty="(Canvas.Top)"
+                                            From="30"
+                                            To="54"
+                                            Duration="0:0:2.1" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <RemoveStoryboard BeginStoryboardName="SprayDrops" />
+                            </Trigger.ExitActions>
+                        </Trigger>
+                        <Trigger Property="Spray" Value="False">
+                            <Setter TargetName="spray" Property="Opacity" Value="0" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.5" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>

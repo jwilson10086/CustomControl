@@ -1,4 +1,4 @@
-﻿using CustomControl.Controls;
+﻿using GeneralControl.Controls;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,12 +13,12 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace CustomControl
+namespace GeneralControl
 {
     /// <summary>
     /// Window1.xaml 的交互逻辑
     /// </summary>
-    public partial class Window1 : GlassWindow
+    public partial class Window1 : GeneralControl.Controls.GcWindow
     {
         public Window1()
         {
@@ -26,3 +26,8 @@ namespace CustomControl
         }
     }
 }
+
+
+
+
+

@@ -1,0 +1,163 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--
+        ================================================================
+        文件说明：Themes\Glass\Brushes.xaml
+        毛玻璃主题的核心画刷（Brushes）与通用转换器。
+        所有控件样式文件都依赖本文件，必须在合并顺序中排在最前。
+
+        设计理念：
+        毛玻璃（Glassmorphism）风格的核心是半透明背景 + 模糊效果 + 微妙边框。
+        由于 WPF 不支持原生的模糊效果，这里通过半透明颜色叠加和投影来模拟。
+        所有画刷都使用高透明度的白色/蓝色调，营造通透、轻盈的视觉感受。
+        ================================================================
+    -->
+
+    <!--
+        ===================== 基础画刷定义 =====================
+        画刷（Brush）是 WPF 中最基础的视觉资源，定义了颜色和填充方式。
+        将画刷定义为 ResourceDictionary 中的资源，可以通过 StaticResource/DynamicResource 引用，
+        实现样式的统一管理和主题切换。
+    -->
+
+    <!--
+        TextBrush：主文字画刷
+        #F2FFFFFF = 95%不透明度的白色
+        用于标题、主要文字，在深色背景上保持高可读性
+        alpha=0xF2≈95%，几乎不透明但比纯白略柔和
+    -->
+    <SolidColorBrush x:Key="GcTextBrush" Color="#F2FFFFFF" />
+
+    <!--
+        TextSecondaryBrush：次要文字画刷
+        #B8FFFFFF = 72%不透明度的白色
+        用于描述文字、辅助信息，与主文字形成层次对比
+        较低的不透明度使其视觉上退后，不与主文字争夺注意力
+    -->
+    <SolidColorBrush x:Key="GcTextSecondaryBrush" Color="#B8FFFFFF" />
+
+    <!--
+        BackdropBrush：毛玻璃背景画刷
+        对角线渐变（左上→右下），三段渐变：
+        - 左上角：#2EFFFFFF（18%白色）
+        - 中间：#24FFFFFF（14%白色）
+        - 右下角：#1AFFFFFF（10%白色）
+        从左上到右下逐渐变透明，模拟光线从左上方照射的玻璃效果。
+        这是所有毛玻璃控件（卡片、面板等）的默认背景。
+    -->
+    <LinearGradientBrush x:Key="GcBackdropBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#2EFFFFFF" Offset="0" />
+        <GradientStop Color="#24FFFFFF" Offset="0.5" />
+        <GradientStop Color="#1AFFFFFF" Offset="1" />
+    </LinearGradientBrush>
+
+    <!--
+        ControlBrush：控件默认背景画刷
+        垂直渐变（上→下），两段渐变：
+        - 顶部：#33FFFFFF（20%白色）
+        - 底部：#1FFFFFFF（12%白色）
+        上亮下暗的微渐变，模拟光照效果，让控件有轻微的立体感。
+        用于按钮、输入框等控件的默认状态背景。
+    -->
+    <LinearGradientBrush x:Key="GcControlBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#33FFFFFF" Offset="0" />
+        <GradientStop Color="#1FFFFFFF" Offset="1" />
+    </LinearGradientBrush>
+
+    <!--
+        ControlHoverBrush：控件悬停状态画刷
+        垂直渐变，比默认状态更亮：
+        - 顶部：#55FFFFFF（33%白色）
+        - 底部：#38FFFFFF（22%白色）
+        悬停时整体变亮，给用户明确的交互反馈。
+    -->
+    <LinearGradientBrush x:Key="GcControlHoverBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#55FFFFFF" Offset="0" />
+        <GradientStop Color="#38FFFFFF" Offset="1" />
+    </LinearGradientBrush>
+
+    <!--
+        ControlPressedBrush：控件按下状态画刷
+        垂直渐变，切换为蓝色调：
+        - 顶部：#6037B6FF（38%蓝色）
+        - 底部：#453A9BFF（27%蓝色）
+        按下时从白色系切换为蓝色调，提供强烈的操作反馈，
+        同时蓝色与主题色调一致，保持视觉统一。
+    -->
+    <LinearGradientBrush x:Key="GcControlPressedBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#6037B6FF" Offset="0" />
+        <GradientStop Color="#453A9BFF" Offset="1" />
+    </LinearGradientBrush>
+
+    <!--
+        AccentBrush：主题强调色画刷
+        对角线渐变，从蓝色到紫色：
+        - 左上角：#4FB6FF（天蓝色）
+        - 右下角：#8C7BFF（薰衣草紫）
+        这是整个主题的核心色，用于主按钮、选中状态、焦点指示等。
+        蓝→紫的渐变增加视觉丰富度，比纯色更有质感。
+    -->
+    <LinearGradientBrush x:Key="GcAccentBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#4FB6FF" Offset="0" />
+        <GradientStop Color="#8C7BFF" Offset="1" />
+    </LinearGradientBrush>
+
+    <!--
+        BorderBrush：控件默认边框画刷
+        #33FFFFFF = 20%不透明度的白色
+        极淡的白色边框，在深色背景上若隐若现，勾勒控件轮廓但不喧宾夺主
+    -->
+    <SolidColorBrush x:Key="GcBorderBrush" Color="#33FFFFFF" />
+
+    <!--
+        BorderHoverBrush：控件悬停边框画刷
+        #66FFFFFF = 40%不透明度的白色
+        悬停时边框亮度翻倍，与背景的悬停变亮配合，强化交互反馈
+    -->
+    <SolidColorBrush x:Key="GcBorderHoverBrush" Color="#66FFFFFF" />
+
+    <!--
+        TopHighlightBrush：顶部高光画刷
+        垂直渐变，模拟光线从顶部照射的高光效果：
+        - 顶部：#73FFFFFF（45%白色）—— 最亮的高光
+        - 中间55%位置：#10FFFFFF（6%白色）—— 快速衰减
+        - 底部：#00000000（完全透明）
+        这个画刷用于叠加在控件顶部，模拟玻璃表面的光线反射。
+        衰减曲线很陡，高光集中在顶部，下面迅速消失。
+    -->
+    <LinearGradientBrush x:Key="GcTopHighlightBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#73FFFFFF" Offset="0" />
+        <GradientStop Color="#10FFFFFF" Offset="0.55" />
+        <GradientStop Color="#00000000" Offset="1" />
+    </LinearGradientBrush>
+
+    <!--
+        EdgeHighlightBrush：边缘高光画刷
+        对角线渐变，模拟玻璃边缘的折射光效果：
+        - 左上角：#66FFFFFF（40%白色）
+        - 40%位置：#1CFFFFFF（11%白色）—— 衰减
+        - 70%位置：#1CC8F8FF（11%天蓝色）—— 右下角带蓝色折射
+        - 右下角：#52FFFFFF（32%白色）—— 边缘反弹
+        这个画刷用于卡片边框，四角亮度不同，模拟真实玻璃的边缘光折射。
+    -->
+    <LinearGradientBrush x:Key="GcEdgeHighlightBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#66FFFFFF" Offset="0" />
+        <GradientStop Color="#1CFFFFFF" Offset="0.4" />
+        <GradientStop Color="#1CC8F8FF" Offset="0.7" />
+        <GradientStop Color="#52FFFFFF" Offset="1" />
+    </LinearGradientBrush>
+
+    <!--
+        BoolToVisibilityConverter：布尔值转可见性转换器
+        WPF 内置转换器，将 bool 值转为 Visibility 枚举：
+        true → Visible（可见）
+        false → Collapsed（折叠，不占空间）
+        用于绑定场景中控制元素的显示/隐藏。
+    -->
+    <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+
+</ResourceDictionary>
+
+
+

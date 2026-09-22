@@ -1,0 +1,88 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:GeneralControl.Controls">
+
+    <!--  拟物 TabControl：凸起背景 + 凹刻页签栏  -->
+    <Style TargetType="controls:GcTabControl">
+        <Setter Property="Foreground" Value="{DynamicResource GcTextBrush}" />
+        <Setter Property="Background" Value="{DynamicResource GcControlBrush}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="controls:GcTabControl">
+                    <Grid SnapsToDevicePixels="True">
+                        <!--  暗面  -->
+                        <Border Background="Transparent" CornerRadius="14">
+                            <Border.Effect>
+                                <DropShadowEffect
+                                    BlurRadius="9"
+                                    Direction="315"
+                                    Opacity="0.45"
+                                    RenderingBias="Quality"
+                                    ShadowDepth="3"
+                                    Color="#A0A0A8" />
+                            </Border.Effect>
+                        </Border>
+                        <!--  亮面  -->
+                        <Border Background="Transparent" CornerRadius="14">
+                            <Border.Effect>
+                                <DropShadowEffect
+                                    BlurRadius="9"
+                                    Direction="135"
+                                    Opacity="0.6"
+                                    RenderingBias="Quality"
+                                    ShadowDepth="3"
+                                    Color="#FFFFFF" />
+                            </Border.Effect>
+                        </Border>
+                        <!--  背景  -->
+                        <Border
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="14"
+                            SnapsToDevicePixels="True" />
+                        <Border
+                            Background="{DynamicResource GcTopHighlightBrush}"
+                            CornerRadius="14"
+                            IsHitTestVisible="False"
+                            SnapsToDevicePixels="True" />
+                        <!--  内容  -->
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <!--  页签栏：凹刻  -->
+                            <Border
+                                Grid.Row="0"
+                                Padding="6,8"
+                                CornerRadius="14,14,0,0"
+                                SnapsToDevicePixels="True">
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="1,1" EndPoint="0,0">
+                                        <GradientStop Offset="0" Color="#DDDDE2" />
+                                        <GradientStop Offset="1" Color="#E8E8EC" />
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                                <TabPanel
+                                    Background="Transparent"
+                                    IsItemsHost="True"
+                                    KeyboardNavigation.TabIndex="1" />
+                            </Border>
+                            <Border
+                                Grid.Row="1"
+                                Background="Transparent"
+                                SnapsToDevicePixels="True">
+                                <ContentPresenter
+                                    Margin="12"
+                                    ContentSource="SelectedContent"
+                                    SnapsToDevicePixels="True"
+                                    TextOptions.TextRenderingMode="ClearType" />
+                            </Border>
+                        </Grid>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>

@@ -1,0 +1,211 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:GeneralControl.Controls">
+
+    <!--
+        ================================================================
+        文件说明：Themes\Steel\Controls\PlatingChamber.xaml
+        PlatingChamber 水平电镀腔样式（半导体水平电镀 cell 正视图横截）。
+
+        依据用户绘制草图（drawio）：六边形（梭形）腔体 + 压板堆叠式腔头。
+        自上而下：
+          ┌ PART_Head  可升降腔头：顶压板 → 连接颈 → 宽压板 → 工艺条 →
+          │              三立柱 → 六角密封条 → 晶圆卡盘 PART_Rotor
+          ├ 六边形腔体（六角/梭形轮廓，腔口法兰沿）
+          ├ 蓝色透明回收罩（腔体上部收集区）
+          ├ 阳极塔（Anode Tower）+ 高/低液位感应器
+          └ 阳极腔液面填充（PART_Liquid）
+
+        【动画 / 状态】
+        - HeadLift 0~100：代码平移 PART_Head（升起/压入腔体）；
+        - IsRotating=true：PART_Rotor 持续旋转（晶圆卡盘转动）；
+        - HeadOpen=true：下部（密封条+卡盘，PART_OpenGroup）下移露出竖向间隙，
+          立柱桥接（气缸开合，释放晶圆）；
+        - Level 0~100：代码刷新 PART_Liquid 液位高度；
+        - 高/低液位感应器由代码随液位自动点亮。
+        ================================================================
+    -->
+
+    <Style TargetType="controls:GcPlatingChamber">
+        <Setter Property="Width" Value="200" />
+        <Setter Property="Height" Value="300" />
+        <!-- 默认镀液画刷：半透明气泡蓝渐变（电镀液质感） -->
+        <Setter Property="LiquidBrush">
+            <Setter.Value>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Color="#8C4FB6FF" Offset="0" />
+                    <GradientStop Color="#B36AE3FF" Offset="1" />
+                </LinearGradientBrush>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="controls:GcPlatingChamber">
+                    <Viewbox Stretch="Uniform">
+                        <Canvas Width="200" Height="300">
+
+                            <!-- ======== ① 六边形腔体（梭形轮廓，Back 层） ======== -->
+                            <!-- 腔体：上下平边、左右顶点（y=180~292 主腔，腔口平顶 x=62..138） -->
+                            <Path Data="M 67,180 L 133,180 L 176,236 L 133,292 L 67,292 L 24,236 Z"
+                                  Fill="#26334155"
+                                  Stroke="{DynamicResource GcEdgeHighlightBrush}"
+                                  StrokeThickness="1.4" />
+                            <!-- 腔口法兰沿（六角腔口上沿） -->
+                            <Rectangle Canvas.Left="58" Canvas.Top="174" Width="84" Height="8"
+                                       RadiusX="3" RadiusY="3" Fill="#33415566" />
+                            <!-- 腔壁左/右两道内高光（金属棱边感） -->
+                            <Path Data="M 26,236 L 24,236 L 62,182 L 64,182 Z" Fill="#30FFFFFF" />
+                            <Path Data="M 174,236 L 176,236 L 138,182 L 136,182 Z" Fill="#22FFFFFF" />
+
+                            <!-- ======== ⑥ 阳极腔底（腔体下半，镀液承载） ======== -->
+                            <!-- 镀液填充：Grid 底部锚定，高度由代码控制 -->
+                            <Grid Canvas.Left="28" Canvas.Top="184" Width="144" Height="104">
+                                <Border x:Name="PART_Liquid"
+                                        VerticalAlignment="Bottom"
+                                        CornerRadius="0,0,8,8"
+                                        Background="{TemplateBinding LiquidBrush}" />
+                            </Grid>
+
+                            <!-- ======== ⑤ 蓝色透明回收罩（腔体上部收集区） ======== -->
+                            <Path Data="M 64,182 L 136,182 L 152,216 L 48,216 Z"
+                                  Fill="#404FB6FF" />
+                            <Path Data="M 66,183 L 134,183 L 131,188 L 69,188 Z"
+                                  Fill="#664FB6FF" />
+
+                            <!-- ======== ④ 阳极塔（Anode Tower）+ 感应器 ======== -->
+                            <!-- 塔身：回收罩顶直贯阳极腔底的竖直立柱 -->
+                            <Rectangle Canvas.Left="96" Canvas.Top="204" Width="8" Height="70"
+                                       RadiusX="3" RadiusY="3"
+                                       Fill="#2F3E50"
+                                       Stroke="#4A5B70" StrokeThickness="0.8" />
+                            <!-- 塔顶导流头（罩内） -->
+                            <Path Data="M 92,204 L 108,204 L 106,212 L 94,212 Z"
+                                  Fill="#475569" />
+                            <!-- 阳极片（塔基铜块，腔底） -->
+                            <Rectangle Canvas.Left="76" Canvas.Top="256" Width="48" Height="18"
+                                       RadiusX="3" RadiusY="3"
+                                       Fill="#C88958" Stroke="#8A5A2E" StrokeThickness="1" />
+                            <!-- 高液位感应器（塔右侧，接近腔顶液位） -->
+                            <Ellipse x:Name="PART_HighLevel"
+                                     Canvas.Left="110" Canvas.Top="212" Width="8" Height="8"
+                                     Fill="#22C55E" Stroke="#0F7A34" StrokeThickness="1" />
+                            <Line X1="114" Y1="216" X2="126" Y2="216"
+                                  Stroke="#667586" StrokeThickness="1" StrokeDashArray="2,2" />
+                            <!-- 低液位感应器（塔左侧，接近腔底液位） -->
+                            <Ellipse x:Name="PART_LowLevel"
+                                     Canvas.Left="82" Canvas.Top="252" Width="8" Height="8"
+                                     Fill="#22C55E" Stroke="#0F7A34" StrokeThickness="1" />
+                            <Line X1="90" Y1="256" X2="76" Y2="256"
+                                  Stroke="#667586" StrokeThickness="1" StrokeDashArray="2,2" />
+                            <!-- 感应器标签：高 / 低 -->
+                            <TextBlock Canvas.Left="126" Canvas.Top="210" FontSize="8"
+                                       Foreground="#5B6B7E" Text="高" />
+                            <TextBlock Canvas.Left="48" Canvas.Top="250" FontSize="8"
+                                       Foreground="#5B6B7E" Text="低" />
+
+                            <!-- ======== ② 可升降腔头（PART_Head：压板堆叠，整体平移） ======== -->
+                            <Canvas x:Name="PART_Head" Width="200" Height="155" Canvas.Top="0">
+                                <!-- 顶压板（宽高 2:1 大压板，顶部第一块） -->
+                                <Rectangle Canvas.Left="62" Canvas.Top="0" Width="76" Height="40"
+                                           RadiusX="7" RadiusY="7"
+                                           Fill="#5B6B7E" Stroke="#2E3B4C" StrokeThickness="1.2" />
+                                <Rectangle Canvas.Left="64" Canvas.Top="4" Width="72" Height="4"
+                                           RadiusX="2" RadiusY="2" Fill="#66FFFFFF" />
+                                <!-- 连接颈 -->
+                                <Rectangle Canvas.Left="87" Canvas.Top="40" Width="26" Height="26"
+                                           RadiusX="3" RadiusY="3"
+                                           Fill="#4B5B70" Stroke="#2E3B4C" StrokeThickness="1" />
+                                <!-- 宽压板（下压环板） -->
+                                <Rectangle Canvas.Left="34" Canvas.Top="66" Width="132" Height="14"
+                                           RadiusX="4" RadiusY="4"
+                                           Fill="#4B5B70" Stroke="#2E3B4C" StrokeThickness="1" />
+                                <!-- 工艺条（process 造型，中部排气刻线） -->
+                                <Rectangle Canvas.Left="28" Canvas.Top="80" Width="144" Height="14"
+                                           RadiusX="3" RadiusY="3"
+                                           Fill="#475569" Stroke="#2E3B4C" StrokeThickness="1" />
+                                <Line X1="100" Y1="82" X2="100" Y2="92"
+                                      Stroke="#66FFFFFF" StrokeThickness="1" StrokeDashArray="1,1.5" />
+
+                                <!-- 可动下部（PART_OpenGroup：三立柱 + 六角密封条 + 卡盘，
+                                     HeadOpen 时下移露出一段竖向间隙，立柱桥接工艺条与密封条） -->
+                                <Canvas x:Name="PART_OpenGroup" Width="200" Height="40" Canvas.Top="94">
+                                    <Canvas.RenderTransform>
+                                        <TranslateTransform X="0" Y="0" />
+                                    </Canvas.RenderTransform>
+                                    <!-- 三根竖直导向立柱（左/中/右） -->
+                                    <Rectangle Canvas.Left="64" Canvas.Top="0" Width="5" Height="16" Fill="#3E4C5E" />
+                                    <Rectangle Canvas.Left="97" Canvas.Top="0" Width="5" Height="16" Fill="#3E4C5E" />
+                                    <Rectangle Canvas.Left="130" Canvas.Top="0" Width="5" Height="16" Fill="#3E4C5E" />
+                                    <!-- 六角密封条（梭形，HeadOpen 时随下部下移） -->
+                                    <Path Data="M 67,16 L 133,16 L 166,23 L 133,30 L 67,30 L 34,23 Z"
+                                          Fill="#4B5B70" Stroke="#2E3B4C" StrokeThickness="1.2" />
+                                    <Path Data="M 70,18 L 130,18 L 155,23 L 70,23 Z"
+                                          Fill="#40FFFFFF" />
+                                    <!-- 晶圆卡盘（PART_Rotor）：扁平晶圆 + 边缘缺角标记 -->
+                                    <Canvas x:Name="PART_Rotor" Width="92" Height="22"
+                                            Canvas.Left="54" Canvas.Top="34">
+                                        <Canvas.RenderTransform>
+                                            <RotateTransform CenterX="46" CenterY="11" Angle="0" />
+                                        </Canvas.RenderTransform>
+                                        <Ellipse Canvas.Left="0" Canvas.Top="3" Width="92" Height="16"
+                                                 Fill="#334155" Stroke="#1F2A38" StrokeThickness="1.4" />
+                                        <Ellipse Canvas.Left="2" Canvas.Top="4" Width="88" Height="5"
+                                                 Fill="#4A5B70" />
+                                        <Path Data="M 88,6 L 95,6 L 91,12 Z" Fill="#22C55E" />
+                                        <Ellipse Canvas.Left="41" Canvas.Top="6" Width="10" Height="10"
+                                                 Fill="#1F2A38" />
+                                    </Canvas>
+                                </Canvas>
+                            </Canvas>
+                        </Canvas>
+                    </Viewbox>
+                    <ControlTemplate.Triggers>
+                        <!-- ===== 旋转：IsRotating 驱动晶圆卡盘转动 ===== -->
+                        <Trigger Property="IsRotating" Value="True">
+                            <Trigger.EnterActions>
+                                <BeginStoryboard x:Name="RotorSpin">
+                                    <Storyboard RepeatBehavior="Forever">
+                                        <DoubleAnimation Storyboard.TargetName="PART_Rotor"
+                                                         Storyboard.TargetProperty="RenderTransform.Angle"
+                                                         From="0" To="360"
+                                                         Duration="0:0:2.4" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <StopStoryboard BeginStoryboardName="RotorSpin" />
+                            </Trigger.ExitActions>
+                        </Trigger>
+
+                        <!-- ===== 开合：HeadOpen=true 时下部（密封条+卡盘）下移露出竖向间隙 ===== -->
+                        <Trigger Property="HeadOpen" Value="True">
+                            <Trigger.EnterActions>
+                                <BeginStoryboard x:Name="HeadOpenBoard">
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="PART_OpenGroup"
+                                                         Storyboard.TargetProperty="RenderTransform.Y"
+                                                         To="18" Duration="0:0:0.35" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard x:Name="HeadCloseBoard">
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="PART_OpenGroup"
+                                                         Storyboard.TargetProperty="RenderTransform.Y"
+                                                         To="0" Duration="0:0:0.35" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
+                        </Trigger>
+
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.5" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>

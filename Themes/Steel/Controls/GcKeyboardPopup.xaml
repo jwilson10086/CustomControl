@@ -1,0 +1,411 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:GeneralControl.Controls">
+
+    <!--
+        ================================================================
+        文件说明：Themes\Steel\Controls\KeyboardPopup.xaml
+        虚拟键盘弹出控件样式，包含键盘专属资源：
+        - KeyboardKeyStyle：基础按键样式
+        - KeyboardConfirmStyle：确认按键样式（蓝色）
+        - NumericSliderStyle：数字键盘竖向范围滑块
+          （KeyboardPopup.cs 通过 TryFindResource 运行时查找此键）
+        - KeyboardPopup 隐式样式（预览框 + 按键区 + 底部按钮）
+
+        依赖：Brushes.xaml（画刷资源）、Dialog.xaml（弹窗按钮样式）。
+        注意：模板中对 DialogButtonStyle / DialogConfirmStyle
+        使用 DynamicResource 引用（跨文件资源）。
+        ================================================================
+    -->
+
+    <!--
+        ===================== 键盘按键样式 =====================
+        KeyboardKeyStyle：虚拟键盘的基础按键样式。
+        采用半透明白色背景营造毛玻璃质感，按下时缩小产生按压反馈。
+        基于 WPF 原生 Button 控件，通过 ControlTemplate 完全自定义外观。
+    -->
+    <Style x:Key="GcKeyboardKeyStyle" TargetType="Button">
+        <!-- Background：半透明白色背景（30334155），alpha=0x30≈19%不透明度 -->
+        <Setter Property="Background" Value="#30334155" />
+        <!-- BorderBrush：更淡的白色边框，比背景更透明，形成微妙的边框层次 -->
+        <Setter Property="BorderBrush" Value="#25334155" />
+        <!-- BorderThickness：1像素细边框，精致而不抢眼 -->
+        <Setter Property="BorderThickness" Value="1" />
+        <!-- Foreground：白色文字，在深色背景上保持高对比度 -->
+        <Setter Property="Foreground" Value="White" />
+        <!-- FontSize：16号字体，适合键盘按键的文字大小 -->
+        <Setter Property="FontSize" Value="16" />
+        <!-- FontWeight：SemiBold 半粗体，增强按键文字辨识度 -->
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <!-- Cursor：手型光标，提示用户此处可点击 -->
+        <Setter Property="Cursor" Value="Hand" />
+        <!-- FocusVisualStyle：设为Null，去掉默认的蓝色聚焦框，保持视觉统一 -->
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <!-- Template：自定义控件模板，定义按键的视觉结构 -->
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <!-- Root Border：按键的外层容器，绑定模板属性以支持外部自定义 -->
+                    <Border x:Name="Root"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="8"
+                            SnapsToDevicePixels="True">
+                        <!-- ContentPresenter：显示按键的文字内容，居中对齐 -->
+                        <ContentPresenter Margin="{TemplateBinding Padding}"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <!--
+                            Trigger 1：IsMouseOver = True
+                            鼠标悬停时，背景和边框都变为更亮的白色（50334155），
+                            让用户明确感知到鼠标已进入按键区域。
+                        -->
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Root" Property="Background" Value="#50334155" />
+                            <Setter TargetName="Root" Property="BorderBrush" Value="#50334155" />
+                        </Trigger>
+                        <!--
+                            Trigger 2：IsPressed = True
+                            按下时：
+                            - 背景变为蓝色调（#704FB6FF），给予视觉反馈表示"正在操作"
+                            - RenderTransform 缩放到 95%，产生按下缩小的物理按压感
+                            - RenderTransformOrigin="0.5,0.5" 确保从中心缩放
+                        -->
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Root" Property="Background" Value="#704FB6FF" />
+                            <Setter TargetName="Root" Property="RenderTransform" Value="0.95,0,0,0.95,0,0" />
+                            <Setter TargetName="Root" Property="RenderTransformOrigin" Value="0.5,0.5" />
+                        </Trigger>
+                        <!--
+                            Trigger 3：IsEnabled = False
+                            禁用时降低整体透明度到 40%，视觉上表示该按键不可用。
+                        -->
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Root" Property="Opacity" Value="0.4" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--
+        ===================== 键盘确认按钮（蓝色主色调） =====================
+        KeyboardConfirmStyle：继承自上方 KeyboardKeyStyle（同文件 StaticResource），
+        通过 BasedOn 复用基础按键的所有样式和模板，
+        仅覆盖背景色、边框色和前景色为蓝色调，突出"确认"操作的主次关系。
+        这是经典的样式继承模式：基础样式 + 派生样式。
+    -->
+    <Style x:Key="KeyboardConfirmStyle" TargetType="Button"
+           BasedOn="{StaticResource GcKeyboardKeyStyle}">
+        <!-- 蓝色背景，作为主操作按钮的视觉标识 -->
+        <Setter Property="Background" Value="#22C55E" />
+        <!-- 浅蓝色边框，与背景形成微妙对比 -->
+        <Setter Property="BorderBrush" Value="#4ADE80" />
+        <!-- 白色前景文字，在蓝色背景上保持清晰可读 -->
+        <Setter Property="Foreground" Value="White" />
+        <!-- 半粗体文字 -->
+        <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+
+    <!--
+        ===================== 数字键盘范围滑块（竖向） =====================
+        NumericSliderStyle：竖向滑块控件，用于数字键盘中的数值范围选择。
+        完全自定义模板，包含：
+        - 轨道背景（半透明白色细条）
+        - 填充区域（蓝色渐变，从滑块位置到顶部）
+        - Track + Thumb（滑块轨道和可拖拽的手柄）
+        - DecreaseRepeatButton / IncreaseRepeatButton（隐藏的点击区域）
+
+        竖向滑块的工作原理：
+        - Track 控件是 Slider 的核心，负责管理滑块位置
+        - Thumb 是可拖拽的手柄，用户通过拖拽它来改变值
+        - DecreaseRepeatButton/IncreaseRepeatButton 是点击轨道空白区域时的响应区域
+        - IsDirectionReversed="True" 表示值越大越靠上（符合竖向数值习惯）
+    -->
+    <Style x:Key="GcNumericSliderStyle" TargetType="Slider">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Slider">
+                    <Grid>
+                        <!-- 三行布局：Auto(顶部) + *(中间轨道) + Auto(底部) -->
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <!--
+                            轨道背景：居中的8px宽白色半透明条
+                            Grid.RowSpan="3" 跨越所有三行，确保轨道贯穿整个滑块高度
+                            CornerRadius="4" 使轨道两端呈半圆（直径8px，半径4px）
+                        -->
+                        <Border Grid.Row="0" Grid.RowSpan="3"
+                                HorizontalAlignment="Center"
+                                Width="8" CornerRadius="4"
+                                Background="#25334155" />
+                        <!--
+                            PART_SelectionRange：已选区域的填充条
+                            命名规范 PART_ 前缀表示这是 Slider 模板的约定部件名
+                            VerticalAlignment="Bottom" 使填充从底部开始向上增长
+                            使用 LinearGradientBrush 从浅蓝到亮蓝的渐变，增强视觉层次
+                        -->
+                        <Border x:Name="PART_SelectionRange"
+                                Grid.Row="0" Grid.RowSpan="3"
+                                HorizontalAlignment="Center"
+                                Width="8" CornerRadius="4"
+                                VerticalAlignment="Bottom">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                    <GradientStop Color="#1D9E52" Offset="0" />
+                                    <GradientStop Color="#22C55E" Offset="1" />
+                                </LinearGradientBrush>
+                            </Border.Background>
+                        </Border>
+                        <!--
+                            Track：Slider 的核心控件，管理滑块位置和交互
+                            Orientation="Vertical" 设为竖向
+                            IsDirectionReversed="True" 值越大越靠上
+                            绑定 Maximum/Minimum/Value 到模板属性，使外部设置生效
+                        -->
+                        <Track x:Name="PART_Track" Grid.Row="0" Grid.RowSpan="3"
+                               Orientation="Vertical"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Stretch"
+                               Maximum="{TemplateBinding Maximum}"
+                               Minimum="{TemplateBinding Minimum}"
+                               Value="{TemplateBinding Value}"
+                               IsDirectionReversed="True">
+                            <!--
+                                Thumb：可拖拽的滑块手柄
+                                22x18 的矩形，圆角4px
+                                Cursor="SizeNS" 表示上下拖拽的双向箭头光标
+                            -->
+                            <Track.Thumb>
+                                <Thumb Width="22" Height="18" Cursor="SizeNS">
+                                    <Thumb.Template>
+                                        <ControlTemplate TargetType="Thumb">
+                                            <!-- 手柄的视觉外观：蓝色背景 + 浅蓝边框 -->
+                                            <Border x:Name="ThumbBorder"
+                                                    Width="22" Height="18"
+                                                    CornerRadius="4"
+                                                    Background="#22C55E"
+                                                    BorderBrush="#4ADE80"
+                                                    BorderThickness="2"
+                                                    Cursor="SizeNS" />
+                                            <ControlTemplate.Triggers>
+                                                <!-- 悬停：手柄变亮 -->
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="ThumbBorder" Property="Background" Value="#4ADE80" />
+                                                </Trigger>
+                                                <!-- 拖拽中：手柄变深，表示正在被操作 -->
+                                                <Trigger Property="IsDragging" Value="True">
+                                                    <Setter TargetName="ThumbBorder" Property="Background" Value="#1D9E52" />
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Thumb.Template>
+                                </Thumb>
+                            </Track.Thumb>
+                            <!--
+                                DecreaseRepeatButton：点击滑块下方区域时的响应按钮
+                                Command="Slider.DecreaseLarge" 减少较大步长的值
+                                模板设为不可见的蓝色条（作为点击热区）
+                                这是 Slider 的内部约定：Decrease 方向对应值减小的方向
+                            -->
+                            <Track.DecreaseRepeatButton>
+                                <RepeatButton Command="Slider.DecreaseLarge">
+                                    <RepeatButton.Template>
+                                        <ControlTemplate TargetType="RepeatButton">
+                                            <Border Background="#22C55E" CornerRadius="1" />
+                                        </ControlTemplate>
+                                    </RepeatButton.Template>
+                                </RepeatButton>
+                            </Track.DecreaseRepeatButton>
+                            <!--
+                                IncreaseRepeatButton：点击滑块上方区域时的响应按钮
+                                Command="Slider.IncreaseLarge" 增加较大步长的值
+                                模板设为完全透明，不显示任何内容
+                            -->
+                            <Track.IncreaseRepeatButton>
+                                <RepeatButton Command="Slider.IncreaseLarge">
+                                    <RepeatButton.Template>
+                                        <ControlTemplate TargetType="RepeatButton">
+                                            <Border Background="Transparent" />
+                                        </ControlTemplate>
+                                    </RepeatButton.Template>
+                                </RepeatButton>
+                            </Track.IncreaseRepeatButton>
+                        </Track>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--
+        ===================== 键盘弹出控件 =====================
+        KeyboardPopup：虚拟键盘的弹出窗口样式。
+        布局结构（从上到下）：
+        1. 预览框 + 清除按钮 —— 显示当前输入内容
+        2. 按键区（StackPanel）—— 动态生成的键盘按键
+        3. 底部按钮（取消 + 确认）
+
+        注意：这是隐式样式（没有 x:Key），直接通过 TargetType 匹配控件类型。
+        这意味着所有 KeyboardPopup 控件自动应用此样式。
+    -->
+    <Style TargetType="controls:GcKeyboardPopup">
+        <!-- 深色半透明背景，alpha=0xE8≈91%，足够深以保证按键清晰可见 -->
+        <Setter Property="Background" Value="#EDF0F5" />
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="controls:GcKeyboardPopup">
+                    <!--
+                        外层 Border：定义弹出窗口的整体外观
+                        - CornerRadius="16" 大圆角，柔和的视觉效果
+                        - Padding="16" 内边距，内容不贴边
+                        - MinWidth="260" 最小宽度保证按键不会过于拥挤
+                        - BorderBrush/BorderThickness：1px 白色半透明边框
+                    -->
+                    <Border Background="{TemplateBinding Background}"
+                            CornerRadius="16"
+                            Padding="16"
+                            MinWidth="260"
+                            BorderBrush="#30334155"
+                            BorderThickness="1">
+                        <!-- DropShadowEffect：投影效果，让弹窗浮在界面之上 -->
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="24" ShadowDepth="4" Opacity="0.5" Color="#000" />
+                        </Border.Effect>
+                        <Grid>
+                            <!-- 四行布局，每行 Auto 高度，由内容撑开 -->
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <!--
+                                Row 0：预览框 + 清除按钮
+                                整体包裹在一个半透明背景的圆角容器中
+                            -->
+                            <Grid Grid.Row="0" Margin="0,0,0,12">
+                                <Border Background="#20334155" CornerRadius="10" Padding="2">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <!-- * 号列：预览文本占据剩余空间 -->
+                                            <ColumnDefinition Width="*" />
+                                            <!-- Auto 列：清除按钮自适应宽度 -->
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <!--
+                                            PART_PreviewBox：输入内容预览文本框
+                                            IsReadOnly="True" 防止用户直接编辑（键盘通过代码修改）
+                                            HorizontalContentAlignment="Right" 文本右对齐
+                                            x:Name="PART_" 前缀表示这是代码中需要引用的部件
+                                        -->
+                                        <TextBox x:Name="PART_PreviewBox"
+                                                 IsReadOnly="True"
+                                                 Background="Transparent"
+                                                 BorderThickness="0"
+                                                 Foreground="White"
+                                                 FontSize="20"
+                                                 FontWeight="SemiBold"
+                                                 HorizontalContentAlignment="Right"
+                                                 VerticalAlignment="Center"
+                                                 MinHeight="32"
+                                                 Margin="12,4,4,4" />
+                                        <!--
+                                            PART_ClearButton：清除按钮
+                                            &#x2716; 是 Unicode 字符 ✖（粗体叉号）
+                                            鼠标悬停时文字变白（通过内联 Style 的 Trigger 实现）
+                                        -->
+                                        <Button x:Name="PART_ClearButton"
+                                                Grid.Column="1"
+                                                Content="&#x2716;"
+                                                Background="Transparent"
+                                                BorderThickness="0"
+                                                Foreground="#475569"
+                                                FontSize="14"
+                                                Padding="8,4"
+                                                Cursor="Hand"
+                                                VerticalAlignment="Center"
+                                                FocusVisualStyle="Null">
+                                            <Button.Style>
+                                                <!-- 内联样式：仅定义悬停效果，不影响按钮的其他属性 -->
+                                                <Style TargetType="Button">
+                                                    <Style.Triggers>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter Property="Foreground" Value="White" />
+                                                        </Trigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                    </Grid>
+                                </Border>
+                            </Grid>
+
+                            <!--
+                                Row 1：按键区
+                                PART_KeysHost 是一个空的 StackPanel，
+                                代码中会动态生成并添加键盘按键按钮到这里。
+                                水平居中，底部留12px间距。
+                            -->
+                            <StackPanel x:Name="PART_KeysHost"
+                                        Grid.Row="1"
+                                        HorizontalAlignment="Center"
+                                        Margin="0,0,0,12" />
+
+                            <!--
+                                Row 2：底部按钮区
+                                两列等宽布局，左侧取消、右侧确认。
+                                按钮样式使用 DynamicResource 跨文件引用 Dialog.xaml 中的资源。
+                            -->
+                            <Grid Grid.Row="2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <!-- 取消按钮：使用普通弹窗按钮样式 -->
+                                <Button x:Name="PART_CancelButton"
+                                        Grid.Column="0"
+                                        Content="取消"
+                                        Style="{DynamicResource GcDialogButtonStyle}"
+                                        Padding="18,10"
+                                        FontSize="14"
+                                        Margin="0,0,6,0" />
+                                <!-- 确认按钮：使用蓝色确认按钮样式，突出主操作 -->
+                                <Button x:Name="PART_ConfirmButton"
+                                        Grid.Column="1"
+                                        Content="确认"
+                                        Style="{DynamicResource GcDialogConfirmStyle}"
+                                        Padding="18,10"
+                                        FontSize="14"
+                                        Margin="6,0,0,0" />
+                            </Grid>
+                        </Grid>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>
+
+
+
+
+
+
+
+
+
+
+
+

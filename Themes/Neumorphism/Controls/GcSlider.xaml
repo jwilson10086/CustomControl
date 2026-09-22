@@ -1,0 +1,192 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:GeneralControl.Controls">
+
+    <Style TargetType="controls:GcSlider">
+        <Setter Property="Foreground" Value="{DynamicResource GcAccentBrush}" />
+        <Setter Property="Background" Value="{DynamicResource GcControlBrush}" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="controls:GcSlider">
+                    <Grid SnapsToDevicePixels="True">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="28" />
+                        </Grid.RowDefinitions>
+
+                        <!--  刻度线  -->
+                        <TickBar
+                            x:Name="TopTick"
+                            Grid.Row="0"
+                            Fill="{DynamicResource GcTextSecondaryBrush}"
+                            Placement="Top"
+                            Visibility="Collapsed" />
+
+                        <!--  轨道容器  -->
+                        <Grid
+                            x:Name="TrackContainer"
+                            Grid.Row="1"
+                            Height="8"
+                            VerticalAlignment="Center">
+
+                            <!--  轨道暗面阴影  -->
+                            <Border
+                                HorizontalAlignment="Stretch"
+                                Background="Transparent"
+                                CornerRadius="4"
+                                SnapsToDevicePixels="True">
+                                <Border.Effect>
+                                    <DropShadowEffect
+                                        BlurRadius="3"
+                                        Direction="315"
+                                        Opacity="0.4"
+                                        RenderingBias="Quality"
+                                        ShadowDepth="1"
+                                        Color="#A0A0A8" />
+                                </Border.Effect>
+                            </Border>
+                            <!--  轨道亮面阴影  -->
+                            <Border
+                                HorizontalAlignment="Stretch"
+                                Background="Transparent"
+                                CornerRadius="4"
+                                SnapsToDevicePixels="True">
+                                <Border.Effect>
+                                    <DropShadowEffect
+                                        BlurRadius="3"
+                                        Direction="135"
+                                        Opacity="0.5"
+                                        RenderingBias="Quality"
+                                        ShadowDepth="1"
+                                        Color="#FFFFFF" />
+                                </Border.Effect>
+                            </Border>
+
+                            <!--  轨道背景  -->
+                            <Border
+                                x:Name="TrackBg"
+                                Height="8"
+                                HorizontalAlignment="Stretch"
+                                CornerRadius="4"
+                                SnapsToDevicePixels="True">
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,1" EndPoint="0,0">
+                                        <GradientStop Offset="0" Color="#DDDEE2" />
+                                        <GradientStop Offset="1" Color="#E8E8EC" />
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                            </Border>
+
+                            <!--  已填充轨道  -->
+                            <Border
+                                x:Name="PART_SelectionRange"
+                                Height="8"
+                                HorizontalAlignment="Left"
+                                Background="{TemplateBinding Foreground}"
+                                CornerRadius="4"
+                                SnapsToDevicePixels="True" />
+
+                            <!--  Thumb 槽  -->
+                            <Track x:Name="PART_Track">
+                                <Track.Thumb>
+                                    <Thumb x:Name="SliderThumb" Cursor="Hand">
+                                        <Thumb.Template>
+                                            <ControlTemplate TargetType="Thumb">
+                                                <Grid x:Name="ThumbRoot" RenderTransformOrigin="0.5,0.5">
+                                                    <Grid.RenderTransform>
+                                                        <ScaleTransform x:Name="ThumbScale" ScaleX="1" ScaleY="1" />
+                                                    </Grid.RenderTransform>
+                                                    <!--  暗面  -->
+                                                    <Border
+                                                        Background="Transparent"
+                                                        CornerRadius="9"
+                                                        SnapsToDevicePixels="True">
+                                                        <Border.Effect>
+                                                            <DropShadowEffect
+                                                                BlurRadius="5"
+                                                                Direction="315"
+                                                                Opacity="0.5"
+                                                                RenderingBias="Quality"
+                                                                ShadowDepth="2"
+                                                                Color="#909098" />
+                                                        </Border.Effect>
+                                                    </Border>
+                                                    <!--  亮面  -->
+                                                    <Border
+                                                        Background="Transparent"
+                                                        CornerRadius="9"
+                                                        SnapsToDevicePixels="True">
+                                                        <Border.Effect>
+                                                            <DropShadowEffect
+                                                                BlurRadius="5"
+                                                                Direction="135"
+                                                                Opacity="0.7"
+                                                                RenderingBias="Quality"
+                                                                ShadowDepth="2"
+                                                                Color="#FFFFFF" />
+                                                        </Border.Effect>
+                                                    </Border>
+                                                    <!--  球体  -->
+                                                    <Border
+                                                        Width="18"
+                                                        Height="18"
+                                                        CornerRadius="9"
+                                                        SnapsToDevicePixels="True">
+                                                        <Border.Background>
+                                                            <RadialGradientBrush>
+                                                                <GradientStop Offset="0" Color="#FAFAFA" />
+                                                                <GradientStop Offset="1" Color="#E8E8EC" />
+                                                            </RadialGradientBrush>
+                                                        </Border.Background>
+                                                    </Border>
+                                                    <!--  高光  -->
+                                                    <Border
+                                                        Width="18"
+                                                        Height="18"
+                                                        CornerRadius="9"
+                                                        IsHitTestVisible="False"
+                                                        SnapsToDevicePixels="True">
+                                                        <Border.Background>
+                                                            <RadialGradientBrush Center="0.35,0.35" GradientOrigin="0.35,0.35">
+                                                                <GradientStop Offset="0" Color="#90FFFFFF" />
+                                                                <GradientStop Offset="0.6" Color="#00FFFFFF" />
+                                                            </RadialGradientBrush>
+                                                        </Border.Background>
+                                                    </Border>
+                                                </Grid>
+                                            </ControlTemplate>
+                                        </Thumb.Template>
+                                    </Thumb>
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
+
+                        <!--  自定义外观  -->
+                        <TextBlock
+                            x:Name="ValueText"
+                            Grid.Row="0"
+                            Margin="0,0,0,2"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Bottom"
+                            FontSize="11"
+                            Foreground="{DynamicResource GcTextSecondaryBrush}"
+                            TextOptions.TextRenderingMode="ClearType"
+                            Visibility="Collapsed" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.4" />
+                        </Trigger>
+                        <Trigger Property="Orientation" Value="Vertical">
+                            <Setter Property="Width" Value="28" />
+                            <Setter Property="Height" Value="200" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>

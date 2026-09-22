@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <!-- 移植的 WaferRobot 复刻件未做可空性注解，屏蔽其历史警告 -->
+    <NoWarn>$(NoWarn);CS0108;CS8632;CS0067;CS0414;CS8618;CS8622;CS8625</NoWarn>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>GeneralControl</RootNamespace>
+    <AssemblyName>GeneralControl</AssemblyName>
+    <Version>1.0.0</Version>
+    <Authors>GeneralControl</Authors>
+    <Description>毛玻璃 (Glassmorphism) 质感 WPF 控件库与演示：窗体、页面、按钮、输入框、复选框、标签、开关、数据表格等，支持液体玻璃着色器、系统亚克力/Mica 与 3D 倾斜效果。</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="Effects\GlassyEffect.ps" />
+    <Resource Include="Assets\MacWallpaper.png" />
+  </ItemGroup>
+
+</Project>
+
+

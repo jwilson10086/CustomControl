@@ -1,0 +1,195 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:GeneralControl.Controls">
+
+    <!--
+        ================================================================
+        文件说明：Themes\Steel\Controls\Cylinder.xaml
+        Cylinder 工业气缸样式（侧视图，双作用气缸造型）。
+        
+        依赖：Brushes.xaml（画刷资源）。
+        结构：Viewbox(等比缩放) → 110x36 画布
+        → [活塞组(PART_PistonGroup)：活塞头 + 铬杆 + 关节块]
+        → [缸筒 + 筒身高光 + 连接螺栓]
+        → [前后端盖 + 顶部进气接头]
+        
+        【活塞组】包含活塞头与活塞杆（刚性连接，物理上一起平移）。
+        代码后置按 Extension 百分比设置 RenderTransform 平移量：
+        - 0   = 缩回；100 = 完全伸出。
+        毛玻璃缸筒半透明，活塞在内部清晰可见；
+        端盖与接头后绘制，压住杆的穿插处。
+        ================================================================
+    -->
+
+    <Style TargetType="controls:GcCylinder">
+        <Setter Property="Width" Value="110" />
+        <Setter Property="Height" Value="36" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="controls:GcCylinder">
+                    <Viewbox Stretch="Uniform">
+                        <Canvas Width="110" Height="36">
+
+                            <!--  ===== 活塞组（先画，玻璃缸筒罩色后仍可见） =====  -->
+                            <Canvas
+                                x:Name="PART_PistonGroup"
+                                Width="110"
+                                Height="36">
+                                <Canvas.RenderTransform>
+                                    <TranslateTransform X="0" Y="0" />
+                                </Canvas.RenderTransform>
+                                <!--  活塞杆：铬质渐变，从活塞一直延伸到右端外侧  -->
+                                <Rectangle
+                                    Canvas.Left="7"
+                                    Canvas.Top="15.75"
+                                    Width="53"
+                                    Height="4.5"
+                                    RadiusX="2.25"
+                                    RadiusY="2.25">
+                                    <Rectangle.Fill>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                            <GradientStop Offset="0" Color="#1F2937" />
+                                            <GradientStop Offset="0.5" Color="#96DEE9F5" />
+                                            <GradientStop Offset="1" Color="#1F2937" />
+                                        </LinearGradientBrush>
+                                    </Rectangle.Fill>
+                                </Rectangle>
+                                <!--  杆端关节块（yoke）  -->
+                                <Rectangle
+                                    Canvas.Left="59"
+                                    Canvas.Top="13.5"
+                                    Width="6"
+                                    Height="9"
+                                    Fill="#475569"
+                                    RadiusX="1.5"
+                                    RadiusY="1.5"
+                                    Stroke="#59334155"
+                                    StrokeThickness="0.8" />
+                                <!--  活塞头  -->
+                                <Rectangle
+                                    Canvas.Left="0"
+                                    Canvas.Top="8"
+                                    Width="8"
+                                    Height="20"
+                                    Fill="#C8FFFFFF"
+                                    RadiusX="1.8"
+                                    RadiusY="1.8" />
+                                <!--  活塞密封环槽 ×2  -->
+                                <Rectangle
+                                    Canvas.Left="1.5"
+                                    Canvas.Top="11"
+                                    Width="5"
+                                    Height="1.2"
+                                    Fill="#33000000"
+                                    RadiusX="0.6"
+                                    RadiusY="0.6" />
+                                <Rectangle
+                                    Canvas.Left="1.5"
+                                    Canvas.Top="23.8"
+                                    Width="5"
+                                    Height="1.2"
+                                    Fill="#33000000"
+                                    RadiusX="0.6"
+                                    RadiusY="0.6" />
+                            </Canvas>
+
+                            <!--  ===== 缸筒：半透明玻璃圆管 =====  -->
+                            <Rectangle
+                                Canvas.Left="8"
+                                Canvas.Top="7"
+                                Width="44"
+                                Height="22"
+                                Fill="#26334155"
+                                RadiusX="2.5"
+                                RadiusY="2.5"
+                                Stroke="{DynamicResource GcEdgeHighlightBrush}"
+                                StrokeThickness="1.4" />
+                            <!--  筒身上部高光条  -->
+                            <Rectangle
+                                Canvas.Left="10"
+                                Canvas.Top="8.6"
+                                Width="40"
+                                Height="2.2"
+                                Fill="#1F334155"
+                                RadiusX="1.1"
+                                RadiusY="1.1" />
+                            <!--  连接螺栓（贯穿前后端盖的拉杆）×2  -->
+                            <Rectangle
+                                Canvas.Left="9"
+                                Canvas.Top="12"
+                                Width="42"
+                                Height="1.4"
+                                Fill="#45334155"
+                                RadiusX="0.7"
+                                RadiusY="0.7" />
+                            <Rectangle
+                                Canvas.Left="9"
+                                Canvas.Top="22.6"
+                                Width="42"
+                                Height="1.4"
+                                Fill="#45334155"
+                                RadiusX="0.7"
+                                RadiusY="0.7" />
+
+                            <!--  ===== 前后端盖（后绘制，压住杆与螺栓端头） =====  -->
+                            <Rectangle
+                                Canvas.Left="4"
+                                Canvas.Top="3"
+                                Width="6"
+                                Height="30"
+                                Fill="#4D334155"
+                                RadiusX="1.5"
+                                RadiusY="1.5"
+                                Stroke="{DynamicResource GcEdgeHighlightBrush}"
+                                StrokeThickness="1" />
+                            <Rectangle
+                                Canvas.Left="50"
+                                Canvas.Top="3"
+                                Width="6"
+                                Height="30"
+                                Fill="#4D334155"
+                                RadiusX="1.5"
+                                RadiusY="1.5"
+                                Stroke="{DynamicResource GcEdgeHighlightBrush}"
+                                StrokeThickness="1" />
+
+                            <!--  ===== 顶部进气接头（各端盖一个） =====  -->
+                            <Rectangle
+                                Canvas.Left="5.5"
+                                Canvas.Top="0"
+                                Width="3"
+                                Height="3.5"
+                                Fill="#475569"
+                                RadiusX="0.8"
+                                RadiusY="0.8" />
+                            <Rectangle
+                                Canvas.Left="51.5"
+                                Canvas.Top="0"
+                                Width="3"
+                                Height="3.5"
+                                Fill="#475569"
+                                RadiusX="0.8"
+                                RadiusY="0.8" />
+                        </Canvas>
+                    </Viewbox>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.5" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>
+
+
+
+
+
+
+
+
+
