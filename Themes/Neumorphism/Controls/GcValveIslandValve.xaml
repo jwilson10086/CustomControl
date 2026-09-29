@@ -1,0 +1,205 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:GeneralControl.Controls">
+
+    <!--
+        ================================================================
+        文件说明：Themes\Neumorphism\Controls\GcValveIslandValve.xaml
+        阀岛里的一片电磁阀（阀位）。
+
+        实物骨架（查 Festo VTUG/VUVG、SMC SY3000、Bürkert AirLINE 8652）：
+        铝制汇流板 + N 片等宽阀位并排卡接，卡缝可见；每片顶面是电磁线圈壳，
+        壳上有一个状态 LED，旁边有手动应急按钮，气路走 1/2/4/3 通道；
+        底部一条 DIN 导轨底座。所以形状按这个骨架走，不做成抽象圆角卡片。
+
+        视觉风格：iOS 扁平化。
+        扁平化 = 去掉拟物感（斜切、浮雕、写实高光、纹理），不是削成直角色块。
+        iOS 该留的都留着：
+          · 统一柔和圆角，没有一处 90° 硬边；
+          · 每个控件一层极轻的投影，暗示高度；
+          · 极浅的双色渐变，只用来表达"上亮下暗"的体积，不做金属质感；
+          · 状态用色块 + LED 微光，不用描边堆叠；
+          · 字号克制，数字用半粗次要色。
+        禁止出现：Bevel / Emboss / Skew / 贴图 / 强渐变。
+
+        结构：Viewbox → PART_All(整体透明度) → 44x44 画布
+              → [状态底色 PART_Tint + 选中描边 PART_Ring + 卡缝 PART_Seam
+                + 线圈壳 PART_Coil + 状态灯 PART_Lamp + 手动按钮 PART_Btn
+                + 工位序号 PART_Index + 气路轨道 PART_Track + 气路通断 PART_Flow]
+
+        【交互】整片可点击（GcValveIslandValve 自管鼠标与空格键），故障态不可点。
+        【配色规则】
+        - 常态：不铺底色，露出汇流板本体，只显示线圈壳、暗灯、手动按钮、空轨道；
+        - 打开：整片铺一层淡强调底，LED 点亮带微光，气路轨道填满强调色；
+        - 选中：底色加深一圈强调色，并亮出 1.5pt 圆角描边；
+        - 故障：整片转淡红，LED/气路/描边转红（Trigger 最后，优先级最高）。
+        ================================================================
+    -->
+
+    <Style TargetType="controls:GcValveIslandValve">
+        <!-- 不写死宽高：随汇流板格子伸展，内部 Viewbox 再等比填充 -->
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="MinWidth" Value="34" />
+        <Setter Property="MinHeight" Value="34" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="controls:GcValveIslandValve">
+                    <!-- Stretch="Fill"：阀位必须撑满格子才能连成一条汇流板，
+                         用 Uniform 会在阀位之间留出空隙，破坏整体感 -->
+                    <Viewbox Stretch="Fill">
+                        <Grid x:Name="PART_All">
+                            <Canvas Width="44" Height="44">
+
+                                <!-- 状态底色：常态透明，露出汇流板；打开/选中/故障时才铺色 -->
+                                <Rectangle x:Name="PART_Tint"
+                                           Canvas.Left="0"
+                                           Canvas.Top="0"
+                                           Width="44"
+                                           Height="44"
+                                           RadiusX="8"
+                                           RadiusY="8"
+                                           Fill="Transparent" />
+
+                                <!-- 选中描边：iOS 选中态的圆角高亮框 -->
+                                <Rectangle x:Name="PART_Ring"
+                                           Canvas.Left="0.75"
+                                           Canvas.Top="0.75"
+                                           Width="42.5"
+                                           Height="42.5"
+                                           RadiusX="7.5"
+                                           RadiusY="7.5"
+                                           Stroke="#3F7FD8"
+                                           StrokeThickness="1.5"
+                                           Visibility="Collapsed" />
+
+                                <!-- 卡缝：阀位与阀位之间的分模线，也是最左端的端面线 -->
+                                <Rectangle x:Name="PART_Seam"
+                                           Canvas.Left="0"
+                                           Canvas.Top="0"
+                                           Width="1"
+                                           Height="44"
+                                           Fill="#CFCAC4" />
+
+                                <!-- 电磁线圈壳：阀位顶面那块方形凸台，阀岛上最大的一块 -->
+                                <Rectangle x:Name="PART_Coil"
+                                           Canvas.Left="7"
+                                           Canvas.Top="5"
+                                           Width="30"
+                                           Height="16"
+                                           RadiusX="5"
+                                           RadiusY="5"
+                                           Stroke="#D4D0CA"
+                                           StrokeThickness="0.75">
+                                    <Rectangle.Fill>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                            <GradientStop Color="#FEFDFC" Offset="0" />
+                                            <GradientStop Color="#E5E1DC" Offset="1" />
+                                        </LinearGradientBrush>
+                                    </Rectangle.Fill>
+                                </Rectangle>
+
+                                <!-- 状态指示灯：居中压在线圈壳上，通电即亮并带一圈微光 -->
+                                <Ellipse x:Name="PART_Lamp"
+                                         Canvas.Left="18.5"
+                                         Canvas.Top="9.5"
+                                         Width="7"
+                                         Height="7"
+                                         Fill="#A8A29A" />
+
+                                <!-- 手动应急按钮：断电时手动按压换向，顺便承载工位序号 -->
+                                <Rectangle x:Name="PART_Btn"
+                                           Canvas.Left="15"
+                                           Canvas.Top="23"
+                                           Width="14"
+                                           Height="13"
+                                           RadiusX="4"
+                                           RadiusY="4"
+                                           Stroke="#D7D2CC"
+                                           StrokeThickness="0.75">
+                                    <Rectangle.Fill>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                            <GradientStop Color="#FFFFFF" Offset="0" />
+                                            <GradientStop Color="#E7E3DE" Offset="1" />
+                                        </LinearGradientBrush>
+                                    </Rectangle.Fill>
+                                </Rectangle>
+
+                                <!-- 工位序号：iOS 风格小号半粗数字，次要色 -->
+                                <TextBlock x:Name="PART_Index"
+                                           Canvas.Left="15"
+                                           Canvas.Top="25.5"
+                                           Width="14"
+                                           FontSize="8.5"
+                                           FontWeight="SemiBold"
+                                           TextAlignment="Center"
+                                           Text="{Binding Index, RelativeSource={RelativeSource TemplatedParent}}"
+                                           Foreground="{DynamicResource GcTextSecondaryBrush}" />
+
+                                <!-- 气路轨道：1/2/4/3 通道的常态底槽 -->
+                                <Rectangle x:Name="PART_Track"
+                                           Canvas.Left="6"
+                                           Canvas.Top="38"
+                                           Width="32"
+                                           Height="4"
+                                           RadiusX="2"
+                                           RadiusY="2"
+                                           Fill="#CFCAC4" />
+
+                                <!-- 气路通断：打开时整条填满强调色 -->
+                                <Rectangle x:Name="PART_Flow"
+                                           Canvas.Left="6"
+                                           Canvas.Top="38"
+                                           Width="32"
+                                           Height="4"
+                                           RadiusX="2"
+                                           RadiusY="2"
+                                           Fill="#3F7FD8"
+                                           Visibility="Collapsed" />
+                            </Canvas>
+                        </Grid>
+                    </Viewbox>
+                    <ControlTemplate.Triggers>
+                        <!-- 打开：铺淡强调底 + LED 亮起带微光 + 气路填满 -->
+                        <Trigger Property="IsOpen" Value="True">
+                            <Setter TargetName="PART_Tint" Property="Fill" Value="#333F7FD8" />
+                            <Setter TargetName="PART_Lamp" Property="Fill" Value="#3F7FD8" />
+                            <Setter TargetName="PART_Lamp" Property="Effect">
+                                <Setter.Value>
+                                    <DropShadowEffect BlurRadius="7"
+                                                      Direction="270"
+                                                      ShadowDepth="0"
+                                                      Color="#3F7FD8"
+                                                      Opacity="0.95" />
+                                </Setter.Value>
+                            </Setter>
+                            <Setter TargetName="PART_Flow" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <!-- 键盘焦点：也亮出描边，方便无鼠标操作 -->
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="PART_Ring" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <!-- 选中：底色加深 + 描边常亮（排在焦点之后，同开时以这条的填充为准） -->
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="PART_Tint" Property="Fill" Value="#4D3F7FD8" />
+                            <Setter TargetName="PART_Ring" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <!-- 禁用：整片一起变淡 -->
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="PART_All" Property="Opacity" Value="0.4" />
+                        </Trigger>
+                        <!-- 故障：整片转红（放最后，盖过上面所有状态） -->
+                        <Trigger Property="IsFault" Value="True">
+                            <Setter TargetName="PART_Tint" Property="Fill" Value="#40E05555" />
+                            <Setter TargetName="PART_Ring" Property="Stroke" Value="#E05555" />
+                            <Setter TargetName="PART_Ring" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="PART_Lamp" Property="Fill" Value="#E05555" />
+                            <Setter TargetName="PART_Flow" Property="Fill" Value="#E05555" />
+                            <Setter TargetName="PART_Flow" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>

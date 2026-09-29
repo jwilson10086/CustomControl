@@ -62,6 +62,9 @@
         <ResourceDictionary Source="Controls\GcAvatar.xaml" />
         <!-- 12. 工业元件 -->
         <ResourceDictionary Source="Controls\GcValve.xaml" />
+        <ResourceDictionary Source="Controls\GcValveIslandValve.xaml" />
+        <ResourceDictionary Source="Controls\GcValveIsland.xaml" />
+
         <ResourceDictionary Source="Controls\GcPump.xaml" />
         <ResourceDictionary Source="Controls\GcTank.xaml" />
         <ResourceDictionary Source="Controls\GcPipe.xaml" />
@@ -74,7 +77,7 @@
         <ResourceDictionary Source="Controls\GcChiller.xaml" />
         <ResourceDictionary Source="Controls\GcDatePicker.xaml" />
         <ResourceDictionary Source="Controls\GcWaferRobot.xaml" />
-        <ResourceDictionary Source="Controls\GcScaraRobot.xaml" />
+        <ResourceDictionary Source="Controls\GcForwardRobot.xaml" />
         <ResourceDictionary Source="Controls\GcClock.xaml" />
         <ResourceDictionary Source="Controls\GcPlatingChamber.xaml" />
     </ResourceDictionary.MergedDictionaries>

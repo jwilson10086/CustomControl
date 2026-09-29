@@ -957,7 +957,7 @@
                                 IsEditing="True"
                                 IsFlowing="True"
                                 PipeWidth="6"
-                                Points="28.5,-19.4 72.5,-17.4 0,30 124.5,32.6" />
+                                Points="28.5,-19.4 71.5,-19.4 0,30 124.5,32.6" />
 
                             <!--  设备层后画，压住管端  -->
                             <controls:GcTank
@@ -1189,60 +1189,82 @@
                         </StackPanel>
                     </controls:GcCard>
 
-                    <controls:GcCard Header="机械手：双臂晶圆搬运 / SCARA 四轴" Style="{StaticResource DemoCardStyle}">
-                        <WrapPanel>
-                            <StackPanel Margin="0,0,24,8">
-                                <wafers:WaferRobot
-                                    Width="70"
-                                    Height="70"
-                                    Arm1_1Angle="0"
-                                    Arm1_2Angle="0"
-                                    Arm1_3Angle="0"
-                                    Arm2_1Angle="0"
-                                    Arm2_2Angle="0"
-                                    Arm2_3Angle="0"
-                                    BaseAngle="0"
-                                    ToolTip="Home 姿态：J1-J8 全0" />
-                                <TextBlock
-                                    Margin="0,4,0,0"
-                                    HorizontalAlignment="Center"
-                                    FontSize="11"
-                                    Foreground="#8CFFFFFF"
-                                    Text="Wafer Robot · Home" />
-                            </StackPanel>
+                    <controls:GcCard Header="机械手：双臂晶圆搬运 / ForwardRobot 前置搬送四轴" Style="{StaticResource DemoCardStyle}">
+                        <Grid Width="560">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
 
-                            <StackPanel Margin="0,0,24,8">
-                                <controls:GcScaraRobot
-                                    Width="160"
-                                    Height="160"
-                                    ElbowAngle="70"
-                                    HoldingWafer="True"
-                                    ShoulderAngle="-35"
-                                    ToolTip="SCARA 吸附晶圆状态" />
-                                <TextBlock
-                                    Margin="0,4,0,0"
-                                    HorizontalAlignment="Center"
-                                    FontSize="11"
-                                    Foreground="#8CFFFFFF"
-                                    Text="SCARA · 吸附晶圆" />
-                            </StackPanel>
-                            <StackPanel Margin="0,0,24,8">
-                                <controls:GcScaraRobot
-                                    Width="160"
-                                    Height="160"
-                                    ElbowAngle="-55"
-                                    HoldingWafer="False"
-                                    IsServoOn="False"
-                                    ShoulderAngle="25"
-                                    ToolTip="SCARA 释放晶圆 + 伺服下电" />
-                                <TextBlock
-                                    Margin="0,4,0,0"
-                                    HorizontalAlignment="Center"
-                                    FontSize="11"
-                                    Foreground="#8CFFFFFF"
-                                    Text="SCARA · 释放/伺服断电" />
-                            </StackPanel>
-                        </WrapPanel>
+                            <!-- 三个工位同底对齐：控件统一 Bottom，序号行固定在下方 -->
+                            <wafers:WaferRobot
+                                Grid.Row="0"
+                                Grid.Column="0"
+                                Width="104"
+                                Height="104"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Bottom"
+                                Arm1_1Angle="0"
+                                Arm1_2Angle="0"
+                                Arm1_3Angle="0"
+                                Arm2_1Angle="0"
+                                Arm2_2Angle="0"
+                                Arm2_3Angle="0"
+                                BaseAngle="0"
+                                ToolTip="Home 姿态：J1-J8 全0" />
+                            <TextBlock
+                                Grid.Row="1"
+                                Grid.Column="0"
+                                Margin="0,8,0,0"
+                                HorizontalAlignment="Center"
+                                FontSize="11"
+                                Foreground="#8CFFFFFF"
+                                Text="Wafer Robot · Home" />
+
+                            <controls:GcForwardRobot
+                                Grid.Row="0"
+                                Grid.Column="1"
+                                Width="170"
+                                Height="116"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Bottom"
+                                Pose="X1Align1"
+                                X1HasWafer="True"
+                                ToolTip="X1 搬送至 1 号对齐位，双叉手夹持晶圆；右键浮出控制面板" />
+                            <TextBlock
+                                Grid.Row="1"
+                                Grid.Column="1"
+                                Margin="0,8,0,0"
+                                HorizontalAlignment="Center"
+                                FontSize="11"
+                                Foreground="#8CFFFFFF"
+                                Text="ForwardRobot · X1Align1 夹持" />
+
+                            <controls:GcForwardRobot
+                                Grid.Row="0"
+                                Grid.Column="2"
+                                Width="170"
+                                Height="116"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Bottom"
+                                HasWafer="True"
+                                Pose="X2Buffer"
+                                X2HasWafer="True"
+                                ToolTip="X2 搬送至缓存位，底座料仓有料；右键浮出控制面板" />
+                            <TextBlock
+                                Grid.Row="1"
+                                Grid.Column="2"
+                                Margin="0,8,0,0"
+                                HorizontalAlignment="Center"
+                                FontSize="11"
+                                Foreground="#8CFFFFFF"
+                                Text="ForwardRobot · X2Buffer 上料" />
+                        </Grid>
                     </controls:GcCard>
 
                     <controls:GcCard Header="阀门 / 泵 状态一览" Style="{StaticResource DemoCardStyle}">
@@ -1282,6 +1304,41 @@
                                     FontSize="11.5"
                                     Foreground="{DynamicResource GcTextSecondaryBrush}"
                                     Text="运行 / 停止 / 故障" />
+                            </StackPanel>
+                        </StackPanel>
+                    </controls:GcCard>
+
+                    <controls:GcCard Header="阀岛：汇流板等分阀位 · 点击阀位切换开关" Style="{StaticResource DemoCardStyle}">
+                        <StackPanel>
+                            <StackPanel Style="{StaticResource DemoRowStyle}">
+                                <TextBlock Style="{StaticResource SampleTagStyle}" Text="横向" />
+                                <controls:GcValveIsland
+                                    Width="330"
+                                    Height="60"
+                                    ValveCount="6"
+                                    SelectedIndex="0"
+                                    ToolTip="6 片阀位横向卡在一条汇流板上，点击任意阀位切换开关" />
+                                <TextBlock
+                                    Margin="18,0,0,0"
+                                    VerticalAlignment="Center"
+                                    FontSize="11.5"
+                                    Foreground="{DynamicResource GcTextSecondaryBrush}"
+                                    Text="大块=电磁线圈壳 · 圆点=状态灯 · 小按钮=手动应急 · 横槽=气路" />
+                            </StackPanel>
+                            <StackPanel Style="{StaticResource DemoRowStyle}">
+                                <TextBlock Style="{StaticResource SampleTagStyle}" Text="纵向" />
+                                <controls:GcValveIsland
+                                    Width="58"
+                                    Height="248"
+                                    Orientation="Vertical"
+                                    ValveCount="4"
+                                    ToolTip="Orientation=Vertical 时汇流板竖放，阀位自上而下等分" />
+                                <TextBlock
+                                    Margin="18,0,0,0"
+                                    VerticalAlignment="Center"
+                                    FontSize="11.5"
+                                    Foreground="{DynamicResource GcTextSecondaryBrush}"
+                                    Text="Orientation=Vertical · 最多 64 个阀位" />
                             </StackPanel>
                         </StackPanel>
                     </controls:GcCard>
