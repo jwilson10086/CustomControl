@@ -98,7 +98,7 @@
                                      HorizontalAlignment="Left"
                                      VerticalAlignment="Top"
                                      Height="368" />
-                </Canvas>==
+                </Canvas>
                 <controls:GcSeparator Margin="0,12,0,12" />
                 <WrapPanel>
                     <controls:GcPanel CornerRadius="8"
